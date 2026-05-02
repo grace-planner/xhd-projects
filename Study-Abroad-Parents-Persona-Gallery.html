@@ -1249,6 +1249,11 @@ function submitForm() {
     return;
   }
 
+  if (!/^1[3-9]\d{9}$/.test(phone)) {
+    alert('请输入正确的手机号码');
+    return;
+  }
+
   userName = name;
   const btn = document.getElementById('btn-submit');
   btn.disabled = true;
@@ -1262,7 +1267,7 @@ function submitForm() {
     电话: phone,
     孩子年级: grade || '未填写',
     人格类型: p.emoji + ' ' + p.name,
-    提交时间: now,
+    提交时间: Date.now(),
     跟进状态: '未联系'
   };
 
