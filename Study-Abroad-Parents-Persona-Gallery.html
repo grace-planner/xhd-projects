@@ -1479,13 +1479,23 @@ function submitForm() {
   const p = PERSONALITIES[resultKey];
   const now = new Date().toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' });
 
+  const getAnswerText = (qId) => {
+    const q = document.querySelector(`#${qId} .option.selected .option-text`);
+    return q ? q.textContent.trim() : '未作答';
+  };
+
   const payload = {
     姓名: name,
     电话: phone,
     孩子年级: grade || '未填写',
     人格类型: p.emoji + ' ' + p.name,
     提交时间: (()=>{ const d = new Date(new Date().toLocaleString('en-US', {timeZone:'Asia/Shanghai'})); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); })(),
-    跟进状态: '未联系'
+    跟进状态: '未联系',
+    回国意愿: getAnswerText('q14'),
+    国际形势态度: getAnswerText('q6'),
+    出国驱动力: getAnswerText('q16'),
+    预算态度: getAnswerText('q4'),
+    孩子主导权: getAnswerText('q5')
   };
 
   fetch(FEISHU_WEBHOOK, {
