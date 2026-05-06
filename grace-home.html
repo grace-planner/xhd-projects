@@ -131,6 +131,17 @@ footer{padding:28px 10vw;border-top:1px solid var(--ink-10);display:flex;align-i
 @keyframes fadeUp{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);}}
 @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
 
+.footer-share-group{display:flex;align-items:center;gap:12px;}
+.footer-share-group .share-text-label{font-size:13px;color:var(--ink-60);}
+
+/* SHARE BAR */
+.share-bar{padding:16px 10vw;border-top:1px solid var(--ink-10);display:flex;align-items:center;justify-content:space-between;gap:16px;background:var(--bg-warm);}
+.share-bar-text{font-size:13px;color:var(--ink-60);}
+.share-bar-text strong{color:var(--ink);}
+.share-bar-btns{display:flex;gap:8px;flex-shrink:0;}
+.share-bar-btn{background:var(--white);color:var(--ink-60);border:1px solid var(--ink-10);border-radius:4px;padding:7px 16px;font-size:12px;font-family:'Outfit',sans-serif;cursor:pointer;transition:all 0.2s;}
+.share-bar-btn:hover{border-color:var(--ink);color:var(--ink);}
+
 /* MOBILE */
 @media(max-width:768px){
   nav{padding:16px 20px;}
@@ -149,6 +160,8 @@ footer{padding:28px 10vw;border-top:1px solid var(--ink-10);display:flex;align-i
   .svc-tag span{writing-mode:initial;}
   .test-inner{grid-template-columns:1fr;gap:28px;}
   footer{flex-direction:column;gap:8px;text-align:center;}
+  .share-bar{flex-direction:column;text-align:center;padding:16px 24px;}
+  .footer-share-group span:first-child{display:none;}
 }
 </style>
 </head>
@@ -169,7 +182,7 @@ footer{padding:28px 10vw;border-top:1px solid var(--ink-10);display:flex;align-i
     <div class="hero-eyebrow">国际升学规划师</div>
     <h1 class="hero-name">Grace</h1>
     <p class="hero-title"><span style="color:var(--gold);">龚丽莎</span> · 新航道成都学校</p>
-    <p class="hero-tagline">专注雅思托福 / IB / A-Level / AP 课程规划<br>帮孩子找到最适合的国际教育路径</p>
+    <p class="hero-tagline">8年咨询经验<br>陪伴超过1600位学生走过国际课程之路<br>专注雅思托福 / IB / A-Level / AP 课程规划<br>帮孩子找到最适合的国际教育路径</p>
     <div class="hero-actions">
       <button class="btn-ink" onclick="copyWechat()">📱 复制微信联系我</button>
       <a class="btn-outline" href="#test">🧬 测测你是哪种家长</a>
@@ -320,11 +333,23 @@ footer{padding:28px 10vw;border-top:1px solid var(--ink-10);display:flex;align-i
 </section>
 
 <footer>
-  <span class="footer-logo">Grace</span>
+  <span class="footer-share-group">
+    <span style="font-size:13px;color:var(--ink-60);">觉得有用？<strong style="color:var(--ink);">分享给有需要的家长</strong></span>
+    <button onclick="shareWechat()" class="share-bar-btn">💬 分享到微信</button>
+  </span>
   <span>© 2026 · 国际升学规划师 · 新航道成都</span>
 </footer>
 
 <script>
+function shareWechat(){
+  const u='https://grace-planner.github.io/xhd-projects/grace-home.html';
+  navigator.clipboard.writeText(u).then(()=>{
+    document.getElementById('copy-tip').textContent='✓ 链接已复制，打开微信粘贴即可分享';
+    setTimeout(()=>document.getElementById('copy-tip').textContent='',4000);
+  }).catch(()=>{
+    document.getElementById('copy-tip').textContent='链接：'+u;
+  });
+}
 function copyWechat(){
   navigator.clipboard.writeText('18512820890').then(()=>{
     document.getElementById('copy-tip').textContent='✓ 已复制：18512820890 — 打开微信搜索添加即可';
