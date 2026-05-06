@@ -1,0 +1,63 @@
+<svg width="600" height="600" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&amp;family=Outfit:wght@300;400;500&amp;display=swap');
+    </style>
+  </defs>
+
+  <!-- Background: --bg #F8F6F0 -->
+  <rect width="600" height="600" fill="#F8F6F0"/>
+
+  <!-- Right panel: --bg-warm #F2EDE4 -->
+  <rect x="380" y="0" width="220" height="600" fill="#F2EDE4"/>
+
+  <!-- Top + bottom gold bars -->
+  <rect x="0" y="0" width="600" height="3" fill="#9E7D45"/>
+  <rect x="0" y="597" width="600" height="3" fill="#9E7D45"/>
+
+  <!-- Left vertical line: --sage -->
+  <rect x="56" y="140" width="1.5" height="300" fill="#3D6B48" opacity="0.3"/>
+
+  <!-- Eyebrow -->
+  <text x="70" y="158" font-family="Outfit, sans-serif" font-size="11" font-weight="400" fill="#3D6B48" letter-spacing="3">新航道成都学校</text>
+
+  <!-- Grace name -->
+  <text x="68" y="258" font-family="Cormorant Garamond, Georgia, serif" font-size="88" font-weight="300" fill="#1C1C1A" letter-spacing="-1">Grace</text>
+
+  <!-- Chinese name italic gold -->
+  <text x="72" y="298" font-family="Cormorant Garamond, Georgia, serif" font-size="22" font-style="italic" fill="#9E7D45" letter-spacing="6">龚丽莎</text>
+
+  <!-- Divider -->
+  <rect x="72" y="318" width="36" height="1" fill="#BCBCB8"/>
+
+  <!-- Title -->
+  <text x="72" y="348" font-family="Outfit, sans-serif" font-size="14" font-weight="300" fill="#7A7A76" letter-spacing="3">国际升学规划师</text>
+
+  <!-- Stat card 1 -->
+  <rect x="390" y="140" width="170" height="80" rx="8" fill="#FFFFFF" fill-opacity="0.7"/>
+  <text x="455" y="192" font-family="Cormorant Garamond, Georgia, serif" font-size="42" font-weight="400" fill="#9E7D45">8</text>
+  <text x="479" y="192" font-family="Cormorant Garamond, Georgia, serif" font-size="18" fill="#9E7D45">年</text>
+  <text x="475" y="210" font-family="Outfit, sans-serif" font-size="11" font-weight="300" fill="#7A7A76" text-anchor="middle" letter-spacing="1">从业经验</text>
+
+  <!-- Stat card 2 -->
+  <rect x="390" y="238" width="170" height="80" rx="8" fill="#FFFFFF" fill-opacity="0.7"/>
+  <text x="420" y="290" font-family="Cormorant Garamond, Georgia, serif" font-size="42" font-weight="400" fill="#9E7D45">1600</text>
+  <text x="510" y="284" font-family="Cormorant Garamond, Georgia, serif" font-size="18" fill="#9E7D45">+</text>
+  <text x="475" y="308" font-family="Outfit, sans-serif" font-size="11" font-weight="300" fill="#7A7A76" text-anchor="middle" letter-spacing="1">服务学生</text>
+
+  <!-- Stat card 3 -->
+  <rect x="390" y="336" width="170" height="80" rx="8" fill="#FFFFFF" fill-opacity="0.7"/>
+  <text x="425" y="388" font-family="Cormorant Garamond, Georgia, serif" font-size="42" font-weight="400" fill="#9E7D45">200</text>
+  <text x="500" y="382" font-family="Cormorant Garamond, Georgia, serif" font-size="18" fill="#9E7D45">+</text>
+  <text x="475" y="406" font-family="Outfit, sans-serif" font-size="11" font-weight="300" fill="#7A7A76" text-anchor="middle" letter-spacing="1">年均规划学生</text>
+
+  <!-- Course pill -->
+  <rect x="72" y="390" width="270" height="28" rx="14" fill="#EBF1ED"/>
+  <text x="207" y="408" font-family="Outfit, sans-serif" font-size="12" font-weight="300" fill="#3D6B48" text-anchor="middle" letter-spacing="1">雅思 · 托福 · IB · A-Level · AP</text>
+
+  <!-- Tagline -->
+  <text x="72" y="450" font-family="Cormorant Garamond, Georgia, serif" font-size="15" font-style="italic" fill="#7A7A76">帮孩子找到最适合的国际教育路径</text>
+
+  <!-- URL -->
+  <text x="72" y="560" font-family="Outfit, sans-serif" font-size="11" font-weight="300" fill="#BCBCB8" letter-spacing="0.5">grace-planner.github.io/xhd-projects/grace-home</text>
+</svg>
