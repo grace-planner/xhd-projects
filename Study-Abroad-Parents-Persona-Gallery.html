@@ -716,9 +716,37 @@ body::before {
   0%, 60%, 100% { transform: translateY(0); }
   30% { transform: translateY(-8px); }
 }
+
+/* ─── BACK BUTTON ─── */
+.back-home {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 999;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: rgba(201,168,76,0.12);
+  border: 1px solid rgba(201,168,76,0.3);
+  border-radius: 50px;
+  color: var(--gold);
+  font-size: 13px;
+  font-family: 'Noto Sans SC', sans-serif;
+  text-decoration: none;
+  transition: background 0.2s, border-color 0.2s;
+}
+.back-home:hover {
+  background: rgba(201,168,76,0.22);
+  border-color: rgba(201,168,76,0.6);
+}
 </style>
 </head>
 <body>
+
+<a class="back-home" href="https://grace-planner.github.io/xhd-projects/grace-home.html">
+  ← 返回主页
+</a>
 
 <!-- ══════════════════════════════════════
      SCREEN 1: INTRO
