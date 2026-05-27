@@ -39,7 +39,7 @@ html,body{height:100%;background:var(--bg);font-family:-apple-system,'PingFang S
 }
 .hd-back:active{background:rgba(255,255,255,.2)}
 .hd-back::before{content:'←';font-size:14px}
-.hd-sub{padding-bottom:28px !important}
+.hd-sub{padding-bottom:16px !important}
 .hd-row{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
 .hd-title{font-size:22px;font-weight:700;letter-spacing:-.5px;line-height:1.2}
 .hd-phone{font-size:13px;color:rgba(255,255,255,.45);font-weight:400}
@@ -453,7 +453,7 @@ function renderList() {
     const name=rv(f['姓名'])||'（无姓名）';
     const phone=rv(f['号码/微信'])||'—';
     const intent=rv(f['意向'])||'';
-    const dateMs=f['下次跟进日期']||f['分配时间'];
+    const dateMs=curCat==='month'?f['分配时间']:(f['下次跟进日期']||f['分配时间']);
     const dateTxt=dateMs?fmtDate(dateMs):'';
     const badge=intent?`<div class="rb" style="background:${iColor(intent)}">${esc(intent)}</div>`:'';
     return `<div class="ri" onclick="openRecord(${idx})">
