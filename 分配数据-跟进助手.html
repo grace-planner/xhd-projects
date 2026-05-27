@@ -170,7 +170,7 @@ input[type=date].fi{color:var(--text)}
 /* ════ 保存栏 ════ */
 .savebar{
   position:fixed;bottom:0;left:0;right:0;
-  padding:12px 16px;padding-bottom:calc(env(safe-area-inset-bottom)+12px);
+  padding:12px 16px;padding-bottom:calc(env(safe-area-inset-bottom)+20px);
   background:rgba(240,244,248,.92);backdrop-filter:blur(16px);
   border-top:1px solid var(--border);z-index:100
 }
@@ -194,6 +194,18 @@ input[type=date].fi{color:var(--text)}
   opacity:0;transition:all .2s;pointer-events:none;white-space:nowrap;z-index:999
 }
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.fi-select{
+  flex:1;height:42px;border:1.5px solid var(--border);border-radius:12px;
+  background:#FAFBFD;font-size:14px;color:var(--text);font-family:inherit;
+  padding:0 12px;outline:none;appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2364748B' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;
+}
+.fi-date-input{
+  flex:1;height:42px;border:1.5px solid var(--border);border-radius:12px;
+  background:#FAFBFD;font-size:14px;color:var(--text);font-family:inherit;
+  padding:0 12px;outline:none;
+}
 </style>
 </head>
 <body>
@@ -228,6 +240,25 @@ input[type=date].fi{color:var(--text)}
         <div class="cat-icon-wrap" style="background:#8B5CF6">📋</div>
         <div class="cat-label">本月分配</div>
         <div class="cat-desc">分配时间在本月</div>
+      </button>
+      <button class="cat-btn" onclick="loadList('today_assigned')">
+        <div class="cat-icon-wrap" style="background:#F59E0B">🆕</div>
+        <div class="cat-label">今日分配</div>
+        <div class="cat-desc">分配时间 = 今天</div>
+      </button>
+      <button class="cat-btn" onclick="loadList('strong_intent')">
+        <div class="cat-icon-wrap" style="background:#EF4444">🔥</div>
+        <div class="cat-label">近日强意向</div>
+        <div class="cat-desc">意向A/B · 本周跟进</div>
+      </button>
+      <button class="cat-btn" onclick="showScreen('s-filter')" style="grid-column:1/-1">
+        <div style="display:flex;align-items:center;gap:12px">
+          <div class="cat-icon-wrap" style="background:#06B6D4;margin-bottom:0">🔍</div>
+          <div>
+            <div class="cat-label">自定义筛选</div>
+            <div class="cat-desc">自由组合条件查询线索</div>
+          </div>
+        </div>
       </button>
     </div>
   </div>
@@ -368,6 +399,105 @@ input[type=date].fi{color:var(--text)}
   </div>
 </div>
 
+
+<!-- ═══ 自定义筛选页 ═══ -->
+<div id="s-filter" class="screen">
+  <div class="hd hd-sub">
+    <button class="hd-back" onclick="goHome()">返回</button>
+    <div class="hd-row">
+      <div class="hd-title">自定义筛选</div>
+    </div>
+  </div>
+  <div class="ctd" style="padding-bottom:100px">
+
+    <!-- 意向 -->
+    <div class="card">
+      <div class="cl">意向等级</div>
+      <div style="padding:10px 13px 14px">
+        <div class="ig">
+          <button class="ib" data-field="意向" data-fv="A" onclick="toggleMulti(this,'fi-intent')">A</button>
+          <button class="ib" data-field="意向" data-fv="B" onclick="toggleMulti(this,'fi-intent')">B</button>
+          <button class="ib" data-field="意向" data-fv="C" onclick="toggleMulti(this,'fi-intent')">C</button>
+          <button class="ib" data-field="意向" data-fv="D" onclick="toggleMulti(this,'fi-intent')">D</button>
+          <button class="ib" data-field="意向" data-fv="E" onclick="toggleMulti(this,'fi-intent')">E</button>
+          <button class="ib" data-field="意向" data-fv="F" onclick="toggleMulti(this,'fi-intent')">F</button>
+          <button class="ib" data-field="意向" data-fv="G" onclick="toggleMulti(this,'fi-intent')">G</button>
+          <button class="ib" data-field="意向" data-fv="已报名" onclick="toggleMulti(this,'fi-intent')">报名</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 客群 -->
+    <div class="card">
+      <div class="cl">客群</div>
+      <div style="padding:12px 13px 14px;display:flex;flex-wrap:wrap;gap:8px" id="fi-group">
+        <button class="ow-btn" data-field="客群" data-fv="小学生" onclick="toggleMulti(this,'fi-group')">小学生</button>
+        <button class="ow-btn" data-field="客群" data-fv="初中生" onclick="toggleMulti(this,'fi-group')">初中生</button>
+        <button class="ow-btn" data-field="客群" data-fv="高中生" onclick="toggleMulti(this,'fi-group')">高中生</button>
+        <button class="ow-btn" data-field="客群" data-fv="大学生" onclick="toggleMulti(this,'fi-group')">大学生</button>
+        <button class="ow-btn" data-field="客群" data-fv="成人" onclick="toggleMulti(this,'fi-group')">成人</button>
+      </div>
+    </div>
+
+    <!-- 下次跟进日期 -->
+    <div class="card">
+      <div class="cl">下次跟进日期</div>
+      <div style="padding:12px 16px 16px;display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:13px;color:var(--sub);flex-shrink:0;width:28px">从</span>
+          <input type="date" id="fi-date-from" class="fi-date-input" placeholder="开始日期">
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:13px;color:var(--sub);flex-shrink:0;width:28px">至</span>
+          <input type="date" id="fi-date-to" class="fi-date-input" placeholder="结束日期">
+        </div>
+      </div>
+    </div>
+
+    <!-- 分配时间 -->
+    <div class="card">
+      <div class="cl">分配时间</div>
+      <div style="padding:12px 16px 16px;display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:13px;color:var(--sub);flex-shrink:0;width:28px">从</span>
+          <input type="date" id="fi-assign-from" class="fi-date-input" placeholder="开始日期">
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:13px;color:var(--sub);flex-shrink:0;width:28px">至</span>
+          <input type="date" id="fi-assign-to" class="fi-date-input" placeholder="结束日期">
+        </div>
+      </div>
+    </div>
+
+    <!-- 是否自有/曾哥/他人 -->
+    <div class="card">
+      <div class="cl">是否自有/曾哥/他人</div>
+      <div style="padding:12px 13px 14px;display:flex;flex-wrap:wrap;gap:8px" id="fi-own">
+        <button class="ow-btn" data-field="是否自有/曾哥/他人" data-fv="是" onclick="toggleSingle(this,'fi-own')">自有</button>
+        <button class="ow-btn" data-field="是否自有/曾哥/他人" data-fv="否" onclick="toggleSingle(this,'fi-own')">否</button>
+        <button class="ow-btn" data-field="是否自有/曾哥/他人" data-fv="曾哥" onclick="toggleSingle(this,'fi-own')">曾哥</button>
+        <button class="ow-btn" data-field="是否自有/曾哥/他人" data-fv="他人" onclick="toggleSingle(this,'fi-own')">他人</button>
+      </div>
+    </div>
+
+    <!-- 留学报备 -->
+    <div class="card">
+      <div class="cl">留学报备</div>
+      <div style="padding:12px 13px 14px;display:flex;flex-wrap:wrap;gap:8px" id="fi-study">
+        <button class="ow-btn" data-field="留学报备" data-fv="是" onclick="toggleSingle(this,'fi-study')">是</button>
+        <button class="ow-btn" data-field="留学报备" data-fv="否" onclick="toggleSingle(this,'fi-study')">否</button>
+      </div>
+    </div>
+
+    <!-- 重置 -->
+    <button onclick="resetFilter()" style="width:100%;background:none;border:1.5px solid var(--border);border-radius:14px;padding:13px;font-size:15px;color:var(--sub);font-family:inherit;margin-top:4px;cursor:pointer">重置所有条件</button>
+
+  </div>
+  <div class="savebar">
+    <button class="savebtn" onclick="doCustomFilter()">查询线索</button>
+  </div>
+</div>
+
 <div id="toast" class="toast"></div>
 
 <script>
@@ -408,7 +538,7 @@ function iColor(v){
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
 function setRO(id,val){const e=document.getElementById(id);if(!e)return;e.textContent=val||'—';e.className='firo'+(val?'':' empty')}
 
-const CAT_NAMES={today:'今日待联系',week:'本周待联系',enrolled:'已报名客户',month:'本月分配'};
+const CAT_NAMES={today:'今日待联系',week:'本周待联系',enrolled:'已报名客户',month:'本月分配',today_assigned:'今日分配',strong_intent:'近日强意向',custom:'自定义筛选'};
 let listStore=[],curCat='';
 
 async function doSearch() {
@@ -559,6 +689,121 @@ let _tt;
 function toast(msg){const e=document.getElementById('toast');e.textContent=msg;e.classList.add('show');clearTimeout(_tt);_tt=setTimeout(()=>e.classList.remove('show'),2800);}
 
 document.getElementById('q').addEventListener('keydown',e=>{if(e.key==='Enter')doSearch();});
+
+// ═══ 自定义筛选逻辑 ═══
+// multiSel: 字段名 -> Set，单选字段 -> 字段名 -> 单个值
+const filterMulti = {}; // 多选字段（意向、客群）
+const filterSingle = {}; // 单选字段（日期、自有等）
+
+const intentColorMap = {A:'var(--iA)',B:'var(--iB)',C:'var(--iC)',D:'var(--iD)',E:'var(--iE)',F:'var(--iF)',G:'var(--iG)','已报名':'var(--ink)'};
+
+function toggleMulti(btn, groupId) {
+  const field = btn.dataset.field;
+  const v = btn.dataset.fv;
+  if(!filterMulti[field]) filterMulti[field] = new Set();
+  if(filterMulti[field].has(v)){
+    filterMulti[field].delete(v);
+    btn.classList.remove('sel');
+    btn.style.background = '';
+  } else {
+    filterMulti[field].add(v);
+    btn.classList.add('sel');
+    if(intentColorMap[v]) btn.style.background = intentColorMap[v];
+  }
+}
+
+function toggleSingle(btn, groupId) {
+  const field = btn.dataset.field;
+  const v = btn.dataset.fv;
+  // 取消选中同组其他按钮
+  document.querySelectorAll('#'+groupId+' .ow-btn').forEach(b=>b.classList.remove('sel'));
+  if(filterSingle[field] === v){
+    delete filterSingle[field];
+  } else {
+    filterSingle[field] = v;
+    btn.classList.add('sel');
+  }
+}
+
+function resetFilter() {
+  Object.keys(filterMulti).forEach(k=>filterMulti[k]=new Set());
+  Object.keys(filterSingle).forEach(k=>delete filterSingle[k]);
+  document.querySelectorAll('#s-filter .ow-btn, #s-filter .ib').forEach(b=>{
+    b.classList.remove('sel'); b.style.background='';
+  });
+  showToast('已重置');
+}
+
+async function doCustomFilter() {
+  const conditions = [];
+
+  // 多选字段（意向、客群）— 同字段内用 or
+  Object.entries(filterMulti).forEach(([field, vals])=>{
+    if(vals.size > 0){
+      [...vals].forEach(v => conditions.push({ field_name: field, operator:'contains', value:[v] }));
+    }
+  });
+
+  // 单选字段（选项类用 contains）
+  Object.entries(filterSingle).forEach(([field, v])=>{
+    if(v) conditions.push({ field_name: field, operator:'contains', value:[v] });
+  });
+
+  // 日期区间字段（从...至...，转为时间戳毫秒）
+  const dateRangeMap = [
+    { fromId:'fi-date-from', toId:'fi-date-to', field:'下次跟进日期' },
+    { fromId:'fi-assign-from', toId:'fi-assign-to', field:'分配时间' },
+  ];
+  dateRangeMap.forEach(({fromId, toId, field})=>{
+    const from = document.getElementById(fromId)?.value;
+    const to   = document.getElementById(toId)?.value;
+    if(from) conditions.push({ field_name: field, operator:'>=', value:[new Date(from).getTime()] });
+    if(to)   conditions.push({ field_name: field, operator:'<=', value:[new Date(to+'T23:59:59').getTime()] });
+  });
+
+  if(!conditions.length){ showToast('请至少选择一个筛选条件'); return; }
+
+  // 构建：多选同字段 or，跨字段 and
+  // 简化：直接把所有条件传给云函数，云函数用 and 连接
+  // 对于意向/客群多选，在云函数侧用 or 处理
+  const multiFields = Object.keys(filterMulti).filter(k=>filterMulti[k].size>0);
+  const singleConds = conditions.filter(c=>!multiFields.includes(c.field_name));
+  
+  let finalConditions = [...singleConds];
+  let conjunction = 'and';
+
+  // 如果只有一种多选字段且无单选，直接or
+  if(multiFields.length === 1 && singleConds.length === 0){
+    finalConditions = conditions;
+    conjunction = 'or';
+  } else if(multiFields.length > 0){
+    // 多选字段各自内部or，整体再and —— 交给云函数分批查询再合并
+    finalConditions = conditions;
+    conjunction = 'and';
+  }
+
+  curCat = 'custom';
+  document.getElementById('l-title').textContent = '自定义筛选';
+  document.getElementById('l-sub').textContent = '查询中…';
+  document.getElementById('list-content').innerHTML = '<div class="loading">加载中…</div>';
+  showScreen('s-list');
+
+  try {
+    const data = await proxyCall('custom', { filters: finalConditions, conjunction });
+    if(data.code!==0&&data.code!==undefined){
+      document.getElementById('l-sub').textContent='查询出错';
+      document.getElementById('list-content').innerHTML=`<div class="empty-state"><div class="ei">⚠️</div>错误：${esc(data.msg||'')}</div>`;
+      return;
+    }
+    listStore = data.data?.items || [];
+    document.getElementById('l-sub').textContent = `共 ${listStore.length} 条`;
+    renderList();
+  } catch(e){
+    document.getElementById('l-sub').textContent='加载失败';
+    document.getElementById('list-content').innerHTML=`<div class="empty-state"><div class="ei">⚠️</div>${esc(e.message)}</div>`;
+  }
+}
+
 </script>
 </body>
 </html>
