@@ -6,11 +6,13 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
 <title>跟进助手</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
-  --ink:#0D1B2E;--ink2:#1A2E47;
+  --ink:#1a0533;--ink2:#2d1b69;--ink-grad:linear-gradient(135deg,#1a0533 0%,#2d1b69 60%,#4c35a3 100%);
   --green:#00C173;--green-dk:#00A562;
   --bg:#F0F4F8;--card:#FFFFFF;
   --text:#0F172A;--sub:#64748B;--hint:#CBD5E1;
@@ -24,22 +26,39 @@ html,body{height:100%;background:var(--bg);font-family:-apple-system,'PingFang S
 
 /* ════ 顶部栏 ════ */
 .hd{
-  background:var(--ink);
+  background:var(--ink-grad);
   color:#fff;
   padding:16px 20px 28px;
   position:sticky;top:0;z-index:50;
+  overflow:hidden;
 }
+.hd::before{
+  content:'Grace';
+  position:absolute;
+  right:10px;bottom:10px;
+  font-family:'Great Vibes',cursive;
+  font-size:100px;font-weight:400;
+  color:rgba(255,255,255,.07);
+  letter-spacing:3px;
+  pointer-events:none;
+  user-select:none;
+  line-height:1;
+  white-space:nowrap;
+  z-index:0;
+}
+.hd>*{position:relative;z-index:1;}
 .hd-back{
-  display:inline-flex;align-items:center;gap:6px;
+  width:36px;height:36px;border-radius:50%;
   background:rgba(255,255,255,.12);border:none;
-  color:rgba(255,255,255,.85);font-size:13px;font-weight:500;
-  padding:7px 14px 7px 10px;border-radius:20px;
-  cursor:pointer;font-family:inherit;margin-bottom:16px;
-  letter-spacing:.1px
+  color:rgba(255,255,255,.9);font-size:18px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-family:inherit;flex-shrink:0;
+  transition:background .15s,transform .15s cubic-bezier(.34,1.56,.64,1)
 }
-.hd-back:active{background:rgba(255,255,255,.2)}
-.hd-back::before{content:'←';font-size:14px}
+.hd-back:active{background:rgba(255,255,255,.25);transform:scale(.9)}
 .hd-sub{padding-bottom:16px !important}
+.hd-row-sub{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.hd-row-sub .hd-info{flex:1;min-width:0}
 .hd-row{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
 .hd-title{font-size:22px;font-weight:700;letter-spacing:-.5px;line-height:1.2}
 .hd-phone{font-size:13px;color:rgba(255,255,255,.45);font-weight:400}
@@ -49,16 +68,18 @@ html,body{height:100%;background:var(--bg);font-family:-apple-system,'PingFang S
 .si{
   flex:1;background:rgba(255,255,255,.1);
   border:1.5px solid rgba(255,255,255,.14);border-radius:12px;
-  padding:11px 15px;color:#fff;font-size:15px;outline:none;font-family:inherit;
+  padding:11px 15px;color:#fff;font-size:15px;outline:none;font-family:inherit;letter-spacing:.2px;
   transition:border-color .15s
 }
 .si::placeholder{color:rgba(255,255,255,.3)}.si:focus{border-color:rgba(255,255,255,.35);background:rgba(255,255,255,.14)}
 .sb{
-  background:var(--green);border:none;border-radius:12px;
+  background:rgba(255,255,255,.2);border:1.5px solid rgba(255,255,255,.35);border-radius:12px;
   padding:0 20px;color:#fff;font-size:14px;font-weight:600;
-  cursor:pointer;font-family:inherit;letter-spacing:.2px
+  cursor:pointer;font-family:inherit;letter-spacing:.2px;
+  transition:transform .18s cubic-bezier(.34,1.56,.64,1),box-shadow .18s ease,background .15s;
 }
-.sb:active{background:var(--green-dk)}
+.sb:active{background:rgba(255,255,255,.3);transform:scale(.93);}
+.sb:hover{background:rgba(255,255,255,.25);box-shadow:0 4px 12px rgba(0,0,0,.2);}
 
 /* ════ 内容区 ════ */
 .ct{padding:12px 16px calc(env(safe-area-inset-bottom)+20px)}
@@ -70,25 +91,47 @@ html,body{height:100%;background:var(--bg);font-family:-apple-system,'PingFang S
   background:var(--card);border:none;border-radius:var(--radius);
   padding:16px;text-align:left;cursor:pointer;
   display:flex;flex-direction:column;gap:0;
-  box-shadow:var(--shadow);transition:transform .12s,box-shadow .12s
+  box-shadow:var(--shadow);
+  transition:transform .18s cubic-bezier(.34,1.56,.64,1),box-shadow .18s ease,background .15s ease;
+  -webkit-tap-highlight-color:transparent;
 }
-.cat-btn:active{transform:scale(.96);box-shadow:none}
+.cat-btn:active{
+  transform:scale(.94);
+  box-shadow:0 2px 8px rgba(13,27,46,.08);
+  background:#F8FAFF;
+}
+.cat-btn:hover{
+  transform:translateY(-2px);
+  box-shadow:0 4px 20px rgba(13,27,46,.12);
+}
 .cat-icon-wrap{
-  width:44px;height:44px;border-radius:12px;
+  width:48px;height:48px;border-radius:14px;
   display:flex;align-items:center;justify-content:center;
-  font-size:22px;margin-bottom:11px
+  font-size:24px;margin-bottom:12px;
+  transition:transform .2s cubic-bezier(.34,1.56,.64,1),box-shadow .2s ease;
+  box-shadow:0 2px 8px rgba(0,0,0,.15);
+}
+.cat-btn:active .cat-icon-wrap{
+  transform:scale(.88) rotate(-3deg);
+  box-shadow:0 1px 4px rgba(0,0,0,.1);
+}
+.cat-btn:hover .cat-icon-wrap{
+  transform:scale(1.08) rotate(2deg);
+  box-shadow:0 4px 14px rgba(0,0,0,.2);
 }
 .cat-label{font-size:15px;font-weight:700;color:var(--text);margin-bottom:3px}
-.cat-desc{font-size:11px;color:var(--sub);line-height:1.5}
+.cat-desc{font-size:11px;color:var(--sub);line-height:1.5;letter-spacing:.2px}
 
 /* ════ 列表项 ════ */
 .ri{
   background:var(--card);border-radius:var(--radius);
   padding:14px 16px;margin-bottom:10px;
   display:flex;align-items:center;gap:12px;cursor:pointer;
-  box-shadow:var(--shadow);transition:transform .1s
+  box-shadow:var(--shadow);
+  transition:transform .18s cubic-bezier(.34,1.56,.64,1),box-shadow .18s ease,background .12s;
 }
-.ri:active{transform:scale(.98);background:#FAFBFD}
+.ri:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(13,27,46,.1);}
+.ri:active{transform:scale(.97) translateX(2px);background:#F0F6FF;box-shadow:none;}
 .ri-left{flex:1;min-width:0}
 .rn{font-size:16px;font-weight:600;margin-bottom:3px;color:var(--text)}
 .rp{font-size:13px;color:var(--sub)}
@@ -117,9 +160,11 @@ html,body{height:100%;background:var(--bg);font-family:-apple-system,'PingFang S
 .ib{
   height:46px;border-radius:12px;border:1.5px solid var(--border);
   background:#FAFBFD;font-size:14px;font-weight:700;color:var(--sub);
-  cursor:pointer;font-family:inherit;transition:all .12s
+  cursor:pointer;font-family:inherit;
+  transition:transform .18s cubic-bezier(.34,1.56,.64,1),box-shadow .18s ease,background .12s,border-color .12s;
 }
-.ib:active{opacity:.75}
+.ib:active{transform:scale(.88);box-shadow:none;}
+.ib.sel{transform:scale(1.04);box-shadow:0 3px 10px rgba(0,0,0,.18);}
 .ib.sel{color:#fff;border-color:transparent;box-shadow:0 2px 8px rgba(0,0,0,.15)}
 .ib[data-v="A"].sel{background:var(--iA)}.ib[data-v="B"].sel{background:var(--iB)}
 .ib[data-v="C"].sel{background:var(--iC)}.ib[data-v="D"].sel{background:var(--iD)}
@@ -131,8 +176,11 @@ html,body{height:100%;background:var(--bg);font-family:-apple-system,'PingFang S
 .yn-btn{
   flex:1;height:42px;border-radius:12px;
   border:1.5px solid var(--border);background:#FAFBFD;
-  font-size:14px;font-weight:600;color:var(--sub);cursor:pointer;font-family:inherit
+  font-size:14px;font-weight:600;color:var(--sub);cursor:pointer;font-family:inherit;
+  transition:transform .18s cubic-bezier(.34,1.56,.64,1),box-shadow .18s ease,background .12s,border-color .12s;
 }
+.yn-btn:active{transform:scale(.90);}
+.yn-btn.sel-yes,.yn-btn.sel-no{transform:scale(1.04);box-shadow:0 3px 10px rgba(0,0,0,.12);}
 .yn-btn.sel-yes{background:#ECFDF5;border-color:#059669;color:#059669}
 .yn-btn.sel-no{background:#FEF2F2;border-color:#DC2626;color:#DC2626}
 .ow-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
@@ -140,10 +188,10 @@ html,body{height:100%;background:var(--bg);font-family:-apple-system,'PingFang S
   height:38px;padding:0 16px;border-radius:20px;
   border:1.5px solid var(--border);background:#FAFBFD;
   font-size:13px;font-weight:600;color:var(--sub);cursor:pointer;font-family:inherit;
-  transition:all .12s
+  transition:transform .18s cubic-bezier(.34,1.56,.64,1),box-shadow .18s ease,background .12s,border-color .12s;
 }
-.ow-btn:active{opacity:.75}
-.ow-btn.sel{background:#EFF6FF;border-color:#2563EB;color:#2563EB}
+.ow-btn:active{transform:scale(.88);box-shadow:none;}
+.ow-btn.sel{background:#EFF6FF;border-color:#2563EB;color:#2563EB;transform:scale(1.06);box-shadow:0 3px 10px rgba(37,99,235,.2);}
 
 /* 表单行 */
 .fr{padding:13px 16px;border-top:1px solid var(--border)}.fr:first-of-type{border-top:none}
@@ -175,12 +223,13 @@ input[type=date].fi{color:var(--text)}
   border-top:1px solid var(--border);z-index:100
 }
 .savebtn{
-  width:100%;background:var(--ink);color:#fff;border:none;
+  width:100%;background:var(--ink-grad);color:#fff;border:none;
   border-radius:14px;padding:15px;font-size:16px;font-weight:600;
   font-family:inherit;cursor:pointer;letter-spacing:.2px;
-  box-shadow:0 4px 16px rgba(13,27,46,.25)
+  box-shadow:0 4px 16px rgba(7,26,79,.35);
+  transition:transform .15s cubic-bezier(.34,1.56,.64,1),box-shadow .15s ease
 }
-.savebtn:active{background:var(--ink2)}.savebtn:disabled{background:var(--hint);box-shadow:none;cursor:not-allowed}
+.savebtn:active{transform:scale(.97);background:linear-gradient(135deg,#071D52 0%,#1153A8 60%,#1976D2 100%)}.savebtn:disabled{background:var(--hint);box-shadow:none;cursor:not-allowed}
 
 /* ════ 杂项 ════ */
 .empty-state{text-align:center;padding:60px 20px;color:var(--sub);font-size:14px}
@@ -213,7 +262,7 @@ input[type=date].fi{color:var(--text)}
 <!-- ═══ 首页 ═══ -->
 <div id="s-home" class="screen active">
   <div class="hd">
-    <div class="hd-row"><div class="hd-title">分配数据跟进</div></div>
+    <div class="hd-row"><div class="hd-title">🤖 跟进助手</div></div>
     <div class="sr">
       <input id="q" class="si" type="search" placeholder="搜索姓名或手机号…" autocomplete="off">
       <button class="sb" onclick="doSearch()">搜索</button>
@@ -267,10 +316,12 @@ input[type=date].fi{color:var(--text)}
 <!-- ═══ 列表页 ═══ -->
 <div id="s-list" class="screen">
   <div class="hd hd-sub">
-    <button class="hd-back" onclick="goHome()">返回</button>
-    <div class="hd-row">
-      <div id="l-title" class="hd-title">—</div>
-      <div id="l-sub" class="hd-phone">加载中…</div>
+    <div class="hd-row-sub">
+      <div class="hd-info">
+        <div id="l-title" class="hd-title">—</div>
+        <div id="l-sub" class="hd-phone">加载中…</div>
+      </div>
+      <button class="hd-back" onclick="goHome()">↩</button>
     </div>
   </div>
   <div class="ct" id="list-content"><div class="loading">加载中…</div></div>
@@ -279,10 +330,12 @@ input[type=date].fi{color:var(--text)}
 <!-- ═══ 详情页 ═══ -->
 <div id="s-detail" class="screen">
   <div class="hd hd-sub">
-    <button class="hd-back" onclick="goList()">返回列表</button>
-    <div class="hd-row">
-      <div id="d-name" class="hd-title">—</div>
-      <div id="d-phone" class="hd-phone">—</div>
+    <div class="hd-row-sub">
+      <div class="hd-info">
+        <div id="d-name" class="hd-title">—</div>
+        <div id="d-phone" class="hd-phone">—</div>
+      </div>
+      <button class="hd-back" onclick="goList()">↩</button>
     </div>
   </div>
   <div class="ctd">
@@ -403,9 +456,11 @@ input[type=date].fi{color:var(--text)}
 <!-- ═══ 自定义筛选页 ═══ -->
 <div id="s-filter" class="screen">
   <div class="hd hd-sub">
-    <button class="hd-back" onclick="goHome()">返回</button>
-    <div class="hd-row">
-      <div class="hd-title">自定义筛选</div>
+    <div class="hd-row-sub">
+      <div class="hd-info">
+        <div class="hd-title">自定义筛选</div>
+      </div>
+      <button class="hd-back" onclick="goHome()">↩</button>
     </div>
   </div>
   <div class="ctd" style="padding-bottom:100px">
