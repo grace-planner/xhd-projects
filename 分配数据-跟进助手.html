@@ -245,9 +245,10 @@ input[type=date].fi{color:var(--text)}
   transform:translateX(-50%) translateY(12px);
   background:rgba(13,27,46,.9);color:#fff;
   padding:10px 22px;border-radius:24px;font-size:14px;
-  opacity:0;transition:all .2s;pointer-events:none;white-space:nowrap;z-index:999
+  opacity:0;transition:all .2s;pointer-events:none;white-space:nowrap;z-index:999;
+  visibility:hidden;
 }
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);visibility:visible;}
 .fi-select{
   flex:1;height:42px;border:1.5px solid var(--border);border-radius:12px;
   background:#FAFBFD;font-size:14px;color:var(--text);font-family:inherit;
