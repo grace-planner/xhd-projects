@@ -3,64 +3,57 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>跟进助手</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
-  --navy:#0F1E35;--navy2:#1A2E4A;--green:#00B96B;--green2:#00A35E;
-  --bg:#EEF1F6;--card:#FFFFFF;--text:#111827;--muted:#6B7280;--border:#E5E8EE;--radius:14px;
-  --intent-A:#00B96B;--intent-B:#1677FF;--intent-C:#FA8C16;--intent-D:#722ED1;
-  --intent-E:#8C8C8C;--intent-F:#FF4D4F;--intent-G:#CF1322;--intent-已报名:#0F1E35;
+  --navy:#0F1E35;--green:#00B96B;--green2:#00A35E;
+  --bg:#EEF1F6;--card:#fff;--text:#111827;--muted:#6B7280;--border:#E5E8EE;--radius:14px;
+  --iA:#00B96B;--iB:#1677FF;--iC:#FA8C16;--iD:#722ED1;--iE:#8C8C8C;--iF:#FF4D4F;--iG:#CF1322;
 }
 html,body{height:100%;background:var(--bg);font-family:-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;color:var(--text)}
 .screen{display:none;min-height:100vh}.screen.active{display:block}
 .hd{background:var(--navy);color:#fff;padding:calc(env(safe-area-inset-top)+14px) 18px 16px;position:sticky;top:0;z-index:50}
-.hd-top{display:flex;align-items:center;gap:10px;margin-bottom:12px}
-.hd-back{background:none;border:none;color:rgba(255,255,255,.65);font-size:15px;padding:0;cursor:pointer;display:flex;align-items:center;gap:4px;font-family:inherit}
+.hd-back{background:none;border:none;color:rgba(255,255,255,.65);font-size:15px;padding:0 0 10px;cursor:pointer;font-family:inherit;display:block}
 .hd-title{font-size:19px;font-weight:700;letter-spacing:-.3px}
 .hd-sub{font-size:13px;color:rgba(255,255,255,.55);margin-top:2px}
-.search-row{display:flex;gap:8px}
-.search-input{flex:1;background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.18);border-radius:11px;padding:11px 14px;color:#fff;font-size:16px;outline:none;font-family:inherit}
-.search-input::placeholder{color:rgba(255,255,255,.35)}
-.search-input:focus{border-color:rgba(255,255,255,.4);background:rgba(255,255,255,.16)}
-.search-btn{background:var(--green);border:none;border-radius:11px;padding:0 18px;color:#fff;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap}
-.search-btn:active{background:var(--green2)}
-.content{padding:14px 14px calc(env(safe-area-inset-bottom)+14px)}
-.content-detail{padding:14px 14px calc(env(safe-area-inset-bottom)+80px)}
-.result-item{background:var(--card);border-radius:var(--radius);padding:13px 15px;margin-bottom:9px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;border:1.5px solid transparent}
-.result-item:active{background:#f5f7fa;border-color:var(--border)}
-.r-name{font-size:16px;font-weight:600;margin-bottom:3px}
-.r-phone{font-size:13px;color:var(--muted)}
-.r-badge{min-width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0}
+.sr{display:flex;gap:8px;margin-top:12px}
+.si{flex:1;background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.18);border-radius:11px;padding:11px 14px;color:#fff;font-size:16px;outline:none;font-family:inherit}
+.si::placeholder{color:rgba(255,255,255,.35)}.si:focus{border-color:rgba(255,255,255,.4)}
+.sb{background:var(--green);border:none;border-radius:11px;padding:0 18px;color:#fff;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit}
+.sb:active{background:var(--green2)}
+.ct{padding:14px 14px calc(env(safe-area-inset-bottom)+14px)}
+.ctd{padding:14px 14px calc(env(safe-area-inset-bottom)+82px)}
+.ri{background:var(--card);border-radius:var(--radius);padding:13px 15px;margin-bottom:9px;display:flex;align-items:center;justify-content:space-between;cursor:pointer}
+.ri:active{background:#f5f7fa}
+.rn{font-size:16px;font-weight:600;margin-bottom:3px}.rp{font-size:13px;color:var(--muted)}
+.rb{min-width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0}
 .card{background:var(--card);border-radius:var(--radius);margin-bottom:11px;overflow:hidden}
-.card-label{font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.6px;padding:13px 15px 0;text-transform:uppercase}
-.intent-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;padding:10px 12px 14px}
-.i-btn{height:44px;border-radius:10px;border:1.5px solid var(--border);background:#fff;font-size:14px;font-weight:700;color:var(--muted);cursor:pointer;transition:all .12s;font-family:inherit}
-.i-btn:active{opacity:.8}
-.i-full{grid-column:1/-1;height:44px}
-.i-btn.sel{color:#fff;border-color:transparent}
-.i-btn[data-v="A"].sel{background:var(--intent-A)}.i-btn[data-v="B"].sel{background:var(--intent-B)}
-.i-btn[data-v="C"].sel{background:var(--intent-C)}.i-btn[data-v="D"].sel{background:var(--intent-D)}
-.i-btn[data-v="E"].sel{background:var(--intent-E)}.i-btn[data-v="F"].sel{background:var(--intent-F)}
-.i-btn[data-v="G"].sel{background:var(--intent-G)}.i-btn[data-v="已报名"].sel{background:var(--intent-已报名)}
-.field-row{padding:11px 15px;border-top:1px solid var(--border)}
-.field-row:first-of-type{border-top:none}
+.cl{font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.6px;padding:13px 15px 0;text-transform:uppercase}
+.ig{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;padding:10px 12px 14px}
+.ib{height:44px;border-radius:10px;border:1.5px solid var(--border);background:#fff;font-size:14px;font-weight:700;color:var(--muted);cursor:pointer;font-family:inherit}
+.ib:active{opacity:.8}.ifw{grid-column:1/-1}
+.ib.sel{color:#fff;border-color:transparent}
+.ib[data-v="A"].sel{background:var(--iA)}.ib[data-v="B"].sel{background:var(--iB)}
+.ib[data-v="C"].sel{background:var(--iC)}.ib[data-v="D"].sel{background:var(--iD)}
+.ib[data-v="E"].sel{background:var(--iE)}.ib[data-v="F"].sel{background:var(--iF)}
+.ib[data-v="G"].sel{background:var(--iG)}.ib[data-v="已报名"].sel{background:var(--navy)}
+.fr{padding:11px 15px;border-top:1px solid var(--border)}.fr:first-of-type{border-top:none}
 .fl{font-size:12px;color:var(--muted);margin-bottom:5px}
 .fi{width:100%;border:none;outline:none;font-size:15px;font-family:inherit;color:var(--text);background:transparent;resize:none}
-.fi-ta{min-height:72px;line-height:1.55}
-.fi-ro{font-size:14px;color:#444;line-height:1.55}
-.fi-ro.empty{color:#bbb}
+.fita{min-height:72px;line-height:1.55}.firo{font-size:14px;color:#444;line-height:1.55}.firo.empty{color:#bbb}
 input[type=date].fi{color:var(--text)}
-.save-bar{position:fixed;bottom:0;left:0;right:0;padding:10px 14px;padding-bottom:calc(env(safe-area-inset-bottom)+10px);background:rgba(255,255,255,.95);backdrop-filter:blur(10px);border-top:1px solid var(--border);z-index:100}
-.save-btn{width:100%;background:var(--green);color:#fff;border:none;border-radius:12px;padding:14px;font-size:16px;font-weight:600;font-family:inherit;cursor:pointer}
-.save-btn:active{background:var(--green2)}.save-btn:disabled{background:#bbb;cursor:not-allowed}
-.loading,.empty-state{text-align:center;padding:60px 20px;color:var(--muted);font-size:14px}
-.empty-icon{font-size:40px;margin-bottom:10px}
+.savebar{position:fixed;bottom:0;left:0;right:0;padding:10px 14px;padding-bottom:calc(env(safe-area-inset-bottom)+10px);background:rgba(255,255,255,.95);backdrop-filter:blur(10px);border-top:1px solid var(--border);z-index:100}
+.savebtn{width:100%;background:var(--green);color:#fff;border:none;border-radius:12px;padding:14px;font-size:16px;font-weight:600;font-family:inherit;cursor:pointer}
+.savebtn:active{background:var(--green2)}.savebtn:disabled{background:#bbb;cursor:not-allowed}
+.empty-state{text-align:center;padding:60px 20px;color:var(--muted);font-size:14px}
+.ei{font-size:40px;margin-bottom:10px}
 .toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%) translateY(10px);background:rgba(15,30,53,.88);color:#fff;padding:9px 20px;border-radius:24px;font-size:14px;opacity:0;transition:all .25s;pointer-events:none;white-space:nowrap;z-index:999}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-.legend{background:var(--card);border-radius:var(--radius);padding:12px 15px;margin-bottom:11px;font-size:12px;color:var(--muted);line-height:1.8}
+.legend{background:var(--card);border-radius:var(--radius);padding:12px 15px;margin-bottom:11px;font-size:12px;color:var(--muted);line-height:1.9}
 .legend strong{font-weight:600;color:var(--text)}
 </style>
 </head>
@@ -69,68 +62,73 @@ input[type=date].fi{color:var(--text)}
 <!-- 搜索页 -->
 <div id="s-search" class="screen active">
   <div class="hd">
-    <div class="hd-top"><div class="hd-title">分配数据跟进</div></div>
-    <div class="search-row">
-      <input id="q" class="search-input" type="search" placeholder="输入手机号 或 客户姓名" autocomplete="off">
-      <button class="search-btn" onclick="search()">搜索</button>
+    <div class="hd-title">分配数据跟进</div>
+    <div class="sr">
+      <input id="q" class="si" type="search" placeholder="输入手机号 或 客户姓名" autocomplete="off">
+      <button class="sb" onclick="doSearch()">搜索</button>
     </div>
   </div>
-  <div class="content" id="results">
-    <div class="empty-state"><div class="empty-icon">📋</div>搜索客户查看跟进情况</div>
+  <div class="ct" id="results">
+    <div class="empty-state"><div class="ei">📋</div>搜索客户查看跟进情况</div>
   </div>
 </div>
 
 <!-- 详情页 -->
 <div id="s-detail" class="screen">
   <div class="hd">
-    <div class="hd-top"><button class="hd-back" onclick="goSearch()">← 返回</button></div>
+    <button class="hd-back" onclick="goSearch()">← 返回搜索</button>
     <div id="d-name" class="hd-title">—</div>
     <div id="d-phone" class="hd-sub">—</div>
   </div>
-  <div class="content-detail">
+  <div class="ctd">
+    <!-- 意向 -->
     <div class="card">
-      <div class="card-label">意向</div>
-      <div class="intent-grid">
-        <button class="i-btn" data-v="A" onclick="setIntent('A')">A</button>
-        <button class="i-btn" data-v="B" onclick="setIntent('B')">B</button>
-        <button class="i-btn" data-v="C" onclick="setIntent('C')">C</button>
-        <button class="i-btn" data-v="D" onclick="setIntent('D')">D</button>
-        <button class="i-btn" data-v="E" onclick="setIntent('E')">E</button>
-        <button class="i-btn" data-v="F" onclick="setIntent('F')">F</button>
-        <button class="i-btn" data-v="G" onclick="setIntent('G')">G</button>
-        <button class="i-btn i-full" data-v="已报名" onclick="setIntent('已报名')">✓ 已报名</button>
+      <div class="cl">意向</div>
+      <div class="ig">
+        <button class="ib" data-v="A" onclick="setIntent('A')">A</button>
+        <button class="ib" data-v="B" onclick="setIntent('B')">B</button>
+        <button class="ib" data-v="C" onclick="setIntent('C')">C</button>
+        <button class="ib" data-v="D" onclick="setIntent('D')">D</button>
+        <button class="ib" data-v="E" onclick="setIntent('E')">E</button>
+        <button class="ib" data-v="F" onclick="setIntent('F')">F</button>
+        <button class="ib" data-v="G" onclick="setIntent('G')">G</button>
+        <button class="ib ifw" data-v="已报名" onclick="setIntent('已报名')">✓ 已报名</button>
       </div>
     </div>
+    <!-- 通话记录 -->
     <div class="card">
-      <div class="field-row">
+      <div class="fr">
         <div class="fl">最新通话记录</div>
-        <textarea id="f-call" class="fi fi-ta" placeholder="记录本次通话内容…"></textarea>
+        <textarea id="f-call" class="fi fita" placeholder="记录本次通话内容…"></textarea>
       </div>
     </div>
+    <!-- 下次跟进 -->
     <div class="card">
-      <div class="field-row">
+      <div class="fr">
         <div class="fl">下次跟进日期</div>
         <input type="date" id="f-date" class="fi">
       </div>
-      <div class="field-row">
+      <div class="fr">
         <div class="fl">跟进目的</div>
         <input type="text" id="f-purpose" class="fi" placeholder="如：推进意向、确认报名…">
       </div>
     </div>
+    <!-- 只读信息 -->
     <div class="card">
-      <div class="field-row" style="border-top:none">
+      <div class="fr" style="border-top:none">
         <div class="fl">具体信息</div>
-        <div id="f-info" class="fi-ro empty">—</div>
+        <div id="f-info" class="firo empty">—</div>
       </div>
-      <div class="field-row">
-        <div class="fl">是否自有</div>
-        <div id="f-owner" class="fi-ro empty">—</div>
+      <div class="fr">
+        <div class="fl">是否自有/曾哥/他人</div>
+        <div id="f-owner" class="firo empty">—</div>
       </div>
-      <div class="field-row">
+      <div class="fr">
         <div class="fl">分配时间</div>
-        <div id="f-atime" class="fi-ro empty">—</div>
+        <div id="f-atime" class="firo empty">—</div>
       </div>
     </div>
+    <!-- 意向说明 -->
     <div class="legend">
       <strong>A</strong> 明确意向 &nbsp;·&nbsp; <strong>B</strong> 待确定 &nbsp;·&nbsp;
       <strong>C</strong> 低价值 &nbsp;·&nbsp; <strong>D</strong> 长期 &nbsp;·&nbsp;
@@ -138,102 +136,98 @@ input[type=date].fi{color:var(--text)}
       <strong>G</strong> 已流失
     </div>
   </div>
-  <div class="save-bar">
-    <button id="save-btn" class="save-btn" onclick="save()">保存更新</button>
+  <div class="savebar">
+    <button id="save-btn" class="savebtn" onclick="doSave()">保存更新</button>
   </div>
 </div>
 
 <div id="toast" class="toast"></div>
 
 <script>
-// ══════════════════════════════
-// 代理地址（所有飞书请求通过这里转发）
-// ══════════════════════════════
+// ══════════════════════════════════════
+// 代理地址（统一入口，用 action 区分操作）
+// ══════════════════════════════════════
 const PROXY = 'https://feishu-le-proxy-wyyuhgxhep.cn-hangzhou.fcapp.run';
 
-// ── 工具函数 ──
+async function proxyCall(action, params) {
+  const resp = await fetch(PROXY, {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({action, ...params}),
+  });
+  const outer = await resp.json();
+  // FC 返回 {statusCode, headers, body(字符串)}
+  return typeof outer.body === 'string' ? JSON.parse(outer.body) : outer;
+}
+
+// ── 工具 ──
 function rv(v) {
   if (v == null) return '';
   if (typeof v === 'string') return v;
-  if (typeof v === 'number') return v;
+  if (typeof v === 'number') return String(v);
   if (Array.isArray(v)) return v.map(i => i.text || '').join('');
   if (typeof v === 'object') return v.text || v.value || '';
   return String(v);
 }
-function msToDate(ms) {
+function msToDateInput(ms) {
   if (!ms) return '';
   const d = new Date(Number(ms));
-  if (isNaN(d)) return '';
-  return d.toISOString().slice(0, 10);
+  return isNaN(d) ? '' : d.toISOString().slice(0,10);
 }
 function fmtDate(ms) {
   if (!ms) return '';
   const d = new Date(Number(ms));
-  if (isNaN(d)) return '';
-  return d.toLocaleDateString('zh-CN', {year:'numeric',month:'long',day:'numeric'});
+  return isNaN(d) ? '' : d.toLocaleDateString('zh-CN',{year:'numeric',month:'long',day:'numeric'});
 }
-function intentColor(v) {
-  return ({A:'#00B96B',B:'#1677FF',C:'#FA8C16',D:'#722ED1',E:'#8C8C8C',F:'#FF4D4F',G:'#CF1322','已报名':'#0F1E35'})[v] || '#bbb';
+function iColor(v) {
+  return ({A:'#00B96B',B:'#1677FF',C:'#FA8C16',D:'#722ED1',E:'#8C8C8C',F:'#FF4D4F',G:'#CF1322','已报名':'#0F1E35'})[v]||'#bbb';
 }
-function esc(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-function setRO(id, val) {
-  const el = document.getElementById(id);
-  if (val) { el.textContent = val; el.className = 'fi-ro'; }
-  else     { el.textContent = '—'; el.className = 'fi-ro empty'; }
-}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function setRO(id,val){const e=document.getElementById(id);e.textContent=val||'—';e.className='firo'+(val?'':' empty')}
 
 // ── 搜索 ──
-let resultStore = [];
-async function search() {
+let store=[], cur=null, curIntent='';
+
+async function doSearch() {
   const q = document.getElementById('q').value.trim();
   if (!q) return;
   const el = document.getElementById('results');
-  el.innerHTML = '<div class="loading">搜索中…</div>';
+  el.innerHTML = '<div class="empty-state">搜索中…</div>';
   try {
-    const resp = await fetch(PROXY + '/search', {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({q}),
-    });
-    const outer = await resp.json();
-    // 代理返回的是 {statusCode, headers, body}，body 是字符串需要再解析
-    const data = typeof outer.body === 'string' ? JSON.parse(outer.body) : outer;
-    resultStore = data.data?.items || [];
-    if (resultStore.length === 0) {
-      el.innerHTML = `<div class="empty-state"><div class="empty-icon">😕</div>没有找到「${esc(q)}」</div>`;
+    const data = await proxyCall('search', {q});
+    store = data.data?.items || [];
+    if (!store.length) {
+      el.innerHTML = `<div class="empty-state"><div class="ei">😕</div>没有找到「${esc(q)}」</div>`;
       return;
     }
-    el.innerHTML = resultStore.map((item, idx) => {
+    el.innerHTML = store.map((item,idx) => {
       const f = item.fields;
-      const name   = rv(f['姓名']) || '（无姓名）';
-      const phone  = rv(f['号码/微信']) || '—';
+      const name  = rv(f['姓名']) || '（无姓名）';
+      const phone = rv(f['号码/微信']) || '—';
       const intent = rv(f['意向']) || '';
-      const badge  = intent
-        ? `<div class="r-badge" style="background:${intentColor(intent)}">${esc(intent)}</div>`
-        : `<div style="width:30px"></div>`;
-      return `<div class="result-item" onclick="openRecord(${idx})">
-        <div><div class="r-name">${esc(name)}</div><div class="r-phone">${esc(phone)}</div></div>
+      const badge = intent
+        ? `<div class="rb" style="background:${iColor(intent)}">${esc(intent)}</div>`
+        : '<div style="width:30px"></div>';
+      return `<div class="ri" onclick="openRecord(${idx})">
+        <div><div class="rn">${esc(name)}</div><div class="rp">${esc(phone)}</div></div>
         ${badge}
       </div>`;
     }).join('');
-  } catch (e) {
-    el.innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div>${esc(e.message)}</div>`;
+  } catch(e) {
+    el.innerHTML = `<div class="empty-state"><div class="ei">⚠️</div>${esc(e.message)}</div>`;
   }
 }
 
 // ── 打开详情 ──
-let cur = null, curIntent = '';
 function openRecord(idx) {
-  cur = resultStore[idx];
+  cur = store[idx];
   const f = cur.fields;
   document.getElementById('d-name').textContent  = rv(f['姓名']) || '（无姓名）';
   document.getElementById('d-phone').textContent = rv(f['号码/微信']) || '—';
   curIntent = rv(f['意向']) || '';
   renderIntent();
   document.getElementById('f-call').value    = rv(f['最新通话记录']) || '';
-  document.getElementById('f-date').value    = msToDate(f['下次跟进日期']);
+  document.getElementById('f-date').value    = msToDateInput(f['下次跟进日期']);
   document.getElementById('f-purpose').value = rv(f['下次跟进目的']) || '';
   setRO('f-info',  rv(f['具体信息']));
   setRO('f-owner', rv(f['是否自有/曾哥/他人']));
@@ -241,66 +235,41 @@ function openRecord(idx) {
   showScreen('s-detail');
 }
 
-// ── 意向按钮 ──
-function setIntent(v) { curIntent = (curIntent === v) ? '' : v; renderIntent(); }
-function renderIntent() {
-  document.querySelectorAll('.i-btn').forEach(btn => {
-    btn.classList.toggle('sel', btn.dataset.v === curIntent);
-  });
-}
+// ── 意向 ──
+function setIntent(v){curIntent=(curIntent===v)?'':v;renderIntent();}
+function renderIntent(){document.querySelectorAll('.ib').forEach(b=>b.classList.toggle('sel',b.dataset.v===curIntent));}
 
 // ── 保存 ──
-async function save() {
+async function doSave() {
   if (!cur) return;
   const btn = document.getElementById('save-btn');
-  btn.disabled = true; btn.textContent = '保存中…';
+  btn.disabled=true; btn.textContent='保存中…';
   try {
     const fields = {};
     if (curIntent) fields['意向'] = curIntent;
     const call = document.getElementById('f-call').value.trim();
     if (call) fields['最新通话记录'] = call;
-    const dateVal = document.getElementById('f-date').value;
-    if (dateVal) fields['下次跟进日期'] = new Date(dateVal + 'T15:59:00.000Z').getTime();
-    const purpose = document.getElementById('f-purpose').value.trim();
-    if (purpose) fields['下次跟进目的'] = purpose;
-    if (Object.keys(fields).length === 0) { toast('没有需要保存的变更'); btn.disabled=false; btn.textContent='保存更新'; return; }
-
-    const resp = await fetch(PROXY + '/record/' + cur.record_id, {
-      method: 'PUT',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({fields}),
-    });
-    const outer = await resp.json();
-    const data = typeof outer.body === 'string' ? JSON.parse(outer.body) : outer;
-    if (data.code === 0) {
-      toast('✅ 已保存');
-      Object.assign(cur.fields, fields);
-    } else {
-      toast('保存失败：' + (data.msg || JSON.stringify(data)));
-    }
-  } catch (e) {
-    toast('错误：' + e.message);
-  }
-  btn.disabled = false; btn.textContent = '保存更新';
+    const dv = document.getElementById('f-date').value;
+    if (dv) fields['下次跟进日期'] = new Date(dv+'T15:59:00.000Z').getTime();
+    const pu = document.getElementById('f-purpose').value.trim();
+    if (pu) fields['下次跟进目的'] = pu;
+    if (!Object.keys(fields).length){toast('没有需要保存的变更');btn.disabled=false;btn.textContent='保存更新';return;}
+    const data = await proxyCall('update', {recordId: cur.record_id, fields});
+    if (data.code===0){toast('✅ 已保存');Object.assign(cur.fields,fields);}
+    else toast('保存失败：'+(data.msg||JSON.stringify(data)));
+  } catch(e){toast('错误：'+e.message);}
+  btn.disabled=false; btn.textContent='保存更新';
 }
 
 // ── 导航 ──
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  window.scrollTo(0, 0);
-}
-function goSearch() { showScreen('s-search'); }
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo(0,0);}
+function goSearch(){showScreen('s-search');}
 
 // ── Toast ──
 let _tt;
-function toast(msg) {
-  const el = document.getElementById('toast');
-  el.textContent = msg; el.classList.add('show');
-  clearTimeout(_tt); _tt = setTimeout(() => el.classList.remove('show'), 2800);
-}
+function toast(msg){const e=document.getElementById('toast');e.textContent=msg;e.classList.add('show');clearTimeout(_tt);_tt=setTimeout(()=>e.classList.remove('show'),2800);}
 
-document.getElementById('q').addEventListener('keydown', e => { if (e.key==='Enter') search(); });
+document.getElementById('q').addEventListener('keydown',e=>{if(e.key==='Enter')doSearch();});
 </script>
 </body>
 </html>
