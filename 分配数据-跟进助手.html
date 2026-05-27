@@ -400,7 +400,6 @@ function openRecord(idx) {
   curYN = rv(f['留学报备']) || '';  renderYN();
   curOwner = rv(f['是否自有/曾哥/他人']) || '';  renderOwner();
   setRO('f-info',  rv(f['具体信息']));
-  setRO('f-owner', rv(f['是否自有/曾哥/他人']));
   setRO('f-atime', fmtDate(f['分配时间']));
   showScreen('s-detail');
 }
