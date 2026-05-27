@@ -154,6 +154,19 @@ input[type=date].fi{color:var(--text)}
     <div id="d-phone" class="hd-sub">—</div>
   </div>
   <div class="ctd">
+    <!-- 基本信息（可编辑）-->
+    <div class="card">
+      <div class="fr" style="border-top:none">
+        <div class="fl">姓名</div>
+        <input type="text" id="f-name" class="fi" placeholder="客户姓名…">
+      </div>
+      <div class="fr">
+        <div class="fl">号码/微信</div>
+        <input type="text" id="f-phone" class="fi" placeholder="手机号或微信号…">
+      </div>
+    </div>
+
+    <!-- 意向 -->
     <div class="card">
       <div class="cl">意向</div>
       <div class="ig">
@@ -164,9 +177,26 @@ input[type=date].fi{color:var(--text)}
         <button class="ib" data-v="E" onclick="setIntent('E')">E</button>
         <button class="ib" data-v="F" onclick="setIntent('F')">F</button>
         <button class="ib" data-v="G" onclick="setIntent('G')">G</button>
-        <button class="ib ifw" data-v="已报名" onclick="setIntent('已报名')">✓ 已报名</button>
+        <button class="ib" data-v="已报名" onclick="setIntent('已报名')" style="font-size:12px">✓已报名</button>
       </div>
     </div>
+
+    <!-- 只读信息 -->
+    <div class="card">
+      <div class="fr" style="border-top:none">
+        <div class="fl">具体信息</div>
+        <div id="f-info" class="firo empty">—</div>
+      </div>
+      <div class="fr">
+        <div class="fl">是否自有/曾哥/他人</div>
+        <div id="f-owner" class="firo empty">—</div>
+      </div>
+      <div class="fr">
+        <div class="fl">分配时间</div>
+        <div id="f-atime" class="firo empty">—</div>
+      </div>
+    </div>
+
     <div class="card">
       <div class="fr">
         <div class="fl">最新通话记录</div>
@@ -200,20 +230,6 @@ input[type=date].fi{color:var(--text)}
           <button class="yn-btn" id="yn-yes" onclick="setYN('是')">是</button>
           <button class="yn-btn" id="yn-no"  onclick="setYN('否')">否</button>
         </div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="fr" style="border-top:none">
-        <div class="fl">具体信息</div>
-        <div id="f-info" class="firo empty">—</div>
-      </div>
-      <div class="fr">
-        <div class="fl">是否自有/曾哥/他人</div>
-        <div id="f-owner" class="firo empty">—</div>
-      </div>
-      <div class="fr">
-        <div class="fl">分配时间</div>
-        <div id="f-atime" class="firo empty">—</div>
       </div>
     </div>
     <div class="legend">
@@ -308,6 +324,13 @@ async function loadList(cat) {
   showScreen('s-list');
   try {
     const data = await proxyCall(cat);
+    // 飞书 API 报错时显示详情（用于调试）
+    if (data.code !== 0 && data.code !== undefined) {
+      document.getElementById('l-sub').textContent = '查询出错';
+      document.getElementById('list-content').innerHTML =
+        `<div class="empty-state"><div class="ei">⚠️</div>飞书错误 ${data.code}：${data.msg || ''}<br><small style="word-break:break-all">${esc(JSON.stringify(data))}</small></div>`;
+      return;
+    }
     listStore = data.data?.items || [];
     document.getElementById('l-sub').textContent = `共 ${listStore.length} 条`;
     renderList();
@@ -352,8 +375,12 @@ let cur = null, curIntent = '', curYN = '';
 function openRecord(idx) {
   cur = listStore[idx];
   const f = cur.fields;
-  document.getElementById('d-name').textContent  = rv(f['姓名']) || '（无姓名）';
-  document.getElementById('d-phone').textContent = rv(f['号码/微信']) || '—';
+  const name  = rv(f['姓名']) || '';
+  const phone = rv(f['号码/微信']) || '';
+  document.getElementById('d-name').textContent  = name  || '（无姓名）';
+  document.getElementById('d-phone').textContent = phone || '—';
+  document.getElementById('f-name').value  = name;
+  document.getElementById('f-phone').value = phone;
   curIntent = rv(f['意向']) || '';  renderIntent();
   document.getElementById('f-call').value         = rv(f['最新通话记录']) || '';
   document.getElementById('f-date').value         = msToDateInput(f['下次跟进日期']);
@@ -382,6 +409,10 @@ async function doSave() {
   btn.disabled=true; btn.textContent='保存中…';
   try {
     const fields = {};
+    const name = document.getElementById('f-name').value.trim();
+    if (name) fields['姓名'] = name;
+    const phone = document.getElementById('f-phone').value.trim();
+    if (phone) fields['号码/微信'] = phone;
     if (curIntent) fields['意向'] = curIntent;
     const call = document.getElementById('f-call').value.trim();
     if (call) fields['最新通话记录'] = call;
