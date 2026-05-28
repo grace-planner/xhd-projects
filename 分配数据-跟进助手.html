@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
-<title>跟进助手</title>
+<title>寻迹</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
@@ -260,14 +260,76 @@ input[type=date].fi{color:var(--text)}
   background:#FAFBFD;font-size:14px;color:var(--text);font-family:inherit;
   padding:0 12px;outline:none;
 }
+
+/* ════ 主入口按钮 ════ */
+.main-entry-btn{
+  width:100%;background:var(--card);border:none;border-radius:var(--radius);
+  padding:18px;margin-bottom:14px;cursor:pointer;
+  display:flex;align-items:center;gap:16px;
+  box-shadow:var(--shadow);text-align:left;
+  transition:transform .12s
+}
+.main-entry-btn:active{transform:scale(.97)}
+.meb-icon{
+  width:56px;height:56px;border-radius:16px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:26px
+}
+.meb-body{flex:1;min-width:0}
+.meb-title{font-size:18px;font-weight:700;color:var(--text);margin-bottom:4px}
+.meb-desc{font-size:12px;color:var(--sub);line-height:1.4}
+.meb-arrow{font-size:22px;color:var(--hint);flex-shrink:0}
 </style>
 </head>
 <body>
 
 <!-- ═══ 首页 ═══ -->
-<div id="s-home" class="screen active">
-  <div class="hd">
-    <div class="hd-row"><div class="hd-title">🤖 跟进助手</div></div>
+<div id="s-main" class="screen active">
+  <div class="hd" style="padding-bottom:28px">
+    <div class="hd-title" style="font-size:26px;font-family:'KaiTi','STKaiti','Kaiti SC','楷体',serif;letter-spacing:2px">🔮 拾光 · 山海</div>
+    <div id="daily-quote" class="hd-phone" style="margin-top:14px;line-height:1.6;font-style:italic;opacity:.85;letter-spacing:.3px">加载中…</div>
+  </div>
+  <div id="combined-results" style="display:none">
+    <div class="ct" style="padding-top:14px;padding-bottom:8px" id="combined-results-content"></div>
+  </div>
+  <div class="ct" style="padding-top:32px">
+    <!-- 跨表搜索 -->
+    <div style="margin-bottom:14px;position:relative">
+      <input id="mq" style="width:100%;background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:13px 48px 13px 15px;color:var(--text);font-size:15px;outline:none;font-family:inherit;box-shadow:var(--shadow)" type="search" placeholder="搜索号码 · 跨两个表格" autocomplete="off">
+      <button onclick="doCombinedSearch()" style="position:absolute;right:4px;top:50%;transform:translateY(-50%);width:38px;height:38px;background:none;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:8px;color:var(--muted)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
+      </button>
+    </div>
+    <div id="combined-results-content" style="margin-bottom:4px"></div>
+
+    <button class="main-entry-btn" onclick="enterFollowUp()">
+      <div class="meb-icon" style="background:linear-gradient(135deg,#0D47A1,#1976D2)">🤖</div>
+      <div class="meb-body">
+        <div class="meb-title">寻迹</div>
+        <div class="meb-desc">分配数据 · 意向管理 · 跟进记录</div>
+      </div>
+      <div class="meb-arrow">›</div>
+    </button>
+    <button class="main-entry-btn" onclick="enterMaintain()">
+      <div class="meb-icon" style="background:linear-gradient(135deg,#2E4A3E,#3D6B58)">🎓</div>
+      <div class="meb-body">
+        <div class="meb-title">织网</div>
+        <div class="meb-desc">学员台账 · 合同管理 · 提醒跟进</div>
+      </div>
+      <div class="meb-arrow">›</div>
+    </button>
+
+    <div id="combined-results-content"></div>
+  </div>
+</div>
+
+<div id="s-home" class="screen">
+  <div class="hd hd-sub">
+    <div class="hd-row-sub">
+      <div class="hd-info">
+        <div class="hd-title">🤖 寻迹</div>
+      </div>
+      <button class="hd-back" onclick="goMain()"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11 4L6 9L11 14" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    </div>
     <div class="sr">
       <input id="q" class="si" type="search" placeholder="搜索姓名或手机号…" autocomplete="off">
       <button class="sb" onclick="doSearch()">搜索</button>
@@ -278,32 +340,32 @@ input[type=date].fi{color:var(--text)}
       <button class="cat-btn" onclick="loadList('today')">
         <div class="cat-icon-wrap" style="background:#FF6B35">📞</div>
         <div class="cat-label">今日待联系</div>
-        <div class="cat-desc">下次跟进 = 今天</div>
+        <div class="cat-desc" id="cnt-today">加载中…</div>
       </button>
       <button class="cat-btn" onclick="loadList('week')">
         <div class="cat-icon-wrap" style="background:#3B82F6">📅</div>
         <div class="cat-label">本周待联系</div>
-        <div class="cat-desc">下次跟进在本周</div>
+        <div class="cat-desc" id="cnt-week">加载中…</div>
       </button>
       <button class="cat-btn" onclick="loadList('enrolled')">
         <div class="cat-icon-wrap" style="background:#10B981">✅</div>
         <div class="cat-label">已报名客户</div>
-        <div class="cat-desc">意向 = 已报名</div>
+        <div class="cat-desc" id="cnt-enrolled">加载中…</div>
       </button>
       <button class="cat-btn" onclick="loadList('month')">
         <div class="cat-icon-wrap" style="background:#8B5CF6">📋</div>
         <div class="cat-label">本月分配</div>
-        <div class="cat-desc">分配时间在本月</div>
+        <div class="cat-desc" id="cnt-month">加载中…</div>
       </button>
       <button class="cat-btn" onclick="loadList('today_assigned')">
         <div class="cat-icon-wrap" style="background:#F59E0B">🆕</div>
         <div class="cat-label">今日分配</div>
-        <div class="cat-desc">分配时间 = 今天</div>
+        <div class="cat-desc" id="cnt-today-assigned">加载中…</div>
       </button>
       <button class="cat-btn" onclick="loadList('strong_intent')">
         <div class="cat-icon-wrap" style="background:#EF4444">🔥</div>
         <div class="cat-label">近日强意向</div>
-        <div class="cat-desc">意向A/B · 本周跟进</div>
+        <div class="cat-desc" id="cnt-strong">加载中…</div>
       </button>
       <button class="cat-btn" onclick="showScreen('s-filter')" style="grid-column:1/-1">
         <div style="display:flex;align-items:center;gap:12px">
@@ -761,23 +823,24 @@ async function doSave(){
 
 function _showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo(0,0);}
 function showScreen(id){
-  if(id!=='s-home') history.pushState({screen:id},'',location.href.split('#')[0]+'#'+id);
-  else history.replaceState({screen:'s-home'},'',location.href.split('#')[0]);
+  if(id!=='s-main') history.pushState({screen:id},'',location.href.split('#')[0]+'#'+id);
+  else history.replaceState({screen:'s-main'},'',location.href.split('#')[0]);
   _showScreen(id);
 }
 function goHome(){showScreen('s-home');}
+function goMain(){showScreen('s-main');}
 function goList(){showScreen('s-list');}
 
 // 用 history.pushState 支持浏览器原生返回手势
 // 页面初始化时压入首页状态，让浏览器知道有历史记录
-history.replaceState({screen:'s-home'}, '', location.href);
+history.replaceState({screen:'s-main'}, '', location.href);
 
 window.addEventListener('popstate', e=>{
   const state = e.state?.screen;
   if(state){
     _showScreen(state);
   } else {
-    _showScreen('s-home');
+    _showScreen('s-main');
   }
 });
 
@@ -899,6 +962,620 @@ async function doCustomFilter() {
   }
 }
 
+
+// ══════════════════════════════════════════════════════
+// 跨表搜索
+// ══════════════════════════════════════════════════════
+let combinedStore = [];
+
+async function doCombinedSearch() {
+  const q = document.getElementById('mq').value.trim();
+  if (!q) return;
+  const sec = document.getElementById('combined-results-content');
+  sec.innerHTML = '<div class="loading" style="padding:20px">搜索中…</div>';
+
+  try {
+    const data = await proxyCall('combined_search', {q});
+    combinedStore = data.data?.items || [];
+    if (!combinedStore.length) {
+      sec.innerHTML = `<div class="empty-state" style="padding:30px 20px"><div class="ei">😕</div>没有找到「${esc(q)}」</div>`;
+      return;
+    }
+    sec.innerHTML = combinedStore.map((item, idx) => {
+      const isDist = item._source === 'dist';
+      const f = item.fields;
+      const name  = rv(isDist ? f['姓名'] : f['学员姓名']) || '（无姓名）';
+      const phone = rv(isDist ? f['号码/微信'] : f['乙方电话']) || '—';
+      const tag   = isDist
+        ? `<span style="background:#EFF6FF;color:#1D4ED8;font-size:10px;font-weight:700;padding:2px 7px;border-radius:8px">寻迹</span>`
+        : `<span style="background:#ECFDF5;color:#065F46;font-size:10px;font-weight:700;padding:2px 7px;border-radius:8px">织网</span>`;
+      const rawPhone = phone.replace(/\s/g,'');
+      const callBtn = rawPhone && /^\d{7,}$/.test(rawPhone)
+        ? `<a class="call-btn" href="tel:${rawPhone}" onclick="event.stopPropagation()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#00C173" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.67A2 2 0 012 1h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 8.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg></a>` : '';
+      return `<div class="ri" onclick="openCombinedRecord(${idx})">
+        <div class="ri-left">
+          <div style="display:flex;align-items:center;gap:7px;margin-bottom:3px">
+            <span class="rn" style="margin-bottom:0">${esc(name)}</span>${tag}
+          </div>
+          <div class="rp">${esc(phone)}</div>
+        </div>
+        <div class="ri-right">${callBtn}</div>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    sec.innerHTML = `<div class="empty-state" style="padding:30px 20px"><div class="ei">⚠️</div>${esc(e.message)}</div>`;
+  }
+}
+
+function openCombinedRecord(idx) {
+  const item = combinedStore[idx];
+  if (item._source === 'dist') {
+    listStore = [item];
+    openRecord(0);
+  } else {
+    studentStore = [item];
+    openStudentRecord(0);
+  }
+}
+
+// 回车搜索
+document.getElementById('mq')?.addEventListener('keydown', e => {
+  if (e.key === 'Enter') doCombinedSearch();
+});
+
+// ══════════════════════════════════════════════════════
+// 每日一言
+// ══════════════════════════════════════════════════════
+async function loadDailyQuote() {
+  const el = document.getElementById('daily-quote');
+  if (!el) return;
+  const today = new Date().toISOString().slice(0, 10);
+  const cached = localStorage.getItem('daily_quote_date');
+  if (cached === today) {
+    const q = localStorage.getItem('daily_quote_text');
+    if (q) { el.textContent = q; return; }
+  }
+  try {
+    // hitokoto.cn：c=b 励志，c=d 哲学，c=k 诗词
+    const r = await fetch('https://v1.hitokoto.cn/?c=b&c=d&c=k', {cache:'no-store'});
+    const d = await r.json();
+    const who  = d.from_who ? d.from_who : '';
+    const from = d.from     ? d.from     : '';
+    const attr = [who, from].filter(Boolean).join(' · ');
+    const text = `「${d.hitokoto}」${attr ? ' —— ' + attr : ''}`;
+    el.textContent = text;
+    localStorage.setItem('daily_quote_date', today);
+    localStorage.setItem('daily_quote_text', text);
+  } catch(e) {
+    el.textContent = '心之所向，素履以往';
+  }
+}
+
+loadDailyQuote();
+function goMain(){ showScreen('s-main'); }
+
+function enterFollowUp(){
+  showScreen('s-home');
+  loadDistCounts();
+}
+
+function enterMaintain(){
+  showScreen('s-maintain-home');
+  loadStudentCounts();
+}
+
+// ══════════════════════════════════════════════════════
+// 寻迹：加载按钮条数
+// ══════════════════════════════════════════════════════
+async function loadDistCounts(){
+  const cats = [
+    {action:'today',           id:'cnt-today'},
+    {action:'week',            id:'cnt-week'},
+    {action:'enrolled',        id:'cnt-enrolled'},
+    {action:'month',           id:'cnt-month'},
+    {action:'today_assigned',  id:'cnt-today-assigned'},
+    {action:'strong_intent',   id:'cnt-strong'},
+  ];
+  cats.forEach(async c => {
+    try {
+      const data = await proxyCall(c.action, {countOnly: true});
+      const n = data.data?.total ?? data.data?.items?.length ?? '?';
+      const el = document.getElementById(c.id);
+      if(el) el.textContent = n + ' 条';
+    } catch(e) {
+      const el = document.getElementById(c.id);
+      if(el) el.textContent = '—';
+    }
+  });
+}
+
+// ══════════════════════════════════════════════════════
+// 织网：加载按钮条数
+// ══════════════════════════════════════════════════════
+async function loadStudentCounts(){
+  const cats = [
+    {action:'student_today_remind',    id:'scnt-today'},
+    {action:'student_week_remind',     id:'scnt-week'},
+    {action:'student_today_contract',  id:'scnt-today-contract'},
+    {action:'student_month_contract',  id:'scnt-month-contract'},
+  ];
+  cats.forEach(async c => {
+    try {
+      const data = await proxyCall(c.action, {countOnly: true});
+      const n = data.data?.total ?? data.data?.items?.length ?? '?';
+      const el = document.getElementById(c.id);
+      if(el) el.textContent = n + ' 条';
+    } catch(e) {
+      const el = document.getElementById(c.id);
+      if(el) el.textContent = '—';
+    }
+  });
+}
+
+// ══════════════════════════════════════════════════════
+// 织网：搜索 & 列表
+// ══════════════════════════════════════════════════════
+let studentStore = [];
+
+const STUDENT_CAT_NAMES = {
+  student_today_remind:   '今日待联系',
+  student_week_remind:    '本周待联系',
+  student_today_contract: '今日签约',
+  student_month_contract: '本月签约',
+  student_search:         '搜索结果',
+  student_custom:         '自定义筛选',
+};
+
+async function doStudentSearch(){
+  const q = document.getElementById('sq').value.trim();
+  if(!q) return;
+  document.getElementById('ml-title').textContent = '搜索结果';
+  document.getElementById('ml-sub').textContent = '「'+q+'」';
+  document.getElementById('maintain-list-content').innerHTML = '<div class="loading">搜索中…</div>';
+  showScreen('s-maintain-list');
+  try {
+    const data = await proxyCall('student_search', {q});
+    studentStore = data.data?.items || [];
+    renderStudentList();
+  } catch(e){
+    document.getElementById('maintain-list-content').innerHTML = '<div class="empty-state"><div class="ei">⚠️</div>'+esc(e.message)+'</div>';
+  }
+}
+
+async function loadStudentList(action){
+  document.getElementById('ml-title').textContent = STUDENT_CAT_NAMES[action] || action;
+  document.getElementById('ml-sub').textContent = '加载中…';
+  document.getElementById('maintain-list-content').innerHTML = '<div class="loading">加载中…</div>';
+  showScreen('s-maintain-list');
+  try {
+    const data = await proxyCall(action);
+    if(data.code!==0 && data.code!==undefined){
+      document.getElementById('ml-sub').textContent = '查询出错';
+      document.getElementById('maintain-list-content').innerHTML = '<div class="empty-state"><div class="ei">⚠️</div>飞书错误 '+data.code+'：'+esc(data.msg||'')+'</div>';
+      return;
+    }
+    studentStore = data.data?.items || [];
+    document.getElementById('ml-sub').textContent = '共 '+studentStore.length+' 条';
+    renderStudentList();
+  } catch(e){
+    document.getElementById('ml-sub').textContent = '加载失败';
+    document.getElementById('maintain-list-content').innerHTML = '<div class="empty-state"><div class="ei">⚠️</div>'+esc(e.message)+'</div>';
+  }
+}
+
+function renderStudentList(){
+  const el = document.getElementById('maintain-list-content');
+  if(!studentStore.length){ el.innerHTML='<div class="empty-state"><div class="ei">😌</div>暂无数据</div>'; return; }
+  el.innerHTML = studentStore.map((item,idx)=>{
+    const f = item.fields;
+    const name    = rv(f['学员姓名']) || '（无姓名）';
+    const phone   = rv(f['乙方电话']) || '—';
+    const ctype   = rv(f['合同类型']) || '';
+    const remind  = fmtDate(f['提醒时间']);
+    const ctypeColors = {'一对一':'#2563EB','班课':'#D97706','留学':'#7C3AED'};
+    const badge = ctype ? `<span class="rb" style="background:${ctypeColors[ctype]||'#94A3B8'}">${esc(ctype)}</span>` : '';
+    const rawPhone = rv(f['乙方电话'])||'';
+    const phoneNum = rawPhone.replace(/\s/g,'');
+    const callBtn = phoneNum&&/^\d{7,}$/.test(phoneNum)
+      ? `<a class="call-btn" href="tel:${phoneNum}" onclick="event.stopPropagation()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#00C173" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.67A2 2 0 012 1h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 8.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg></a>` : '';
+    return `<div class="ri" onclick="openStudentRecord(${idx})">
+      <div class="ri-left">
+        <div class="rn">${esc(name)}</div>
+        <div class="rp">${esc(phone)}</div>
+        ${remind ? '<div class="ri-meta">提醒 '+esc(remind)+'</div>' : ''}
+      </div>
+      <div class="ri-right">${callBtn}${badge}</div>
+    </div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════════════
+// 织网：打开详情
+// ══════════════════════════════════════════════════════
+let curStudent = null, curContractType = '', curStudySign = '';
+
+function openStudentRecord(idx){
+  curStudent = studentStore[idx];
+  const f = curStudent.fields;
+  const name  = rv(f['学员姓名'])||'';
+  const phone = rv(f['乙方电话'])||'';
+  document.getElementById('md-name').textContent = name||'（无姓名）';
+  document.getElementById('md-phone').textContent = phone||'—';
+
+  document.getElementById('mf-name').value    = name;
+  document.getElementById('mf-phone').value   = phone;
+  document.getElementById('mf-guardian').value = rv(f['监护人姓名'])||'';
+  document.getElementById('mf-guardian-phone').value = rv(f['监护人电话'])||'';
+  document.getElementById('mf-course').value  = rv(f['课程方案'])||'';
+
+  const amt = f['金额'];
+  document.getElementById('mf-amount').value  = amt!=null ? (typeof amt==='object'?amt.value||'':amt) : '';
+
+  document.getElementById('mf-arranged').value = rv(f['已排课程'])||'';
+  document.getElementById('mf-remind-date').value = msToDateInput(f['提醒时间']);
+  document.getElementById('mf-remind-note').value = rv(f['提醒备注'])||'';
+  document.getElementById('mf-remark').value  = rv(f['备注'])||'';
+
+  setRO('mf-sign-date',  fmtDate(f['签约日期']));
+  setRO('mf-last-update', fmtDate(f['最后更新日期']));
+
+  curContractType = rv(f['合同类型'])||''; renderContractType();
+  curStudySign    = rv(f['留学是否签约'])||''; renderStudySign();
+
+  showScreen('s-maintain-detail');
+}
+
+function setContractType(v){ curContractType=(curContractType===v)?'':v; renderContractType(); }
+function renderContractType(){
+  document.querySelectorAll('#s-maintain-detail .ow-btn[data-v]').forEach(b=>{
+    if(['一对一','班课','留学'].includes(b.dataset.v))
+      b.classList.toggle('sel', b.dataset.v===curContractType);
+  });
+}
+function setStudySign(v){ curStudySign=(curStudySign===v)?'':v; renderStudySign(); }
+function renderStudySign(){
+  document.getElementById('myn-yes').className='yn-btn'+(curStudySign==='是'?' sel-yes':'');
+  document.getElementById('myn-no').className='yn-btn'+(curStudySign==='否'?' sel-no':'');
+}
+
+// ══════════════════════════════════════════════════════
+// 织网：保存
+// ══════════════════════════════════════════════════════
+async function doStudentSave(){
+  if(!curStudent) return;
+  const btn = document.getElementById('msave-btn');
+  btn.disabled=true; btn.textContent='保存中…';
+  try {
+    const fields = {};
+    const name = document.getElementById('mf-name').value.trim();
+    if(name) fields['学员姓名'] = name;
+    const phone = document.getElementById('mf-phone').value.trim();
+    if(phone) fields['乙方电话'] = phone;
+    const guardian = document.getElementById('mf-guardian').value.trim();
+    if(guardian) fields['监护人姓名'] = guardian;
+    const guardianPhone = document.getElementById('mf-guardian-phone').value.trim();
+    if(guardianPhone) fields['监护人电话'] = guardianPhone;
+    if(curContractType) fields['合同类型'] = curContractType;
+    const course = document.getElementById('mf-course').value.trim();
+    if(course) fields['课程方案'] = course;
+    const amount = document.getElementById('mf-amount').value;
+    if(amount) fields['金额'] = parseFloat(amount);
+    const arranged = document.getElementById('mf-arranged').value.trim();
+    if(arranged) fields['已排课程'] = arranged;
+    if(curStudySign) fields['留学是否签约'] = curStudySign;
+    const remindDate = document.getElementById('mf-remind-date').value;
+    if(remindDate) fields['提醒时间'] = new Date(remindDate+'T15:59:00.000Z').getTime();
+    const remindNote = document.getElementById('mf-remind-note').value.trim();
+    if(remindNote) fields['提醒备注'] = remindNote;
+    const remark = document.getElementById('mf-remark').value.trim();
+    if(remark) fields['备注'] = remark;
+
+    if(!Object.keys(fields).length){ toast('没有需要保存的变更'); btn.disabled=false; btn.textContent='保存更新'; return; }
+    const data = await proxyCall('student_update', {recordId: curStudent.record_id, fields});
+    if(data.code===0){ toast('✅ 已保存'); Object.assign(curStudent.fields, fields); }
+    else toast('保存失败：'+(data.msg||JSON.stringify(data)));
+  } catch(e){ toast('错误：'+e.message); }
+  btn.disabled=false; btn.textContent='保存更新';
+}
+
+// ══════════════════════════════════════════════════════
+// 织网：自定义筛选
+// ══════════════════════════════════════════════════════
+let maintainFilterContracts = new Set();
+let maintainFilterStudySign = '';
+
+function toggleMaintainFilter(type, val){
+  if(type === 'contract'){
+    if(maintainFilterContracts.has(val)) maintainFilterContracts.delete(val);
+    else maintainFilterContracts.add(val);
+    document.querySelectorAll('.mf-contract').forEach(b=>
+      b.classList.toggle('sel', maintainFilterContracts.has(b.dataset.v)));
+  } else if(type === 'study_sign'){
+    maintainFilterStudySign = (maintainFilterStudySign===val)?'':val;
+    document.getElementById('mfyn-yes').className='yn-btn'+(maintainFilterStudySign==='是'?' sel-yes':'');
+    document.getElementById('mfyn-no').className='yn-btn'+(maintainFilterStudySign==='否'?' sel-no':'');
+  }
+}
+
+function resetMaintainFilter(){
+  maintainFilterContracts.clear();
+  maintainFilterStudySign = '';
+  document.querySelectorAll('.mf-contract').forEach(b=>b.classList.remove('sel'));
+  document.getElementById('mfyn-yes').className='yn-btn';
+  document.getElementById('mfyn-no').className='yn-btn';
+  ['mf-remind-from','mf-remind-to','mf-sign-from','mf-sign-to'].forEach(id=>{
+    document.getElementById(id).value='';
+  });
+  toast('已重置');
+}
+
+async function doMaintainFilter(){
+  const conditions = [];
+  maintainFilterContracts.forEach(v=>
+    conditions.push({field_name:'合同类型', operator:'contains', value:[v]}));
+  if(maintainFilterStudySign)
+    conditions.push({field_name:'留学是否签约', operator:'contains', value:[maintainFilterStudySign]});
+
+  const remindFrom = document.getElementById('mf-remind-from').value;
+  const remindTo   = document.getElementById('mf-remind-to').value;
+  if(remindFrom) conditions.push({field_name:'提醒时间', operator:'>=', value:[new Date(remindFrom).getTime()]});
+  if(remindTo)   conditions.push({field_name:'提醒时间', operator:'<=', value:[new Date(remindTo+'T23:59:59').getTime()]});
+
+  const signFrom = document.getElementById('mf-sign-from').value;
+  const signTo   = document.getElementById('mf-sign-to').value;
+  if(signFrom) conditions.push({field_name:'签约日期', operator:'>=', value:[new Date(signFrom).getTime()]});
+  if(signTo)   conditions.push({field_name:'签约日期', operator:'<=', value:[new Date(signTo+'T23:59:59').getTime()]});
+
+  document.getElementById('ml-title').textContent = '自定义筛选';
+  document.getElementById('ml-sub').textContent = '加载中…';
+  document.getElementById('maintain-list-content').innerHTML = '<div class="loading">加载中…</div>';
+  showScreen('s-maintain-list');
+
+  try {
+    const data = conditions.length
+      ? await proxyCall('student_custom', {filters:conditions, conjunction:'and'})
+      : await proxyCall('student_all');
+    studentStore = data.data?.items || [];
+    document.getElementById('ml-sub').textContent = '共 '+studentStore.length+' 条';
+    renderStudentList();
+  } catch(e){
+    document.getElementById('ml-sub').textContent = '加载失败';
+    document.getElementById('maintain-list-content').innerHTML = '<div class="empty-state"><div class="ei">⚠️</div>'+esc(e.message)+'</div>';
+  }
+}
+
 </script>
+
+<!-- ═══ 织网首页 ═══ -->
+<div id="s-maintain-home" class="screen">
+  <div class="hd hd-sub">
+    <div class="hd-row-sub">
+      <div class="hd-info">
+        <div class="hd-title">🎓 织网</div>
+      </div>
+      <button class="hd-back" onclick="goMain()"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11 4L6 9L11 14" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    </div>
+    <div class="sr">
+      <input id="sq" class="si" type="search" placeholder="搜索学员姓名或电话…" autocomplete="off">
+      <button class="sb" onclick="doStudentSearch()">搜索</button>
+    </div>
+  </div>
+  <div class="ct">
+    <div class="btn-grid">
+      <button class="cat-btn" onclick="loadStudentList('student_today_remind')">
+        <div class="cat-icon-wrap" style="background:#FF6B35">🔔</div>
+        <div class="cat-label">今日待联系</div>
+        <div class="cat-desc" id="scnt-today">加载中…</div>
+      </button>
+      <button class="cat-btn" onclick="loadStudentList('student_week_remind')">
+        <div class="cat-icon-wrap" style="background:#3B82F6">📅</div>
+        <div class="cat-label">本周待联系</div>
+        <div class="cat-desc" id="scnt-week">加载中…</div>
+      </button>
+      <button class="cat-btn" onclick="loadStudentList('student_today_contract')">
+        <div class="cat-icon-wrap" style="background:#10B981">✍️</div>
+        <div class="cat-label">今日签约</div>
+        <div class="cat-desc" id="scnt-today-contract">加载中…</div>
+      </button>
+      <button class="cat-btn" onclick="loadStudentList('student_month_contract')">
+        <div class="cat-icon-wrap" style="background:#8B5CF6">📝</div>
+        <div class="cat-label">本月签约</div>
+        <div class="cat-desc" id="scnt-month-contract">加载中…</div>
+      </button>
+      <button class="cat-btn" onclick="showScreen('s-maintain-filter')" style="grid-column:1/-1">
+        <div style="display:flex;align-items:center;gap:12px">
+          <div class="cat-icon-wrap" style="background:#06B6D4;margin-bottom:0">🔍</div>
+          <div>
+            <div class="cat-label">自定义筛选</div>
+            <div class="cat-desc">按合同类型、日期等条件查询</div>
+          </div>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ 织网列表 ═══ -->
+<div id="s-maintain-list" class="screen">
+  <div class="hd hd-sub">
+    <div class="hd-row-sub">
+      <div class="hd-info">
+        <div id="ml-title" class="hd-title">—</div>
+        <div id="ml-sub" class="hd-phone">加载中…</div>
+      </div>
+      <button class="hd-back" onclick="showScreen('s-maintain-home')"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11 4L6 9L11 14" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    </div>
+  </div>
+  <div class="ct" id="maintain-list-content"><div class="loading">加载中…</div></div>
+</div>
+
+<!-- ═══ 织网详情 ═══ -->
+<div id="s-maintain-detail" class="screen">
+  <div class="hd hd-sub">
+    <button class="hd-back" onclick="showScreen('s-maintain-list')"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11 4L6 9L11 14" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <div class="hd-row">
+      <div id="md-name" class="hd-title">—</div>
+      <div id="md-phone" class="hd-phone">—</div>
+    </div>
+  </div>
+  <div class="ctd">
+
+    <!-- 基本信息 -->
+    <div class="card">
+      <div style="display:flex">
+        <div class="fr" style="border-top:none;flex:1;border-right:1px solid var(--border)">
+          <div class="fl">学员姓名</div>
+          <input type="text" id="mf-name" class="fi" placeholder="学员姓名…">
+        </div>
+        <div class="fr" style="border-top:none;flex:1.4">
+          <div class="fl">乙方电话</div>
+          <input type="text" id="mf-phone" class="fi" placeholder="手机号…">
+        </div>
+      </div>
+      <div style="display:flex">
+        <div class="fr" style="flex:1;border-right:1px solid var(--border)">
+          <div class="fl">监护人姓名</div>
+          <input type="text" id="mf-guardian" class="fi" placeholder="监护人…">
+        </div>
+        <div class="fr" style="flex:1.4">
+          <div class="fl">监护人电话</div>
+          <input type="text" id="mf-guardian-phone" class="fi" placeholder="联系电话…">
+        </div>
+      </div>
+    </div>
+
+    <!-- 合同信息 -->
+    <div class="card">
+      <div class="cl">合同类型</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;padding:10px 13px 14px">
+        <button class="ow-btn" data-v="一对一" onclick="setContractType('一对一')" style="background:#EFF6FF;color:#1E3A8A;border-color:#BFDBFE">一对一</button>
+        <button class="ow-btn" data-v="班课"   onclick="setContractType('班课')"   style="background:#FEF9C3;color:#78350F;border-color:#FDE68A">班课</button>
+        <button class="ow-btn" data-v="留学"   onclick="setContractType('留学')"   style="background:#F5F3FF;color:#4C1D95;border-color:#DDD6FE">留学</button>
+      </div>
+      <div class="fr">
+        <div class="fl">课程方案</div>
+        <input type="text" id="mf-course" class="fi" placeholder="如：雅思在线课、托福面授…">
+      </div>
+      <div class="fr">
+        <div class="fl">金额</div>
+        <input type="number" id="mf-amount" class="fi" placeholder="合同金额">
+      </div>
+      <div class="fr">
+        <div class="fl">签约日期</div>
+        <div id="mf-sign-date" class="firo empty">—</div>
+      </div>
+    </div>
+
+    <!-- 课程跟进 -->
+    <div class="card">
+      <div class="fr" style="border-top:none">
+        <div class="fl">已排课程</div>
+        <textarea id="mf-arranged" class="fi fita" placeholder="课程安排情况…"></textarea>
+      </div>
+    </div>
+
+    <!-- 留学签约 -->
+    <div class="card">
+      <div class="fr" style="border-top:none">
+        <div class="fl">留学是否签约</div>
+        <div class="yn-row">
+          <button class="yn-btn" id="myn-yes" onclick="setStudySign('是')">是</button>
+          <button class="yn-btn" id="myn-no"  onclick="setStudySign('否')">否</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 提醒 -->
+    <div class="card">
+      <div class="fr" style="border-top:none">
+        <div class="fl">提醒时间</div>
+        <input type="date" id="mf-remind-date" class="fi">
+      </div>
+      <div class="fr">
+        <div class="fl">提醒备注</div>
+        <textarea id="mf-remind-note" class="fi fita" placeholder="提醒内容…"></textarea>
+      </div>
+    </div>
+
+    <!-- 备注 -->
+    <div class="card">
+      <div class="fr" style="border-top:none">
+        <div class="fl">备注</div>
+        <textarea id="mf-remark" class="fi fita" placeholder="其他备注…"></textarea>
+      </div>
+      <div class="fr">
+        <div class="fl">最后更新日期</div>
+        <div id="mf-last-update" class="firo empty">—</div>
+      </div>
+    </div>
+
+  </div>
+  <div class="savebar">
+    <button id="msave-btn" class="savebtn" onclick="doStudentSave()">保存更新</button>
+  </div>
+</div>
+
+<!-- ═══ 织网自定义筛选 ═══ -->
+<div id="s-maintain-filter" class="screen">
+  <div class="hd hd-sub">
+    <div class="hd-row-sub">
+      <div class="hd-info">
+        <div class="hd-title">自定义筛选</div>
+        <div class="hd-phone">台账条件查询</div>
+      </div>
+      <button class="hd-back" onclick="showScreen('s-maintain-home')"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11 4L6 9L11 14" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    </div>
+  </div>
+  <div class="ct" style="padding-bottom:100px">
+    <div class="card">
+      <div class="cl">合同类型</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;padding:10px 13px 14px">
+        <button class="ow-btn mf-contract" data-v="一对一" onclick="toggleMaintainFilter('contract','一对一')" style="background:#EFF6FF;color:#1E3A8A;border-color:#BFDBFE">一对一</button>
+        <button class="ow-btn mf-contract" data-v="班课"   onclick="toggleMaintainFilter('contract','班课')"   style="background:#FEF9C3;color:#78350F;border-color:#FDE68A">班课</button>
+        <button class="ow-btn mf-contract" data-v="留学"   onclick="toggleMaintainFilter('contract','留学')"   style="background:#F5F3FF;color:#4C1D95;border-color:#DDD6FE">留学</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="fr" style="border-top:none">
+        <div class="fl">留学是否签约</div>
+        <div style="display:flex;gap:8px;margin-top:6px">
+          <button class="yn-btn" id="mfyn-yes" onclick="toggleMaintainFilter('study_sign','是')">是</button>
+          <button class="yn-btn" id="mfyn-no"  onclick="toggleMaintainFilter('study_sign','否')">否</button>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="fr" style="border-top:none">
+        <div class="fl" style="color:#3B82F6;font-weight:700">提醒时间范围</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:6px">
+          <span style="font-size:13px;color:var(--sub)">从</span>
+          <input type="date" id="mf-remind-from" class="fi" style="flex:1">
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:8px">
+          <span style="font-size:13px;color:var(--sub)">至</span>
+          <input type="date" id="mf-remind-to" class="fi" style="flex:1">
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="fr" style="border-top:none">
+        <div class="fl" style="color:#8B5CF6;font-weight:700">签约日期范围</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:6px">
+          <span style="font-size:13px;color:var(--sub)">从</span>
+          <input type="date" id="mf-sign-from" class="fi" style="flex:1">
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:8px">
+          <span style="font-size:13px;color:var(--sub)">至</span>
+          <input type="date" id="mf-sign-to" class="fi" style="flex:1">
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="savebar" style="display:flex;gap:10px">
+    <button onclick="resetMaintainFilter()" style="flex:1;background:#F0F4F8;color:var(--sub);border:none;border-radius:14px;padding:15px;font-size:15px;font-weight:600;font-family:inherit;cursor:pointer">重置</button>
+    <button onclick="doMaintainFilter()" style="flex:2;background:var(--ink);color:#fff;border:none;border-radius:14px;padding:15px;font-size:16px;font-weight:600;font-family:inherit;cursor:pointer">查询学员</button>
+  </div>
+</div>
+
 </body>
 </html>
