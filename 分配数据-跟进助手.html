@@ -245,10 +245,9 @@ input[type=date].fi{color:var(--text)}
   transform:translateX(-50%) translateY(12px);
   background:rgba(13,27,46,.9);color:#fff;
   padding:10px 22px;border-radius:24px;font-size:14px;
-  opacity:0;transition:all .2s;pointer-events:none;white-space:nowrap;z-index:999;
-  visibility:hidden;
+  opacity:0;transition:all .2s;pointer-events:none;white-space:nowrap;z-index:999
 }
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0);visibility:visible;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .fi-select{
   flex:1;height:42px;border:1.5px solid var(--border);border-radius:12px;
   background:#FAFBFD;font-size:14px;color:var(--text);font-family:inherit;
@@ -341,10 +340,10 @@ input[type=date].fi{color:var(--text)}
         <div id="d-name" class="hd-title">—</div>
         <div style="display:flex;align-items:center;gap:10px">
           <div id="d-phone" class="hd-phone">—</div>
-          <a id="d-call-btn" href="#" onclick="return false"
+          <a id="d-call-btn" href="#"
             style="display:none;background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.25);
             border-radius:20px;padding:4px 12px 4px 8px;color:#fff;font-size:12px;font-weight:600;
-            text-decoration:none;display:flex;align-items:center;gap:5px;letter-spacing:.2px">
+            text-decoration:none;align-items:center;gap:5px;letter-spacing:.2px">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.67A2 2 0 012 1h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 8.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
             拨号
           </a>
