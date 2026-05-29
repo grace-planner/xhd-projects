@@ -1142,6 +1142,7 @@ let studentStore = [];
 const STUDENT_CAT_NAMES = {
   student_today_remind:   '今日待联系',
   student_week_remind:    '本周待联系',
+  student_month_remind:   '本月待联系',
   student_today_contract: '今日签约',
   student_month_contract: '本月签约',
   student_search:         '搜索结果',
@@ -1223,6 +1224,10 @@ function openStudentRecord(idx){
   const phone = rv(f['乙方电话'])||'';
   document.getElementById('md-name').textContent = name||'（无姓名）';
   document.getElementById('md-phone').textContent = phone||'—';
+  const mdCall = document.getElementById('md-call-btn');
+  const mdNum = phone.replace(/\s/g,'');
+  if(mdNum && /^\d{7,}$/.test(mdNum)){ mdCall.href='tel:'+mdNum; mdCall.style.display='flex'; }
+  else { mdCall.style.display='none'; }
 
   document.getElementById('mf-name').value    = name;
   document.getElementById('mf-phone').value   = phone;
@@ -1447,7 +1452,10 @@ async function doMaintainFilter(){
     <div class="hd-row-sub">
       <div class="hd-info">
         <div id="md-name" class="hd-title">—</div>
-        <div id="md-phone" class="hd-phone">—</div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div id="md-phone" class="hd-phone">—</div>
+          <a id="md-call-btn" href="#" style="display:none;background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.25);border-radius:20px;padding:4px 12px 4px 8px;color:#fff;font-size:12px;font-weight:600;text-decoration:none;align-items:center;gap:5px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.67A2 2 0 012 1h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 8.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg> 拨号</a>
+        </div>
       </div>
       <button class="hd-back" onclick="showScreen('s-maintain-list')"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11 4L6 9L11 14" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     </div>
