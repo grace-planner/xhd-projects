@@ -139,13 +139,15 @@ html,body{height:100%;background:var(--bg);font-family:-apple-system,'PingFang S
 .rp{font-size:13px;color:var(--sub)}
 .ri-meta{font-size:11px;color:var(--hint);margin-top:3px}
 .rb{
-  width:32px;height:32px;border-radius:50%;flex-shrink:0;
-  display:inline-flex;align-items:center;justify-content:center;
-  font-size:12px;font-weight:700;color:#fff;
+  width:32px;height:32px;min-width:32px;min-height:32px;
+  border-radius:50%;flex-shrink:0;box-sizing:border-box;
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;font-weight:700;color:#fff;
   white-space:nowrap;overflow:hidden
 }
 .call-btn{
-  width:32px;height:32px;border-radius:50%;flex-shrink:0;
+  width:32px;height:32px;min-width:32px;min-height:32px;
+  border-radius:50%;flex-shrink:0;box-sizing:border-box;
   display:flex;align-items:center;justify-content:center;
   background:#00C173;text-decoration:none;border:none;
   transition:background .15s
@@ -732,7 +734,7 @@ function renderList() {
     const intent=rv(f['意向'])||'';
     const dateMs=curCat==='month'?f['分配时间']:(f['下次跟进日期']||f['分配时间']);
     const dateTxt=dateMs?fmtDate(dateMs):'';
-    const badgeStyle = intent==='已报名' ? 'background:#FEF9C3;color:#78350F' : `background:${iColor(intent)}`;
+    const badgeStyle = intent==='已报名' ? 'background:#D97706;color:#fff' : `background:${iColor(intent)}`;
     const badgeText = intent==='已报名' ? '报' : intent;
     const group = rv(f['客群'])||'';
     const groupPalette = {'小学生':{bg:'#ECFCCB',c:'#365314'},'初中生':{bg:'#DCFCE7',c:'#14532D'},'高中生':{bg:'#FEF9C3',c:'#78350F'},'大学生':{bg:'#DBEAFE',c:'#1E3A8A'},'成人':{bg:'#EDE9FE',c:'#4C1D95'}};
