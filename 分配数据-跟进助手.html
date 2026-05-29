@@ -456,8 +456,8 @@ input[type=date].fi{color:var(--text)}
     <!-- 客户信息只读 -->
     <div class="card">
       <div class="fr" style="border-top:none">
-        <div class="fl">具体信息</div>
-        <div id="f-info" class="firo empty">—</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px"><div class="fl" style="margin-bottom:0">具体信息</div><button onclick="var e=document.getElementById('f-info');e.value='';e.focus()" style="background:none;border:none;color:var(--hint);font-size:20px;cursor:pointer;padding:0 2px;line-height:1;flex-shrink:0">×</button></div>
+        <textarea id="f-info" class="fi fita" placeholder="具体信息…"></textarea>
       </div>
       <div class="fr">
         <div class="fl">分配时间</div>
@@ -788,7 +788,7 @@ function openRecord(idx){
   curYN=rv(f['留学报备'])||''; renderYN();
   curOwner=rv(f['是否自有/曾哥/他人'])||''; renderOwner();
   curGroup=rv(f['客群'])||''; renderGroup();
-  setRO('f-info',rv(f['具体信息']));
+  document.getElementById('f-info').value = rv(f['具体信息'])||'';
   setRO('f-atime',fmtDate(f['分配时间']));
   showScreen('s-detail');
 }
@@ -830,6 +830,7 @@ async function doSave(){
     const name=document.getElementById('f-name').value.trim();if(name)fields['姓名']=name;
     const phone=document.getElementById('f-phone').value.trim();if(phone)fields['号码/微信']=phone;
     if(curIntent)fields['意向']=curIntent;
+    const info=document.getElementById('f-info').value.trim();if(info)fields['具体信息']=info;
     const call=document.getElementById('f-call').value.trim();if(call)fields['最新通话记录']=call;
     const dv=document.getElementById('f-date').value;if(dv)fields['下次跟进日期']=new Date(dv+'T15:59:00.000Z').getTime();
     const pu=document.getElementById('f-purpose').value.trim();if(pu)fields['下次跟进目的']=pu;
