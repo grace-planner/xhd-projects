@@ -15,7 +15,7 @@
   --ink:#1a0533;--ink2:#2d1b69;--ink-grad:linear-gradient(135deg,#1a0533 0%,#2d1b69 60%,#4c35a3 100%);
   --green:#00C173;--green-dk:#00A562;
   --bg:#F0F4F8;--card:#FFFFFF;
-  --text:#0F172A;--sub:#64748B;--hint:#CBD5E1;
+  --text:#4A4A4F;--sub:#64748B;--hint:#CBD5E1;
   --border:#E8EDF3;--radius:16px;
   --shadow:0 1px 2px rgba(13,27,46,.04),0 4px 16px rgba(13,27,46,.06);
   --iA:#EF4444;--iB:#7C3AED;--iC:#38BDF8;--iD:#16A34A;
@@ -62,7 +62,7 @@ html,body{height:100%;background:var(--bg);font-family:-apple-system,'PingFang S
 .hd-row-sub{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .hd-row-sub .hd-info{flex:1;min-width:0;display:flex;flex-direction:column;gap:7px}
 .hd-row{display:flex;flex-direction:column;gap:8px}
-.hd-title{font-size:22px;font-weight:700;letter-spacing:-.5px;line-height:1.2}
+.hd-title{font-size:26px;font-weight:700;letter-spacing:1px;line-height:1.2;font-family:'KaiTi','STKaiti','Kaiti SC','楷体',serif}
 .hd-phone{font-size:13px;color:rgba(255,255,255,.45);font-weight:400}
 
 /* ════ 搜索栏 ════ */
@@ -279,14 +279,15 @@ input[type=date].fi{color:var(--text)}
 .meb-desc{font-size:12px;color:var(--sub);line-height:1.4}
 .meb-arrow{font-size:22px;color:var(--hint);flex-shrink:0}
 </style>
+
 </head>
 <body>
 
 <!-- ═══ 首页 ═══ -->
 <div id="s-main" class="screen active">
   <div class="hd" style="padding-bottom:28px">
-    <div class="hd-title" style="font-size:26px;font-family:'KaiTi','STKaiti','Kaiti SC','楷体',serif;letter-spacing:2px">🔮 拾光 · 山海</div>
-    <div id="daily-quote" class="hd-phone" style="margin-top:14px;line-height:1.6;font-style:italic;opacity:.85;letter-spacing:.3px">加载中…</div>
+    <div class="hd-title" style="letter-spacing:2px">🔮 拾光 · 山海</div>
+    <div id="daily-quote" class="hd-phone" onclick="refreshQuote()" style="margin-top:14px;line-height:1.6;font-style:italic;opacity:.85;letter-spacing:.3px;cursor:pointer" title="点击换一句">加载中…</div>
   </div>
   <div class="ct" style="padding-top:32px">
     <!-- 跨表搜索 -->
@@ -1021,6 +1022,23 @@ document.getElementById('mq')?.addEventListener('keydown', e => {
 // ══════════════════════════════════════════════════════
 // 每日一言
 // ══════════════════════════════════════════════════════
+async function refreshQuote() {
+  const el = document.getElementById('daily-quote');
+  if (!el) return;
+  el.style.opacity = '.4';
+  try {
+    const r = await fetch('https://v1.hitokoto.cn/?c=b&c=d&c=k', {cache:'no-store'});
+    const d = await r.json();
+    const who = d.from_who || '', from = d.from || '';
+    const attr = [who, from].filter(Boolean).join(' · ');
+    const text = `「${d.hitokoto}」${attr ? ' —— ' + attr : ''}`;
+    el.textContent = text;
+    el.style.opacity = '.85';
+    localStorage.setItem('daily_quote_date', new Date().toISOString().slice(0,10));
+    localStorage.setItem('daily_quote_text', text);
+  } catch(e) { el.style.opacity = '.85'; }
+}
+
 async function loadDailyQuote() {
   const el = document.getElementById('daily-quote');
   if (!el) return;
@@ -1089,17 +1107,26 @@ async function loadDistCounts(){
 // ══════════════════════════════════════════════════════
 async function loadStudentCounts(){
   const cats = [
-    {action:'student_today_remind',    id:'scnt-today'},
-    {action:'student_week_remind',     id:'scnt-week'},
-    {action:'student_today_contract',  id:'scnt-today-contract'},
-    {action:'student_month_contract',  id:'scnt-month-contract'},
+    {action:'student_today_remind',    id:'scnt-today',          type:'count'},
+    {action:'student_week_remind',     id:'scnt-week',           type:'count'},
+    {action:'student_today_contract',  id:'scnt-today-contract', type:'sum'},
+    {action:'student_month_contract',  id:'scnt-month-contract', type:'sum'},
+    {action:'student_month_remind',    id:'scnt-month-remind',   type:'count'},
   ];
   cats.forEach(async c => {
     try {
-      const data = await proxyCall(c.action, {countOnly: true});
-      const n = data.data?.total ?? data.data?.items?.length ?? '?';
+      const params = c.type === 'sum' ? {sumField:'金额'} : {countOnly:true};
+      const data = await proxyCall(c.action, params);
       const el = document.getElementById(c.id);
-      if(el) el.textContent = n + ' 条';
+      if (!el) return;
+      if (c.type === 'sum') {
+        const sum = data.data?.sum || 0;
+        const cnt = data.data?.total || 0;
+        el.textContent = sum > 0 ? `¥${sum.toLocaleString('zh-CN')} · ${cnt}单` : `${cnt} 单`;
+      } else {
+        const n = data.data?.total ?? data.data?.items?.length ?? '?';
+        el.textContent = n + ' 条';
+      }
     } catch(e) {
       const el = document.getElementById(c.id);
       if(el) el.textContent = '—';
@@ -1377,6 +1404,16 @@ async function doMaintainFilter(){
         <div class="cat-label">本月签约</div>
         <div class="cat-desc" id="scnt-month-contract">加载中…</div>
       </button>
+      <button class="cat-btn" onclick="loadStudentList('student_month_remind')">
+        <div class="cat-icon-wrap" style="background:#0EA5E9">📆</div>
+        <div class="cat-label">本月待联系</div>
+        <div class="cat-desc" id="scnt-month-remind">加载中…</div>
+      </button>
+      <button class="cat-btn" onclick="showScreen('s-maintain-new')">
+        <div class="cat-icon-wrap" style="background:#0D9488">✏️</div>
+        <div class="cat-label">新增学员</div>
+        <div class="cat-desc">手动录入台账信息</div>
+      </button>
       <button class="cat-btn" onclick="showScreen('s-maintain-filter')" style="grid-column:1/-1">
         <div style="display:flex;align-items:center;gap:12px">
           <div class="cat-icon-wrap" style="background:#06B6D4;margin-bottom:0">🔍</div>
@@ -1544,26 +1581,26 @@ async function doMaintainFilter(){
     <div class="card">
       <div class="fr" style="border-top:none">
         <div class="fl" style="color:#3B82F6;font-weight:700">提醒时间范围</div>
-        <div style="display:flex;align-items:center;gap:8px;margin-top:6px">
-          <span style="font-size:13px;color:var(--sub)">从</span>
-          <input type="date" id="mf-remind-from" class="fi" style="flex:1">
+        <div class="fr" style="border-top:none;padding:8px 0 0">
+          <div class="fl">从</div>
+          <input type="date" id="mf-remind-from" class="fi">
         </div>
-        <div style="display:flex;align-items:center;gap:8px;margin-top:8px">
-          <span style="font-size:13px;color:var(--sub)">至</span>
-          <input type="date" id="mf-remind-to" class="fi" style="flex:1">
+        <div class="fr">
+          <div class="fl">至</div>
+          <input type="date" id="mf-remind-to" class="fi">
         </div>
       </div>
     </div>
     <div class="card">
       <div class="fr" style="border-top:none">
         <div class="fl" style="color:#8B5CF6;font-weight:700">签约日期范围</div>
-        <div style="display:flex;align-items:center;gap:8px;margin-top:6px">
-          <span style="font-size:13px;color:var(--sub)">从</span>
-          <input type="date" id="mf-sign-from" class="fi" style="flex:1">
+        <div class="fr" style="border-top:none;padding:8px 0 0">
+          <div class="fl">从</div>
+          <input type="date" id="mf-sign-from" class="fi">
         </div>
-        <div style="display:flex;align-items:center;gap:8px;margin-top:8px">
-          <span style="font-size:13px;color:var(--sub)">至</span>
-          <input type="date" id="mf-sign-to" class="fi" style="flex:1">
+        <div class="fr">
+          <div class="fl">至</div>
+          <input type="date" id="mf-sign-to" class="fi">
         </div>
       </div>
     </div>
@@ -1574,5 +1611,138 @@ async function doMaintainFilter(){
   </div>
 </div>
 
+
+<!-- ═══ 新增学员 ═══ -->
+<div id="s-maintain-new" class="screen">
+  <div class="hd hd-sub">
+    <div class="hd-row-sub">
+      <div class="hd-info">
+        <div class="hd-title">新增学员</div>
+        <div class="hd-phone">录入台账信息</div>
+      </div>
+      <button class="hd-back" onclick="showScreen('s-maintain-home')"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11 4L6 9L11 14" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    </div>
+  </div>
+  <div class="ctd">
+    <div class="card">
+      <div style="display:flex">
+        <div class="fr" style="border-top:none;flex:1;border-right:1px solid var(--border)">
+          <div class="fl">学员姓名</div>
+          <input type="text" id="nf-name" class="fi" placeholder="学员姓名…">
+        </div>
+        <div class="fr" style="border-top:none;flex:1.4">
+          <div class="fl">乙方电话</div>
+          <input type="text" id="nf-phone" class="fi" placeholder="手机号…">
+        </div>
+      </div>
+      <div style="display:flex">
+        <div class="fr" style="flex:1;border-right:1px solid var(--border)">
+          <div class="fl">监护人姓名</div>
+          <input type="text" id="nf-guardian" class="fi" placeholder="监护人…">
+        </div>
+        <div class="fr" style="flex:1.4">
+          <div class="fl">监护人电话</div>
+          <input type="text" id="nf-guardian-phone" class="fi" placeholder="联系电话…">
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="cl">合同类型</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;padding:10px 13px 14px">
+        <button class="ow-btn" data-v="一对一" onclick="setNewContractType('一对一')" style="background:#EFF6FF;color:#1E3A8A;border-color:#BFDBFE">一对一</button>
+        <button class="ow-btn" data-v="班课"   onclick="setNewContractType('班课')"   style="background:#FEF9C3;color:#78350F;border-color:#FDE68A">班课</button>
+        <button class="ow-btn" data-v="留学"   onclick="setNewContractType('留学')"   style="background:#F5F3FF;color:#4C1D95;border-color:#DDD6FE">留学</button>
+      </div>
+      <div class="fr"><div class="fl">课程方案</div><input type="text" id="nf-course" class="fi" placeholder="如：雅思在线课…"></div>
+      <div class="fr"><div class="fl">金额</div><input type="number" id="nf-amount" class="fi" placeholder="合同金额"></div>
+      <div class="fr"><div class="fl">签约日期</div><input type="date" id="nf-sign-date" class="fi"></div>
+    </div>
+    <div class="card">
+      <div class="fr" style="border-top:none">
+        <div class="fl">已排课程</div>
+        <textarea id="nf-arranged" class="fi fita" placeholder="课程安排情况…"></textarea>
+      </div>
+    </div>
+    <div class="card">
+      <div class="fr" style="border-top:none">
+        <div class="fl">提醒时间</div>
+        <input type="date" id="nf-remind-date" class="fi">
+      </div>
+      <div class="fr">
+        <div class="fl">提醒备注</div>
+        <textarea id="nf-remind-note" class="fi fita" placeholder="提醒内容…"></textarea>
+      </div>
+    </div>
+    <div class="card">
+      <div class="fr" style="border-top:none">
+        <div class="fl">备注</div>
+        <textarea id="nf-remark" class="fi fita" placeholder="其他备注…"></textarea>
+      </div>
+    </div>
+  </div>
+  <div class="savebar">
+    <button id="ncreate-btn" class="savebtn" onclick="doStudentCreate()">创建学员</button>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════
+// 新增学员
+// ══════════════════════════════════════════════════════
+let newContractType = '';
+
+function setNewContractType(v){
+  newContractType = (newContractType===v)?'':v;
+  document.querySelectorAll('#s-maintain-new .ow-btn[data-v]').forEach(b=>
+    b.classList.toggle('sel', b.dataset.v===newContractType));
+}
+
+async function doStudentCreate(){
+  const btn = document.getElementById('ncreate-btn');
+  btn.disabled=true; btn.textContent='创建中…';
+  try {
+    const fields = {};
+    const name = document.getElementById('nf-name').value.trim();
+    if(!name){ toast('请填写学员姓名'); btn.disabled=false; btn.textContent='创建学员'; return; }
+    fields['学员姓名'] = name;
+    const phone = document.getElementById('nf-phone').value.trim();
+    if(phone) fields['乙方电话'] = phone;
+    const guardian = document.getElementById('nf-guardian').value.trim();
+    if(guardian) fields['监护人姓名'] = guardian;
+    const gphone = document.getElementById('nf-guardian-phone').value.trim();
+    if(gphone) fields['监护人电话'] = gphone;
+    if(newContractType) fields['合同类型'] = newContractType;
+    const course = document.getElementById('nf-course').value.trim();
+    if(course) fields['课程方案'] = course;
+    const amount = document.getElementById('nf-amount').value;
+    if(amount) fields['金额'] = parseFloat(amount);
+    const signDate = document.getElementById('nf-sign-date').value;
+    if(signDate) fields['签约日期'] = new Date(signDate+'T15:59:00.000Z').getTime();
+    const arranged = document.getElementById('nf-arranged').value.trim();
+    if(arranged) fields['已排课程'] = arranged;
+    const remindDate = document.getElementById('nf-remind-date').value;
+    if(remindDate) fields['提醒时间'] = new Date(remindDate+'T15:59:00.000Z').getTime();
+    const remindNote = document.getElementById('nf-remind-note').value.trim();
+    if(remindNote) fields['提醒备注'] = remindNote;
+    const remark = document.getElementById('nf-remark').value.trim();
+    if(remark) fields['备注'] = remark;
+
+    const data = await proxyCall('student_create', {fields});
+    if(data.code===0){
+      toast('✅ 学员已创建');
+      // 清空表单
+      ['nf-name','nf-phone','nf-guardian','nf-guardian-phone','nf-course','nf-amount','nf-sign-date','nf-arranged','nf-remind-date','nf-remind-note','nf-remark'].forEach(id=>{
+        const el=document.getElementById(id); if(el) el.value='';
+      });
+      newContractType='';
+      document.querySelectorAll('#s-maintain-new .ow-btn').forEach(b=>b.classList.remove('sel'));
+      setTimeout(()=>showScreen('s-maintain-home'), 1200);
+    } else {
+      toast('创建失败：'+(data.msg||JSON.stringify(data)));
+    }
+  } catch(e){ toast('错误：'+e.message); }
+  btn.disabled=false; btn.textContent='创建学员';
+}
+</script>
 </body>
 </html>
