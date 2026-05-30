@@ -924,7 +924,7 @@ async function doSave(){
     if(curGroup)fields['客群']=curGroup;
     if(!Object.keys(fields).length){toast('没有需要保存的变更');btn.disabled=false;btn.textContent='保存更新';return;}
     const data=await proxyCall('update',{recordId:cur.record_id,fields});
-    if(data.code===0){Object.assign(cur.fields,fields);checkAndRemove(fields,curCat,listStore,cur,goList);}
+    if(data.code===0){Object.assign(cur.fields,fields);checkAndRemove(fields,curCat,listStore,cur,goList);if(listStore.includes(cur))renderList();}
     else toast('保存失败：'+(data.msg||JSON.stringify(data)));
   }catch(e){toast('错误：'+e.message);}
   btn.disabled=false;btn.textContent='保存更新';
@@ -1423,7 +1423,18 @@ async function doStudentSave(){
 
     if(!Object.keys(fields).length){ toast('没有需要保存的变更'); btn.disabled=false; btn.textContent='保存更新'; return; }
     const data = await proxyCall('student_update', {recordId: curStudent.record_id, fields});
-    if(data.code===0){ Object.assign(curStudent.fields,fields); checkAndRemove(fields,curCat,studentStore,curStudent,()=>showScreen('s-maintain-list')); }
+    if(data.code===0){
+      Object.assign(curStudent.fields, fields);
+      if(curCat==="student_today_contract"||curCat==="student_month_contract"){
+        proxyCall(curCat,{sumField:"金额"}).then(d=>{
+          const elId=curCat==="student_today_contract"?"scnt-today-contract":"scnt-month-contract";
+          const el=document.getElementById(elId);
+          if(el){const sum=d.data?.sum||0,cnt=d.data?.total||0;el.textContent=sum>0?`¥${sum.toLocaleString("zh-CN")} · ${cnt}单`:`${cnt} 单`;}
+        }).catch(()=>{});
+      }
+      checkAndRemove(fields,curCat,studentStore,curStudent,()=>showScreen("s-maintain-list"));
+      if(studentStore.includes(curStudent)) renderStudentList();
+    }
     else toast('保存失败：'+(data.msg||JSON.stringify(data)));
   } catch(e){ toast('错误：'+e.message); }
   btn.disabled=false; btn.textContent='保存更新';
