@@ -83,8 +83,8 @@ html,body{height:100%;background:var(--bg);font-family:-apple-system,'PingFang S
 .sb:hover{background:rgba(255,255,255,.25);box-shadow:0 4px 12px rgba(0,0,0,.2);}
 
 /* ════ 内容区 ════ */
-.ct{padding:32px 16px calc(env(safe-area-inset-bottom)+20px);overflow:hidden}
-.ctd{padding:32px 16px calc(env(safe-area-inset-bottom)+86px);overflow:hidden}
+.ct{padding:12px 16px calc(env(safe-area-inset-bottom)+20px)}
+.ctd{padding:14px 16px calc(env(safe-area-inset-bottom)+86px)}
 
 /* ════ 首页分类按钮 ════ */
 .btn-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:20px}
@@ -127,7 +127,7 @@ html,body{height:100%;background:var(--bg);font-family:-apple-system,'PingFang S
 /* ════ 列表项 ════ */
 .ri{
   background:var(--card);border-radius:var(--radius);
-  padding:14px 16px;margin-bottom:10px;
+  padding:14px 16px;margin-bottom:10px;margin-top:0;
   display:flex;align-items:center;gap:12px;cursor:pointer;
   position:relative;z-index:1;
   box-shadow:var(--shadow);
@@ -306,7 +306,6 @@ input[type=date].fi{color:var(--text)}
     <div id="daily-quote" class="hd-phone" onclick="refreshQuote()" style="margin-top:14px;line-height:1.6;font-style:italic;opacity:.85;letter-spacing:.3px;cursor:pointer" title="点击换一句">加载中…</div>
   </div>
   <div class="ct" style="padding-top:32px">
-  <div style="position:absolute;top:-60px;right:-60px;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,rgba(139,92,246,.28) 0%,transparent 65%);pointer-events:none;z-index:0"></div>
 
 
     <!-- 跨表搜索 -->
@@ -351,7 +350,6 @@ input[type=date].fi{color:var(--text)}
     </div>
   </div>
   <div class="ct" >
-  <div style="position:absolute;top:-60px;right:-60px;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,rgba(139,92,246,.28) 0%,transparent 65%);pointer-events:none;z-index:0"></div>
 
 
     <div class="btn-grid">
@@ -410,7 +408,6 @@ input[type=date].fi{color:var(--text)}
     </div>
   </div>
   <div class="ct" id="list-content">
-  <div style="position:absolute;top:-60px;right:-60px;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,rgba(139,92,246,.28) 0%,transparent 65%);pointer-events:none;z-index:0"></div>
 
 <div class="loading">加载中…</div></div>
 </div>
@@ -436,7 +433,6 @@ input[type=date].fi{color:var(--text)}
     </div>
   </div>
   <div class="ctd">
-  <div style="position:absolute;top:-60px;right:-60px;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,rgba(139,92,246,.28) 0%,transparent 65%);pointer-events:none;z-index:0"></div>
 
 
 
@@ -576,7 +572,6 @@ input[type=date].fi{color:var(--text)}
     </div>
   </div>
   <div class="ctd" style="padding-bottom:100px">
-  <div style="position:absolute;top:-60px;right:-60px;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,rgba(139,92,246,.28) 0%,transparent 65%);pointer-events:none;z-index:0"></div>
 
 
 
@@ -1609,7 +1604,6 @@ async function doMaintainFilter(){
     </div>
   </div>
   <div class="ct" >
-  <div style="position:absolute;top:-60px;right:-60px;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,rgba(139,92,246,.28) 0%,transparent 65%);pointer-events:none;z-index:0"></div>
 
 
     <div class="btn-grid">
@@ -1668,7 +1662,6 @@ async function doMaintainFilter(){
     </div>
   </div>
   <div class="ct" id="maintain-list-content">
-  <div style="position:absolute;top:-60px;right:-60px;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,rgba(139,92,246,.28) 0%,transparent 65%);pointer-events:none;z-index:0"></div>
 
 <div class="loading">加载中…</div></div>
 </div>
@@ -1688,7 +1681,6 @@ async function doMaintainFilter(){
     </div>
   </div>
   <div class="ctd">
-  <div style="position:absolute;top:-60px;right:-60px;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,rgba(139,92,246,.28) 0%,transparent 65%);pointer-events:none;z-index:0"></div>
 
 
 
@@ -1799,7 +1791,6 @@ async function doMaintainFilter(){
     </div>
   </div>
   <div class="ct" style="padding-bottom:100px">
-  <div style="position:absolute;top:-60px;right:-60px;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,rgba(139,92,246,.28) 0%,transparent 65%);pointer-events:none;z-index:0"></div>
 
 
     <div class="card">
@@ -1865,7 +1856,6 @@ async function doMaintainFilter(){
     </div>
   </div>
   <div class="ctd">
-  <div style="position:absolute;top:-60px;right:-60px;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,rgba(139,92,246,.28) 0%,transparent 65%);pointer-events:none;z-index:0"></div>
 
 
     <div class="card">
