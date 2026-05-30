@@ -727,6 +727,9 @@ function renderList() {
   const sub=document.getElementById('l-sub');
   if(sub) sub.textContent='共 '+listStore.length+' 条';
   if(!listStore.length){el.innerHTML='<div class="empty-state"><div class="ei">😌</div>暂无数据</div>';return;}
+  // 倒序排列：分配类用分配时间，跟进类用下次跟进日期
+  const sortField = (curCat==='month'||curCat==='today_assigned') ? '分配时间' : '下次跟进日期';
+  listStore = [...listStore].sort((a,b)=>(b.fields[sortField]||0)-(a.fields[sortField]||0));
   el.innerHTML=listStore.map((item,idx)=>{
     const f=item.fields;
     const name=rv(f['姓名'])||'（无姓名）';
@@ -1307,6 +1310,9 @@ function renderStudentList(){
   if(sub) sub.textContent = '共 '+studentStore.length+' 条';
   if(!studentStore.length){ el.innerHTML='<div class="empty-state"><div class="ei">😌</div>暂无数据</div>'; return; }
   const isContractCat = (curCat === 'student_today_contract' || curCat === 'student_month_contract');
+  // 倒序排列：签约类用签约日期，提醒类用提醒时间
+  const studentSortField = isContractCat ? '签约日期' : '提醒时间';
+  studentStore = [...studentStore].sort((a,b)=>(b.fields[studentSortField]||0)-(a.fields[studentSortField]||0));
   el.innerHTML = studentStore.map((item,idx)=>{
     const f = item.fields;
     const name    = rv(f['学员姓名']) || '（无姓名）';
