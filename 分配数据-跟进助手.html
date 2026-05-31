@@ -1768,7 +1768,7 @@ async function doMaintainFilter(){
       <button class="hd-back" onclick="showScreen('s-maintain-list')"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11 4L6 9L11 14" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     </div>
   </div>
-  <div class="ctd" style="padding-top:12px">
+  <div class="ctd" style="padding-top:12px;padding-bottom:100px">
 
 
 
@@ -1839,6 +1839,10 @@ async function doMaintainFilter(){
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px"><div class="fl" style="margin-bottom:0">已排课程</div><button onclick="var e=document.getElementById('mf-arranged');e.value='';e.focus()" style="background:none;border:none;color:var(--hint);font-size:20px;cursor:pointer;padding:0 2px;line-height:1;flex-shrink:0">×</button></div>
         <textarea id="mf-arranged" class="fi fita" placeholder="课程安排情况…"></textarea>
       </div>
+      <div class="fr">
+        <div class="fl">最后更新日期</div>
+        <div id="mf-last-update" class="firo empty">—</div>
+      </div>
     </div>
 
     <!-- 提醒 -->
@@ -1858,10 +1862,6 @@ async function doMaintainFilter(){
       <div class="fr" style="border-top:none">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px"><div class="fl" style="margin-bottom:0">备注</div><button onclick="var e=document.getElementById('mf-remark');e.value='';e.focus()" style="background:none;border:none;color:var(--hint);font-size:20px;cursor:pointer;padding:0 2px;line-height:1;flex-shrink:0">×</button></div>
         <textarea id="mf-remark" class="fi fita" placeholder="其他备注…"></textarea>
-      </div>
-      <div class="fr">
-        <div class="fl">最后更新日期</div>
-        <div id="mf-last-update" class="firo empty">—</div>
       </div>
     </div>
 
