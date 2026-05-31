@@ -437,7 +437,7 @@ input[type=date].fi{color:var(--text)}
       <button class="hd-back" onclick="goList()"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11 4L6 9L11 14" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     </div>
   </div>
-  <div class="ctd">
+  <div class="ctd" style="padding-top:12px">
 
 
 
@@ -455,31 +455,58 @@ input[type=date].fi{color:var(--text)}
       </div>
     </div>
 
-    <!-- 意向 -->
-    <div class="card">
-      <div class="cl">意向</div>
-      <div class="ig">
-        <button class="ib" data-v="A" onclick="setIntent('A')">A</button>
-        <button class="ib" data-v="B" onclick="setIntent('B')">B</button>
-        <button class="ib" data-v="C" onclick="setIntent('C')">C</button>
-        <button class="ib" data-v="D" onclick="setIntent('D')">D</button>
-        <button class="ib" data-v="E" onclick="setIntent('E')">E</button>
-        <button class="ib" data-v="F" onclick="setIntent('F')">F</button>
-        <button class="ib" data-v="G" onclick="setIntent('G')">G</button>
-        <button class="ib" data-v="已报名" onclick="setIntent('已报名')" style="font-size:12px">✓已报名</button>
-      </div>
-    </div>
+    <!-- ══ 快速选项区（置顶）══ -->
+    <div class="card" style="padding:0">
 
-    <!-- 客群 -->
-    <div class="card">
-      <div class="cl">客群</div>
-      <div style="display:flex;flex-wrap:wrap;gap:8px;padding:10px 13px 14px">
-        <button class="ow-btn" data-v="小学生" onclick="setGroup('小学生')">小学生</button>
-        <button class="ow-btn" data-v="初中生" onclick="setGroup('初中生')">初中生</button>
-        <button class="ow-btn" data-v="高中生" onclick="setGroup('高中生')">高中生</button>
-        <button class="ow-btn" data-v="大学生" onclick="setGroup('大学生')">大学生</button>
-        <button class="ow-btn" data-v="成人"   onclick="setGroup('成人')">成人</button>
+      <!-- 留学报备 -->
+      <div style="padding:12px 14px 10px;border-bottom:1px solid var(--border)">
+        <div class="fl" style="margin-bottom:8px">留学报备</div>
+        <div style="display:flex;gap:8px">
+          <button class="yn-btn" id="yn-yes" onclick="setYN('是')">是</button>
+          <button class="yn-btn" id="yn-no"  onclick="setYN('否')">否</button>
+        </div>
       </div>
+
+      <!-- 意向 + 客群 并排（意向在左窄，客群在右宽） -->
+      <div style="display:flex;border-bottom:1px solid var(--border)">
+        <!-- 意向 -->
+        <div style="flex:1;padding:13px 16px;border-right:1px solid var(--border);min-width:0">
+          <div class="fl" style="margin-bottom:8px">意向</div>
+          <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;text-align:center">
+            <button class="ow-btn" data-v="A" onclick="setIntent('A')" style="padding:6px 4px;text-align:center;width:100%">A</button>
+            <button class="ow-btn" data-v="B" onclick="setIntent('B')" style="padding:6px 4px;text-align:center;width:100%">B</button>
+            <button class="ow-btn" data-v="C" onclick="setIntent('C')" style="padding:6px 4px;text-align:center;width:100%">C</button>
+            <button class="ow-btn" data-v="D" onclick="setIntent('D')" style="padding:6px 4px;text-align:center;width:100%">D</button>
+            <button class="ow-btn" data-v="E" onclick="setIntent('E')" style="padding:6px 4px;text-align:center;width:100%">E</button>
+            <button class="ow-btn" data-v="F" onclick="setIntent('F')" style="padding:6px 4px;text-align:center;width:100%">F</button>
+            <button class="ow-btn" data-v="G" onclick="setIntent('G')" style="padding:6px 4px;text-align:center;width:100%">G</button>
+            <button class="ow-btn" data-v="已报名" onclick="setIntent('已报名')" style="padding:6px 4px;font-size:12px;text-align:center;width:100%;grid-column:span 2">报名</button>
+          </div>
+        </div>
+        <!-- 客群 -->
+        <div style="flex:1.4;padding:13px 16px;min-width:0;overflow:hidden">
+          <div class="fl" style="margin-bottom:8px">客群</div>
+          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px">
+            <button class="ow-btn" data-v="小学生" onclick="setGroup('小学生')" style="font-size:12px;text-align:center">小学生</button>
+            <button class="ow-btn" data-v="初中生" onclick="setGroup('初中生')" style="font-size:12px;text-align:center">初中生</button>
+            <button class="ow-btn" data-v="高中生" onclick="setGroup('高中生')" style="font-size:12px;text-align:center">高中生</button>
+            <button class="ow-btn" data-v="大学生" onclick="setGroup('大学生')" style="font-size:12px;text-align:center">大学生</button>
+            <button class="ow-btn" data-v="成人"   onclick="setGroup('成人')"   style="font-size:12px;text-align:center;grid-column:span 2">成人</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 是否自有/曾哥/他人 -->
+      <div style="padding:12px 14px 12px">
+        <div class="fl" style="margin-bottom:8px">是否自有 / 曾哥 / 他人</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="ow-btn" data-v="是"   onclick="setOwner('是')">自有</button>
+          <button class="ow-btn" data-v="否"   onclick="setOwner('否')">否</button>
+          <button class="ow-btn" data-v="曾哥" onclick="setOwner('曾哥')">曾哥</button>
+          <button class="ow-btn" data-v="他人" onclick="setOwner('他人')">他人</button>
+        </div>
+      </div>
+
     </div>
 
     <!-- 客户信息只读 -->
@@ -526,25 +553,7 @@ input[type=date].fi{color:var(--text)}
       </div>
     </div>
 
-    <!-- 留学报备 & 是否自有 -->
-    <div class="card">
-      <div class="fr" style="border-top:none">
-        <div class="fl">留学报备</div>
-        <div class="yn-row">
-          <button class="yn-btn" id="yn-yes" onclick="setYN('是')">是</button>
-          <button class="yn-btn" id="yn-no"  onclick="setYN('否')">否</button>
-        </div>
-      </div>
-      <div class="fr">
-        <div class="fl">是否自有 / 曾哥 / 他人</div>
-        <div class="ow-row">
-          <button class="ow-btn" data-v="是"   onclick="setOwner('是')">是</button>
-          <button class="ow-btn" data-v="否"   onclick="setOwner('否')">否</button>
-          <button class="ow-btn" data-v="曾哥" onclick="setOwner('曾哥')">曾哥</button>
-          <button class="ow-btn" data-v="他人" onclick="setOwner('他人')">他人</button>
-        </div>
-      </div>
-    </div>
+
 
     <!-- 意向说明 -->
     <div class="legend">
@@ -576,7 +585,7 @@ input[type=date].fi{color:var(--text)}
       <button class="hd-back" onclick="goHome()"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11 4L6 9L11 14" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     </div>
   </div>
-  <div class="ctd" style="padding-bottom:100px">
+  <div class="ctd" style="padding-top:12px;padding-bottom:100px">
 
 
 
@@ -889,7 +898,17 @@ function openRecord(idx){
 }
 
 function setIntent(v){curIntent=(curIntent===v)?'':v;renderIntent();}
-function renderIntent(){document.querySelectorAll('.ib').forEach(b=>b.classList.toggle('sel',b.dataset.v===curIntent));}
+function renderIntent(){
+  const colors={'A':'#EF4444','B':'#7C3AED','C':'#38BDF8','D':'#16A34A','E':'#94A3B8','F':'#475569','G':'#1E293B','已报名':'#D97706'};
+  document.querySelectorAll('#s-detail .ow-btn[data-v]').forEach(b=>{
+    // 只处理意向按钮（A-G 和已报名）
+    if(!colors[b.dataset.v]) return;
+    const sel = b.dataset.v === curIntent;
+    b.classList.toggle('sel', sel);
+    if(sel){ b.style.background=colors[b.dataset.v]; b.style.borderColor=colors[b.dataset.v]; b.style.color='#fff'; b.style.borderWidth='2px'; }
+    else{ b.style.background=''; b.style.borderColor=''; b.style.color=''; b.style.borderWidth=''; }
+  });
+}
 function setYN(v){curYN=(curYN===v)?'':v;renderYN();}
 function renderYN(){
   document.getElementById('yn-yes').className='yn-btn'+(curYN==='是'?' sel-yes':'');
@@ -1749,7 +1768,7 @@ async function doMaintainFilter(){
       <button class="hd-back" onclick="showScreen('s-maintain-list')"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11 4L6 9L11 14" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     </div>
   </div>
-  <div class="ctd">
+  <div class="ctd" style="padding-top:12px">
 
 
 
@@ -1859,7 +1878,7 @@ async function doMaintainFilter(){
       <button class="hd-back" onclick="showScreen('s-maintain-home')"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11 4L6 9L11 14" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     </div>
   </div>
-  <div class="ctd" style="padding-bottom:100px">
+  <div class="ctd" style="padding-top:12px;padding-bottom:100px">
 
     <!-- 合同类型 -->
     <div class="card">
@@ -1931,7 +1950,7 @@ async function doMaintainFilter(){
       <button class="hd-back" onclick="showScreen('s-maintain-home')"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11 4L6 9L11 14" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     </div>
   </div>
-  <div class="ctd">
+  <div class="ctd" style="padding-top:12px">
 
 
     <div class="card">
