@@ -1796,15 +1796,30 @@ async function doMaintainFilter(){
       </div>
     </div>
 
+    <!-- ══ 快速选项区（置顶）══ -->
+    <div class="card" style="padding:0">
+      <!-- 合同类型 -->
+      <div style="padding:12px 16px 12px;border-bottom:1px solid var(--border)">
+        <div class="fl" style="margin-bottom:8px">合同类型</div>
+        <div style="display:flex;gap:8px">
+          <button class="ow-btn" data-v="一对一" onclick="setContractType('一对一')" style="background:#EFF6FF;color:#1E3A8A;border-color:#BFDBFE">一对一</button>
+          <button class="ow-btn" data-v="班课"   onclick="setContractType('班课')"   style="background:#FEF9C3;color:#78350F;border-color:#FDE68A">班课</button>
+          <button class="ow-btn" data-v="留学"   onclick="setContractType('留学')"   style="background:#F5F3FF;color:#4C1D95;border-color:#DDD6FE">留学</button>
+        </div>
+      </div>
+      <!-- 留学是否签约 -->
+      <div style="padding:12px 16px 12px">
+        <div class="fl" style="margin-bottom:8px">留学是否签约</div>
+        <div style="display:flex;gap:8px">
+          <button class="yn-btn" id="myn-yes" onclick="setStudySign('是')">是</button>
+          <button class="yn-btn" id="myn-no"  onclick="setStudySign('否')">否</button>
+        </div>
+      </div>
+    </div>
+
     <!-- 合同信息 -->
     <div class="card">
-      <div class="cl">合同类型</div>
-      <div style="display:flex;flex-wrap:wrap;gap:8px;padding:10px 13px 14px">
-        <button class="ow-btn" data-v="一对一" onclick="setContractType('一对一')" style="background:#EFF6FF;color:#1E3A8A;border-color:#BFDBFE">一对一</button>
-        <button class="ow-btn" data-v="班课"   onclick="setContractType('班课')"   style="background:#FEF9C3;color:#78350F;border-color:#FDE68A">班课</button>
-        <button class="ow-btn" data-v="留学"   onclick="setContractType('留学')"   style="background:#F5F3FF;color:#4C1D95;border-color:#DDD6FE">留学</button>
-      </div>
-      <div class="fr">
+      <div class="fr" style="border-top:none">
         <div class="fl">课程方案</div>
         <input type="text" id="mf-course" class="fi" placeholder="如：雅思在线课、托福面授…">
       </div>
@@ -1823,17 +1838,6 @@ async function doMaintainFilter(){
       <div class="fr" style="border-top:none">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px"><div class="fl" style="margin-bottom:0">已排课程</div><button onclick="var e=document.getElementById('mf-arranged');e.value='';e.focus()" style="background:none;border:none;color:var(--hint);font-size:20px;cursor:pointer;padding:0 2px;line-height:1;flex-shrink:0">×</button></div>
         <textarea id="mf-arranged" class="fi fita" placeholder="课程安排情况…"></textarea>
-      </div>
-    </div>
-
-    <!-- 留学签约 -->
-    <div class="card">
-      <div class="fr" style="border-top:none">
-        <div class="fl">留学是否签约</div>
-        <div class="yn-row">
-          <button class="yn-btn" id="myn-yes" onclick="setStudySign('是')">是</button>
-          <button class="yn-btn" id="myn-no"  onclick="setStudySign('否')">否</button>
-        </div>
       </div>
     </div>
 
