@@ -1312,23 +1312,27 @@ function resetFilter() {
 }
 
 async function doCustomFilter() {
-  // 收集日期条件（用于前端过滤）
+  // 所有条件全部传给飞书服务端过滤
+  const conditions = [];
+
+  // 意向、客群等文字类条件（同字段多值 = OR，字段间 = AND）
+  for(const [field, vals] of Object.entries(filterMulti)){
+    if(vals.size === 0) continue;
+    conditions.push({ field_name: field, operator: 'contains', value: [...vals] });
+  }
+
+  // 日期条件：前端时间戳过滤（飞书日期API操作符不稳定，时间戳更可靠）
+  const dateFilters = [];
   const dateRangeMap = [
     { fromId:'fi-date-from', toId:'fi-date-to', field:'下次跟进日期' },
     { fromId:'fi-assign-from', toId:'fi-assign-to', field:'分配时间' },
   ];
-  const dateFilters = [];
   dateRangeMap.forEach(({fromId, toId, field})=>{
     const from = document.getElementById(fromId)?.value;
     const to   = document.getElementById(toId)?.value;
-    if(from) dateFilters.push({ field, op:'>=', ts: new Date(from).getTime() });
-    if(to)   dateFilters.push({ field, op:'<=', ts: new Date(to+'T23:59:59').getTime() });
+    if(from) dateFilters.push({ field, op:'>=', ts: new Date(from + 'T00:00:00+08:00').getTime() });
+    if(to)   dateFilters.push({ field, op:'<=', ts: new Date(to   + 'T23:59:59+08:00').getTime() });
   });
-
-  // 判断是否有任何条件
-  const hasMulti  = Object.values(filterMulti).some(s=>s.size>0);
-  const hasDate   = dateFilters.length > 0;
-  const fetchAll  = !hasMulti && !hasDate;
 
   curCat = 'custom';
   document.getElementById('l-title').textContent = '自定义筛选';
@@ -1337,43 +1341,34 @@ async function doCustomFilter() {
   showScreen('s-list');
 
   try {
-    // 拉全量数据，前端做过滤
-    // 同字段多个值 = OR，不同字段 = AND
-    const data = await proxyCall('all');
+    let data;
+    if(conditions.length > 0){
+      // 有意向/客群等文字条件：传给飞书服务端过滤
+      data = await proxyCall('custom', { filters: conditions, conjunction: 'and' });
+    } else {
+      // 只有日期条件或无条件：拉全量
+      data = await proxyCall('all');
+    }
     if(data.code!==0&&data.code!==undefined){
       document.getElementById('l-sub').textContent='查询出错';
       document.getElementById('list-content').innerHTML=`<div class="empty-state"><div class="ei">⚠️</div>错误：${esc(data.msg||'')}</div>`;
       return;
     }
-
     let items = data.data?.items || [];
-
-    if(!fetchAll){
+    // 日期条件前端过滤
+    if(dateFilters.length > 0){
       items = items.filter(item => {
         const f = item.fields;
-
-        // 多选字段：同字段内 OR（任意匹配）
-        for(const [field, vals] of Object.entries(filterMulti)){
-          if(vals.size === 0) continue;
-          const raw = f[field];
-          const fv = Array.isArray(raw) ? raw.map(r=>typeof r==='object'?r.value||r.text||String(r):String(r)) : [String(raw||'')];
-          const matched = [...vals].some(v => fv.some(r=>r.includes(v)));
-          if(!matched) return false; // 跨字段 AND
-        }
-
-        // 日期字段
         for(const {field, op, ts} of dateFilters){
           const raw = f[field];
-          if(raw==null) return false;
-          const t = typeof raw==='number'?raw:parseInt(raw);
-          if(op==='>='&&t<ts) return false;
-          if(op==='<='&&t>ts) return false;
+          if(raw == null) return false;
+          const t = typeof raw === 'number' ? raw : parseInt(raw);
+          if(op === '>=' && t < ts) return false;
+          if(op === '<=' && t > ts) return false;
         }
-
         return true;
       });
     }
-
     listStore = items;
     document.getElementById('l-sub').textContent = `共 ${listStore.length} 条`;
     renderList();
