@@ -1308,6 +1308,9 @@ function resetFilter() {
     b.classList.remove('sel');
     b.style.cssText = '';
   });
+  ['fi-date-from','fi-date-to','fi-assign-from','fi-assign-to'].forEach(id=>{
+    const el = document.getElementById(id); if(el) el.value = '';
+  });
   toast('已重置');
 }
 
