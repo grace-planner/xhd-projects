@@ -1327,11 +1327,20 @@ async function doCustomFilter() {
     { fromId:'fi-date-from', toId:'fi-date-to', field:'下次跟进日期' },
     { fromId:'fi-assign-from', toId:'fi-assign-to', field:'分配时间' },
   ];
+  // 飞书日期字段时间戳存法不统一：
+  // 有的存 UTC当天00:00（如吴乐森），有的存北京时间当天00:00即UTC前一天16:00（如赵小满）
+  // 起点：当天北京00:00（取最早）
+  // 终点：次日北京00:00（严格小于，能覆盖两种存法）
+  function bjDayTs(dateStr, isEnd) {
+    const d = new Date(dateStr + 'T00:00:00+08:00');
+    if(isEnd) d.setDate(d.getDate() + 1);
+    return d.getTime();
+  }
   dateRangeMap.forEach(({fromId, toId, field})=>{
     const from = document.getElementById(fromId)?.value;
     const to   = document.getElementById(toId)?.value;
-    if(from) dateFilters.push({ field, op:'>=', ts: new Date(from + 'T00:00:00+08:00').getTime() });
-    if(to)   dateFilters.push({ field, op:'<=', ts: new Date(to   + 'T23:59:59+08:00').getTime() });
+    if(from) dateFilters.push({ field, op:'>=', ts: bjDayTs(from, false) });
+    if(to)   dateFilters.push({ field, op:'<',  ts: bjDayTs(to,   true)  });
   });
 
   curCat = 'custom';
@@ -1363,8 +1372,9 @@ async function doCustomFilter() {
           const raw = f[field];
           if(raw == null) return false;
           const t = typeof raw === 'number' ? raw : parseInt(raw);
-          if(op === '>=' && t < ts) return false;
-          if(op === '<=' && t > ts) return false;
+          if(op === '>=' && t <  ts) return false;
+          if(op === '<=' && t >  ts) return false;
+          if(op === '<'  && t >= ts) return false;
         }
         return true;
       });
