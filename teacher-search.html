@@ -14,201 +14,93 @@
     --accent: #2d5a3d;
     --accent-light: #e8f0eb;
     --accent-mid: #4a8c61;
-    --warn: #c17d2a;
     --warn-light: #fdf3e3;
+    --warn: #c17d2a;
     --danger: #b83c3c;
     --radius: 10px;
     --radius-sm: 6px;
   }
-
   * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    font-family: 'Noto Serif SC', 'Source Han Serif CN', Georgia, serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    padding: 0;
-  }
-
-  header {
-    background: var(--accent);
-    color: #fff;
-    padding: 1.5rem 2rem;
-    display: flex;
-    align-items: baseline;
-    gap: 1rem;
-  }
-  header h1 { font-size: 1.2rem; font-weight: 600; letter-spacing: 0.05em; }
-  header span { font-size: 0.8rem; opacity: 0.7; font-family: 'Noto Sans SC', sans-serif; }
-
+  body { font-family: 'Noto Serif SC', Georgia, serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+  header { background: var(--accent); color: #fff; padding: 1.25rem 2rem; display: flex; align-items: baseline; gap: 1rem; }
+  header h1 { font-size: 1.1rem; font-weight: 600; letter-spacing: 0.05em; }
+  header span { font-size: 0.78rem; opacity: 0.7; font-family: 'Noto Sans SC', sans-serif; }
   main { max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem; }
 
-  /* Upload zone */
   #upload-zone {
-    border: 2px dashed var(--border);
-    border-radius: var(--radius);
-    background: var(--surface);
-    padding: 3rem 2rem;
-    text-align: center;
-    cursor: pointer;
-    transition: border-color 0.2s, background 0.2s;
+    border: 2px dashed var(--border); border-radius: var(--radius);
+    background: var(--surface); padding: 2.5rem 2rem; text-align: center;
+    cursor: pointer; transition: border-color 0.2s, background 0.2s;
   }
-  #upload-zone:hover, #upload-zone.drag-over {
-    border-color: var(--accent-mid);
-    background: var(--accent-light);
-  }
-  #upload-zone svg { width: 40px; height: 40px; color: var(--muted); margin-bottom: 0.75rem; }
+  #upload-zone:hover, #upload-zone.drag-over { border-color: var(--accent-mid); background: var(--accent-light); }
+  #upload-zone svg { width: 36px; height: 36px; color: var(--muted); margin-bottom: 0.6rem; }
   #upload-zone .label { font-size: 1rem; font-weight: 600; color: var(--text); margin-bottom: 0.3rem; font-family: 'Noto Sans SC', sans-serif; }
-  #upload-zone .sub { font-size: 0.82rem; color: var(--muted); font-family: 'Noto Sans SC', sans-serif; }
+  #upload-zone .sub { font-size: 0.8rem; color: var(--muted); font-family: 'Noto Sans SC', sans-serif; }
   #file-input { display: none; }
 
-  /* Progress */
-  #progress-section { margin-top: 1.5rem; display: none; }
-  .file-progress {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 1rem 1.25rem;
-    margin-bottom: 0.75rem;
-  }
-  .file-progress .name { font-size: 0.9rem; font-weight: 600; font-family: 'Noto Sans SC', sans-serif; margin-bottom: 0.4rem; display: flex; align-items: center; gap: 0.5rem; }
-  .file-progress .status { font-size: 0.8rem; color: var(--muted); font-family: 'Noto Sans SC', sans-serif; margin-bottom: 0.5rem; }
+  #progress-section { margin-top: 1.5rem; }
+  .file-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem 1.25rem; margin-bottom: 0.75rem; }
+  .file-card .fname { font-size: 0.9rem; font-weight: 600; font-family: 'Noto Sans SC', sans-serif; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.5rem; }
+  .file-card .status { font-size: 0.78rem; color: var(--muted); font-family: 'Noto Sans SC', sans-serif; margin-bottom: 0.45rem; }
   .bar-wrap { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
-  .bar { height: 3px; background: var(--accent-mid); width: 0%; transition: width 0.4s; border-radius: 2px; }
+  .bar { height: 3px; background: var(--accent-mid); width: 0%; transition: width 0.3s; border-radius: 2px; }
   .bar.done { background: var(--accent); }
   .bar.error { background: var(--danger); }
 
-  /* Search */
   #search-section { margin-top: 1.5rem; display: none; }
   .search-wrap { position: relative; }
-  .search-wrap svg { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; color: var(--muted); pointer-events: none; }
+  .search-wrap svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 17px; height: 17px; color: var(--muted); pointer-events: none; }
   #search-input {
-    width: 100%;
-    padding: 0.85rem 1rem 0.85rem 2.75rem;
-    font-size: 1rem;
-    font-family: 'Noto Sans SC', sans-serif;
-    border: 1.5px solid var(--border);
-    border-radius: var(--radius);
-    background: var(--surface);
-    color: var(--text);
-    outline: none;
-    transition: border-color 0.2s;
+    width: 100%; padding: 0.85rem 1rem 0.85rem 2.6rem;
+    font-size: 1rem; font-family: 'Noto Sans SC', sans-serif;
+    border: 1.5px solid var(--border); border-radius: var(--radius);
+    background: var(--surface); color: var(--text); outline: none; transition: border-color 0.2s;
   }
   #search-input:focus { border-color: var(--accent-mid); }
   #search-input::placeholder { color: var(--muted); }
+  .stats-row { display: flex; gap: 0.75rem; margin-top: 0.75rem; flex-wrap: wrap; }
+  .chip { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 0.25rem 0.8rem; font-size: 0.77rem; font-family: 'Noto Sans SC', sans-serif; color: var(--muted); }
+  .chip strong { color: var(--text); }
+  .search-meta { font-size: 0.78rem; color: var(--muted); font-family: 'Noto Sans SC', sans-serif; margin-top: 0.5rem; }
 
-  .search-meta { font-size: 0.8rem; color: var(--muted); font-family: 'Noto Sans SC', sans-serif; margin-top: 0.6rem; }
-
-  /* Stats row */
-  .stats-row { display: flex; gap: 1rem; margin-top: 1rem; flex-wrap: wrap; }
-  .stat-chip {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 0.3rem 0.85rem;
-    font-size: 0.78rem;
-    font-family: 'Noto Sans SC', sans-serif;
-    color: var(--muted);
-    display: flex; align-items: center; gap: 0.35rem;
-  }
-  .stat-chip strong { color: var(--text); }
-
-  /* Results */
-  #results-section { margin-top: 1.5rem; }
-  .result-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 1.1rem 1.3rem;
-    margin-bottom: 0.75rem;
-    transition: border-color 0.15s;
-  }
+  #results-section { margin-top: 1rem; }
+  .result-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem 1.25rem; margin-bottom: 0.75rem; transition: border-color 0.15s; }
   .result-card:hover { border-color: var(--accent-mid); }
-  .result-card .meta {
-    display: flex; align-items: center; gap: 0.5rem;
-    font-size: 0.75rem; color: var(--muted);
-    font-family: 'Noto Sans SC', sans-serif;
-    margin-bottom: 0.5rem;
-  }
-  .result-card .meta .file-tag {
-    background: var(--accent-light);
-    color: var(--accent);
-    padding: 0.15rem 0.6rem;
-    border-radius: 20px;
-    font-weight: 600;
-  }
-  .result-card .content {
-    font-size: 0.9rem;
-    line-height: 1.8;
-    color: var(--text);
-    font-family: 'Noto Sans SC', sans-serif;
-    white-space: pre-wrap;
-    word-break: break-all;
-  }
-  mark {
-    background: var(--warn-light);
-    color: var(--warn);
-    border-radius: 2px;
-    padding: 0 2px;
-    font-weight: 600;
-  }
+  .result-card .meta { display: flex; align-items: center; gap: 0.5rem; font-size: 0.74rem; color: var(--muted); font-family: 'Noto Sans SC', sans-serif; margin-bottom: 0.45rem; }
+  .file-tag { background: var(--accent-light); color: var(--accent); padding: 0.12rem 0.55rem; border-radius: 20px; font-weight: 600; }
+  .method-tag { background: #eef4ff; color: #3a5fa0; padding: 0.12rem 0.55rem; border-radius: 20px; }
+  .result-card .content { font-size: 0.88rem; line-height: 1.8; color: var(--text); font-family: 'Noto Sans SC', sans-serif; white-space: pre-wrap; word-break: break-all; }
+  mark { background: var(--warn-light); color: var(--warn); border-radius: 2px; padding: 0 2px; font-weight: 600; }
+  .empty-state { text-align: center; padding: 3rem; color: var(--muted); font-family: 'Noto Sans SC', sans-serif; font-size: 0.9rem; }
 
-  .empty-state {
-    text-align: center;
-    padding: 3rem;
-    color: var(--muted);
-    font-family: 'Noto Sans SC', sans-serif;
-    font-size: 0.9rem;
-  }
-
-  /* Add more button */
-  #add-more-btn {
-    display: none;
-    margin-top: 1rem;
-    padding: 0.6rem 1.2rem;
-    font-size: 0.85rem;
-    font-family: 'Noto Sans SC', sans-serif;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    color: var(--text);
-    cursor: pointer;
-    transition: border-color 0.2s, background 0.2s;
-  }
+  #add-more-btn { display: none; margin-top: 1rem; padding: 0.55rem 1.1rem; font-size: 0.83rem; font-family: 'Noto Sans SC', sans-serif; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text); cursor: pointer; transition: border-color 0.2s, background 0.2s; }
   #add-more-btn:hover { border-color: var(--accent-mid); background: var(--accent-light); }
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;600&family=Noto+Serif+SC:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
-
 <header>
   <h1>老师简介检索</h1>
-  <span>上传图片型PDF · OCR识别 · 关键词搜索</span>
+  <span>支持文字层PDF + 图片型PDF · 关键词即时搜索</span>
 </header>
-
 <main>
   <div id="upload-zone" onclick="document.getElementById('file-input').click()" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
       <path d="M12 16V8m0 0-3 3m3-3 3 3M6 20h12a2 2 0 002-2V8l-5-5H6a2 2 0 00-2 2v13a2 2 0 002 2z"/>
     </svg>
     <div class="label">拖入PDF文件，或点击选择</div>
-    <div class="sub">支持同时上传多个PDF · 自动OCR识别图片内容 · 中英文均可</div>
+    <div class="sub">支持同时上传多个PDF · 自动判断文字层或OCR识别 · 中英文均可</div>
     <input type="file" id="file-input" accept=".pdf" multiple onchange="handleFiles(this.files)">
   </div>
 
-  <button id="add-more-btn" onclick="document.getElementById('file-input').click()">
-    + 继续添加更多PDF
-  </button>
+  <button id="add-more-btn" onclick="document.getElementById('file-input').click()">+ 继续添加更多PDF</button>
 
   <div id="progress-section"></div>
 
   <div id="search-section">
     <div class="search-wrap">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-      </svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
       <input type="text" id="search-input" placeholder="输入关键词，如：姓名、科目、学历、学校…" oninput="doSearch(this.value)">
     </div>
     <div class="stats-row" id="stats-row"></div>
@@ -219,167 +111,122 @@
 </main>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/4.1.1/tesseract.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/2.1.5/tesseract.min.js"></script>
 <script>
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
+const MIN_TEXT_CHARS = 30; // 少于这个字符数则判定为图片页，走OCR
 let allPages = [];
-let totalFiles = 0;
-let totalPages = 0;
 
-function handleDragOver(e) {
-  e.preventDefault();
-  document.getElementById('upload-zone').classList.add('drag-over');
-}
-function handleDragLeave(e) {
-  document.getElementById('upload-zone').classList.remove('drag-over');
-}
-function handleDrop(e) {
-  e.preventDefault();
-  document.getElementById('upload-zone').classList.remove('drag-over');
-  const files = Array.from(e.dataTransfer.files).filter(f => f.name.toLowerCase().endsWith('.pdf'));
-  if (files.length) handleFiles(files);
-}
+function handleDragOver(e) { e.preventDefault(); document.getElementById('upload-zone').classList.add('drag-over'); }
+function handleDragLeave() { document.getElementById('upload-zone').classList.remove('drag-over'); }
+function handleDrop(e) { e.preventDefault(); handleDragLeave(); const f = [...e.dataTransfer.files].filter(f=>f.name.toLowerCase().endsWith('.pdf')); if(f.length) handleFiles(f); }
 
 async function handleFiles(files) {
-  const fileArr = Array.from(files);
-  if (!fileArr.length) return;
-
-  document.getElementById('progress-section').style.display = 'block';
+  const arr = [...files];
+  if (!arr.length) return;
   document.getElementById('add-more-btn').style.display = 'inline-block';
   document.getElementById('search-section').style.display = 'none';
   document.getElementById('results-section').innerHTML = '';
+  allPages = [];
 
-  for (let fi = 0; fi < fileArr.length; fi++) {
-    const file = fileArr[fi];
-    const id = 'fp_' + Date.now() + '_' + fi;
+  for (let i = 0; i < arr.length; i++) {
+    const file = arr[i];
+    const id = 'fc_' + Date.now() + '_' + i;
     const card = document.createElement('div');
-    card.className = 'file-progress';
-    card.id = id;
-    card.innerHTML = `
-      <div class="name">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-        ${file.name}
-      </div>
-      <div class="status" id="${id}-status">准备中…</div>
-      <div class="bar-wrap"><div class="bar" id="${id}-bar"></div></div>
-    `;
+    card.className = 'file-card'; card.id = id;
+    card.innerHTML = `<div class="fname"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>${file.name}</div><div class="status" id="${id}-st">准备中…</div><div class="bar-wrap"><div class="bar" id="${id}-bar"></div></div>`;
     document.getElementById('progress-section').appendChild(card);
-
+    const setSt = (msg, pct) => { document.getElementById(`${id}-st`).textContent = msg; document.getElementById(`${id}-bar`).style.width = pct + '%'; };
     try {
-      await processFile(file, id);
-      totalFiles++;
+      const buf = await file.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({data: buf}).promise;
+      const n = pdf.numPages;
+      let textCount = 0, ocrCount = 0;
+
+      for (let p = 1; p <= n; p++) {
+        setSt(`处理第 ${p}/${n} 页…`, Math.round((p-1)/n*90));
+        const page = await pdf.getPage(p);
+
+        // 先尝试提取文字层
+        const textContent = await page.getTextContent();
+        const extracted = textContent.items.map(i => i.str).join('').trim();
+
+        if (extracted.length >= MIN_TEXT_CHARS) {
+          // 文字层足够，直接用
+          allPages.push({ file: file.name, page: p, text: extracted, method: 'text' });
+          textCount++;
+        } else {
+          // 文字层不足，走OCR
+          setSt(`第 ${p}/${n} 页 OCR识别中…`, Math.round((p-1)/n*90));
+          const viewport = page.getViewport({scale: 2.0});
+          const canvas = document.createElement('canvas');
+          canvas.width = viewport.width; canvas.height = viewport.height;
+          await page.render({canvasContext: canvas.getContext('2d'), viewport}).promise;
+
+          const result = await Tesseract.recognize(canvas, 'chi_sim+eng', {logger: ()=>{}});
+          const ocrText = result.data.text.trim();
+          if (ocrText.length > 10) {
+            allPages.push({ file: file.name, page: p, text: ocrText, method: 'ocr' });
+            ocrCount++;
+          }
+        }
+      }
+
+      setSt(`完成 — 文字层 ${textCount} 页，OCR ${ocrCount} 页`, 100);
+      document.getElementById(`${id}-bar`).classList.add('done');
+      document.getElementById(`${id}-bar`).style.width = '100%';
     } catch(err) {
-      document.getElementById(`${id}-status`).textContent = '识别失败：' + err.message;
+      document.getElementById(`${id}-st`).textContent = '失败：' + err.message;
       document.getElementById(`${id}-bar`).classList.add('error');
       document.getElementById(`${id}-bar`).style.width = '100%';
     }
   }
 
-  document.getElementById('search-section').style.display = 'block';
-  updateStats();
-  showResults(allPages);
-}
-
-async function processFile(file, id) {
-  const setStatus = (msg, pct) => {
-    document.getElementById(`${id}-status`).textContent = msg;
-    const bar = document.getElementById(`${id}-bar`);
-    bar.style.width = pct + '%';
-  };
-
-  setStatus('读取PDF…', 5);
-  const arrayBuffer = await file.arrayBuffer();
-  const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-  const numPages = pdf.numPages;
-  let filePages = 0;
-
-  for (let p = 1; p <= numPages; p++) {
-    setStatus(`OCR识别第 ${p} / ${numPages} 页…`, Math.round(5 + (p-1)/numPages * 90));
-
-    const page = await pdf.getPage(p);
-    const viewport = page.getViewport({ scale: 2.0 });
-    const canvas = document.createElement('canvas');
-    canvas.width = viewport.width;
-    canvas.height = viewport.height;
-    await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
-    const dataUrl = canvas.toDataURL('image/png');
-
-    const worker = await Tesseract.createWorker(['chi_sim', 'eng'], 1, { logger: () => {} });
-    const { data: { text } } = await worker.recognize(dataUrl);
-    await worker.terminate();
-
-    const cleaned = text.trim();
-    if (cleaned.length > 10) {
-      allPages.push({ file: file.name, page: p, text: cleaned });
-      totalPages++;
-      filePages++;
-    }
+  if (allPages.length > 0) {
+    document.getElementById('search-section').style.display = 'block';
+    updateStats();
+    showResults(allPages);
   }
-
-  setStatus(`完成 — 识别 ${filePages} 页有效内容`, 100);
-  document.getElementById(`${id}-bar`).classList.add('done');
-  document.getElementById(`${id}-bar`).style.width = '100%';
 }
 
 function updateStats() {
-  const fileNames = [...new Set(allPages.map(p => p.file))];
-  document.getElementById('stats-row').innerHTML = `
-    <div class="stat-chip">文件 <strong>${fileNames.length}</strong> 份</div>
-    <div class="stat-chip">页面 <strong>${allPages.length}</strong> 页</div>
-  `;
+  const files = new Set(allPages.map(p=>p.file)).size;
+  const ocr = allPages.filter(p=>p.method==='ocr').length;
+  const txt = allPages.filter(p=>p.method==='text').length;
+  document.getElementById('stats-row').innerHTML = `<div class="chip">文件 <strong>${files}</strong> 份</div><div class="chip">共 <strong>${allPages.length}</strong> 页</div><div class="chip">文字层 <strong>${txt}</strong> 页</div><div class="chip">OCR <strong>${ocr}</strong> 页</div>`;
+  document.getElementById('search-meta').textContent = '输入关键词开始搜索';
 }
 
 function doSearch(q) {
   const query = q.trim();
-  if (!query) {
-    document.getElementById('search-meta').textContent = '';
-    showResults(allPages);
-    return;
-  }
+  if (!query) { document.getElementById('search-meta').textContent = '输入关键词开始搜索'; showResults(allPages); return; }
   const lower = query.toLowerCase();
   const filtered = allPages.filter(p => p.text.toLowerCase().includes(lower));
-  document.getElementById('search-meta').textContent = `找到 ${filtered.length} 条匹配结果`;
+  document.getElementById('search-meta').textContent = `找到 ${filtered.length} 条结果`;
   showResults(filtered, query);
 }
 
+function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
 function highlight(text, query) {
-  if (!query) return escHtml(text);
-  const safe = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  return escHtml(text).replace(new RegExp(escHtml(safe), 'gi'), m => `<mark>${m}</mark>`);
+  if (!query) return esc(text);
+  const safe = query.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+  return esc(text).replace(new RegExp(esc(safe),'gi'), m=>`<mark>${m}</mark>`);
 }
 
-function escHtml(s) {
-  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
-
-function getSnippet(text, query, maxLen = 400) {
-  if (!query) return text.slice(0, maxLen) + (text.length > maxLen ? '…' : '');
+function snippet(text, query, max=400) {
+  if (!query) return text.slice(0,max) + (text.length>max?'…':'');
   const idx = text.toLowerCase().indexOf(query.toLowerCase());
-  if (idx === -1) return text.slice(0, maxLen) + (text.length > maxLen ? '…' : '');
-  const start = Math.max(0, idx - 100);
-  const end = Math.min(text.length, start + maxLen);
-  return (start > 0 ? '…' : '') + text.slice(start, end) + (end < text.length ? '…' : '');
+  if (idx===-1) return text.slice(0,max)+(text.length>max?'…':'');
+  const s = Math.max(0,idx-100), e = Math.min(text.length,s+max);
+  return (s>0?'…':'')+text.slice(s,e)+(e<text.length?'…':'');
 }
 
-function showResults(list, query = '') {
+function showResults(list, query='') {
   const area = document.getElementById('results-section');
-  if (!list.length) {
-    area.innerHTML = '<div class="empty-state">未找到匹配内容</div>';
-    return;
-  }
-  area.innerHTML = list.map(p => {
-    const snippet = getSnippet(p.text, query);
-    return `
-      <div class="result-card">
-        <div class="meta">
-          <span class="file-tag">${escHtml(p.file)}</span>
-          <span>第 ${p.page} 页</span>
-        </div>
-        <div class="content">${highlight(snippet, query)}</div>
-      </div>
-    `;
-  }).join('');
+  if (!list.length) { area.innerHTML = '<div class="empty-state">未找到匹配内容</div>'; return; }
+  area.innerHTML = list.map(p => `<div class="result-card"><div class="meta"><span class="file-tag">${esc(p.file)}</span><span>第 ${p.page} 页</span><span class="method-tag">${p.method==='ocr'?'OCR':'文字层'}</span></div><div class="content">${highlight(snippet(p.text,query),query)}</div></div>`).join('');
 }
 </script>
 </body>
