@@ -1469,8 +1469,8 @@ async function doCustomFilter() {
   dateRangeMap.forEach(({fromId, toId, field})=>{
     const from = document.getElementById(fromId)?.value;
     const to   = document.getElementById(toId)?.value;
-    if(from) dateFilters.push({ field, op:'>=', ts: new Date(from).getTime() });
-    if(to)   dateFilters.push({ field, op:'<=', ts: new Date(to+'T23:59:59').getTime() });
+    if(from) dateFilters.push({ field, op:'>=', ts: new Date(from+'T00:00:00+08:00').getTime() });
+    if(to)   dateFilters.push({ field, op:'<=', ts: new Date(to+'T00:00:00+08:00').getTime() + 86400000 - 1 });
   });
 
   // 判断是否有任何条件
@@ -1928,12 +1928,12 @@ async function doMaintainFilter(){
   const dateFilters = [];
   const remindFrom = document.getElementById('mf-remind-from').value;
   const remindTo   = document.getElementById('mf-remind-to').value;
-  if(remindFrom) dateFilters.push({field:'提醒时间', op:'>=', ts:new Date(remindFrom).getTime()});
-  if(remindTo)   dateFilters.push({field:'提醒时间', op:'<=', ts:new Date(remindTo+'T23:59:59').getTime()});
+  if(remindFrom) dateFilters.push({field:'提醒时间', op:'>=', ts:new Date(remindFrom+'T00:00:00+08:00').getTime()});
+  if(remindTo)   dateFilters.push({field:'提醒时间', op:'<=', ts:new Date(remindTo+'T00:00:00+08:00').getTime() + 86400000 - 1});
   const signFrom = document.getElementById('mf-sign-from').value;
   const signTo   = document.getElementById('mf-sign-to').value;
-  if(signFrom) dateFilters.push({field:'签约日期', op:'>=', ts:new Date(signFrom).getTime()});
-  if(signTo)   dateFilters.push({field:'签约日期', op:'<=', ts:new Date(signTo+'T23:59:59').getTime()});
+  if(signFrom) dateFilters.push({field:'签约日期', op:'>=', ts:new Date(signFrom+'T00:00:00+08:00').getTime()});
+  if(signTo)   dateFilters.push({field:'签约日期', op:'<=', ts:new Date(signTo+'T00:00:00+08:00').getTime() + 86400000 - 1});
 
   const hasMulti = (filterMulti['合同类型']||new Set()).size>0 || (filterMulti['留学是否签约']||new Set()).size>0;
   const fetchAll = !hasMulti && !dateFilters.length;
