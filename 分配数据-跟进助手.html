@@ -305,10 +305,101 @@ input[type=date].fi{color:var(--text)}
 .meb-title{font-size:18px;font-weight:700;color:var(--text);margin-bottom:4px}
 .meb-desc{font-size:12px;color:var(--sub);line-height:1.4}
 .meb-arrow{font-size:22px;color:var(--hint);flex-shrink:0}
+
+/* ════ 宽屏分栏布局 ════ */
+@media (min-width:900px){
+  body{ background:#DDE3EC; }
+
+  /* 整体容器：主页 / 寻迹分栏 / 织网分栏 三选一 */
+  #app-root{
+    min-height:100vh;
+    display:flex;
+    align-items:stretch;
+  }
+
+  /* 主页：居中单列 */
+  #app-root.mode-main #split-xunzhi,
+  #app-root.mode-main #split-zhiwang{ display:none; }
+  #app-root.mode-main #s-main{ display:block; width:500px; margin:0 auto; box-shadow:0 0 60px rgba(0,0,0,.12); }
+
+  /* 寻迹分栏模式 */
+  #app-root.mode-xunzhi #s-main,
+  #app-root.mode-xunzhi #split-zhiwang{ display:none; }
+  #app-root.mode-xunzhi #split-xunzhi{ display:flex; flex:1; }
+
+  /* 织网分栏模式 */
+  #app-root.mode-zhiwang #s-main,
+  #app-root.mode-zhiwang #split-xunzhi{ display:none; }
+  #app-root.mode-zhiwang #split-zhiwang{ display:flex; flex:1; }
+
+  /* 分栏容器 */
+  .split-wrap{
+    display:none; /* 默认隐藏，由 mode-* 控制 */
+    width:100%;
+    align-items:stretch;
+  }
+
+  /* 左栏 */
+  .split-left{
+    width:380px;
+    flex-shrink:0;
+    background:var(--bg);
+    border-right:1px solid var(--border);
+    overflow-y:auto;
+    height:100vh;
+    position:sticky;
+    top:0;
+    box-shadow:2px 0 12px rgba(0,0,0,.06);
+  }
+
+  /* 右栏 */
+  .split-right{
+    flex:1;
+    min-width:0;
+    overflow-y:auto;
+    height:100vh;
+    background:var(--bg);
+  }
+
+  /* 右栏空占位 */
+  .split-right-empty{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    height:100%;
+    gap:14px;
+    color:var(--hint);
+    user-select:none;
+  }
+  .split-right-empty .sre-icon{ font-size:52px; opacity:.35; }
+  .split-right-empty .sre-text{ font-size:14px; opacity:.45; letter-spacing:.3px; }
+
+  /* 分栏内 screen 控制 */
+  .split-left  > .screen{ display:none; min-height:auto; }
+  .split-right > .screen{ display:none; min-height:auto; }
+  .split-left  > .screen.panel-active{ display:block; }
+  .split-right > .screen.panel-active{ display:block; }
+
+  /* 右栏隐藏返回按钮 */
+  .split-right .hd-back{ display:none !important; }
+
+  /* savebar 在右栏内吸底 */
+  .split-right .savebar{ position:sticky; bottom:0; }
+  .split-right .hd{ position:sticky; top:0; z-index:50; }
+}
+@media (max-width:899px){
+  #app-root{ display:contents; }
+  .split-wrap{ display:contents; }
+  .split-left{ display:contents; }
+  .split-right{ display:contents; }
+  .split-right-empty{ display:none !important; }
+}
 </style>
 
 </head>
 <body>
+<div id="app-root" class="mode-main">
 
 <!-- ═══ 首页 ═══ -->
 <div id="s-main" class="screen active">
@@ -354,7 +445,10 @@ input[type=date].fi{color:var(--text)}
   </div>
 </div>
 
-<div id="s-home" class="screen">
+<!-- ═══ 寻迹分栏 ═══ -->
+<div class="split-wrap" id="split-xunzhi">
+<div class="split-left" id="split-xunzhi-left">
+<div id="s-home" class="screen panel-active">
   <div class="hd hd-sub">
     <div class="hd-row-sub">
       <div class="hd-info">
@@ -431,6 +525,9 @@ input[type=date].fi{color:var(--text)}
 </div>
 
 <!-- ═══ 详情页 ═══ -->
+</div><!-- /split-left xunzhi -->
+<div class="split-right" id="split-xunzhi-right">
+<div class="split-right-empty" id="xunzhi-empty"><div class="sre-icon">⛳️</div><div class="sre-text">从左侧选择一条线索查看详情</div></div>
 <div id="s-detail" class="screen">
   <div class="hd hd-sub">
     <div class="hd-row-sub">
@@ -593,18 +690,6 @@ input[type=date].fi{color:var(--text)}
 
 
 
-    <!-- 意向说明 -->
-    <div class="legend">
-      <div class="legend-row">
-        <div class="legend-item"><div class="legend-dot" style="background:#059669"></div>A 明确意向</div>
-        <div class="legend-item"><div class="legend-dot" style="background:#2563EB"></div>B 待确定</div>
-        <div class="legend-item"><div class="legend-dot" style="background:#D97706"></div>C 低价值</div>
-        <div class="legend-item"><div class="legend-dot" style="background:#7C3AED"></div>D 长期</div>
-        <div class="legend-item"><div class="legend-dot" style="background:#64748B"></div>E 无意向</div>
-        <div class="legend-item"><div class="legend-dot" style="background:#DC2626"></div>F 无效</div>
-        <div class="legend-item"><div class="legend-dot" style="background:#991B1B"></div>G 已流失</div>
-      </div>
-    </div>
 
   </div>
   <div class="savebar">
@@ -714,6 +799,9 @@ input[type=date].fi{color:var(--text)}
     <button class="savebtn" onclick="doCustomFilter()">查询线索</button>
   </div>
 </div>
+
+</div><!-- /split-right xunzhi -->
+</div><!-- /split-wrap xunzhi -->
 
 <div id="toast" class="toast"><svg class="toast-ck" viewBox="0 0 20 20"><circle class="toast-ck-circle" cx="10" cy="10" r="8" transform="rotate(-90 10 10)"/><path class="toast-ck-check" d="M6 10l3 3 5-5"/></svg><span id="toast-msg"></span></div>
 
@@ -1167,7 +1255,13 @@ function checkAndRemove(savedFields, cat, store, record, goBackFn) {
     }
 
     toast('✅ 已保存，已从列表移除');
-    setTimeout(goBackFn, 900);
+    if(isWide()){
+      const mod = curCat.startsWith('student') ? 'zhiwang' : 'xunzhi';
+      SPLIT_CFG[mod].right.forEach(rid=>document.getElementById(rid)?.classList.remove('panel-active'));
+      document.getElementById(mod+'-empty').style.display='';
+    } else {
+      setTimeout(goBackFn, 900);
+    }
   } else {
     toast('✅ 已保存');
   }
@@ -1201,12 +1295,66 @@ async function doSave(){
   btn.disabled=false;btn.textContent='保存更新';
 }
 
-function _showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo(0,0);}
+// ── 分栏路由 ──
+const SPLIT_CFG = {
+  'xunzhi': { left:['s-home','s-list'], right:['s-detail','s-filter'] },
+  'zhiwang':{ left:['s-maintain-home','s-maintain-list'], right:['s-maintain-detail','s-maintain-filter','s-maintain-new'] },
+};
+function _panelOf(id){
+  for(const [mod,cfg] of Object.entries(SPLIT_CFG)){
+    if(cfg.left.includes(id))  return {mod, side:'left'};
+    if(cfg.right.includes(id)) return {mod, side:'right'};
+  }
+  return null;
+}
+function isWide(){ return window.innerWidth >= 900; }
+
+function _showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id)?.classList.add('active');
+  window.scrollTo(0,0);
+}
+
 function showScreen(id){
   if(id!=='s-main') history.pushState({screen:id},'',location.href.split('#')[0]+'#'+id);
   else history.replaceState({screen:'s-main'},'',location.href.split('#')[0]);
-  _showScreen(id);
+
+  if(!isWide()){ _showScreen(id); return; }
+
+  const root = document.getElementById('app-root');
+  const info = _panelOf(id);
+
+  if(!info){
+    // 主页
+    root.className = 'mode-main';
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active','panel-active'));
+    document.getElementById('s-main').classList.add('active');
+    return;
+  }
+
+  const {mod, side} = info;
+  const cfg = SPLIT_CFG[mod];
+
+  // 切换模式
+  root.className = 'mode-' + mod;
+
+  if(side === 'left'){
+    // 左栏：激活对应面板
+    cfg.left.forEach(lid => document.getElementById(lid)?.classList.toggle('panel-active', lid===id));
+    // 右栏：清空，显示空占位
+    cfg.right.forEach(rid => document.getElementById(rid)?.classList.remove('panel-active'));
+    document.getElementById(mod+'-empty').style.display = '';
+    // 左栏滚顶
+    document.getElementById('split-'+mod+'-left')?.scrollTo(0,0);
+  } else {
+    // 右栏：激活对应面板，隐藏空占位
+    cfg.right.forEach(rid => document.getElementById(rid)?.classList.toggle('panel-active', rid===id));
+    document.getElementById(mod+'-empty').style.display = 'none';
+    // 右栏滚顶
+    document.getElementById('split-'+mod+'-right')?.scrollTo(0,0);
+  }
 }
+
 function goHome(){showScreen('s-home');}
 function goMain(){showScreen('s-main');}
 function goList(){showScreen('s-list');}
@@ -1308,43 +1456,27 @@ function resetFilter() {
     b.classList.remove('sel');
     b.style.cssText = '';
   });
-  ['fi-date-from','fi-date-to','fi-assign-from','fi-assign-to'].forEach(id=>{
-    const el = document.getElementById(id); if(el) el.value = '';
-  });
   toast('已重置');
 }
 
 async function doCustomFilter() {
-  // 所有条件全部传给飞书服务端过滤
-  const conditions = [];
-
-  // 意向、客群等文字类条件（同字段多值 = OR，字段间 = AND）
-  for(const [field, vals] of Object.entries(filterMulti)){
-    if(vals.size === 0) continue;
-    conditions.push({ field_name: field, operator: 'contains', value: [...vals] });
-  }
-
-  // 日期条件：前端时间戳过滤（飞书日期API操作符不稳定，时间戳更可靠）
-  const dateFilters = [];
+  // 收集日期条件（用于前端过滤）
   const dateRangeMap = [
     { fromId:'fi-date-from', toId:'fi-date-to', field:'下次跟进日期' },
     { fromId:'fi-assign-from', toId:'fi-assign-to', field:'分配时间' },
   ];
-  // 飞书日期字段时间戳存法不统一：
-  // 有的存 UTC当天00:00（如吴乐森），有的存北京时间当天00:00即UTC前一天16:00（如赵小满）
-  // 起点：当天北京00:00（取最早）
-  // 终点：次日北京00:00（严格小于，能覆盖两种存法）
-  function bjDayTs(dateStr, isEnd) {
-    const d = new Date(dateStr + 'T00:00:00+08:00');
-    if(isEnd) d.setDate(d.getDate() + 1);
-    return d.getTime();
-  }
+  const dateFilters = [];
   dateRangeMap.forEach(({fromId, toId, field})=>{
     const from = document.getElementById(fromId)?.value;
     const to   = document.getElementById(toId)?.value;
-    if(from) dateFilters.push({ field, op:'>=', ts: bjDayTs(from, false) });
-    if(to)   dateFilters.push({ field, op:'<',  ts: bjDayTs(to,   true)  });
+    if(from) dateFilters.push({ field, op:'>=', ts: new Date(from).getTime() });
+    if(to)   dateFilters.push({ field, op:'<=', ts: new Date(to+'T23:59:59').getTime() });
   });
+
+  // 判断是否有任何条件
+  const hasMulti  = Object.values(filterMulti).some(s=>s.size>0);
+  const hasDate   = dateFilters.length > 0;
+  const fetchAll  = !hasMulti && !hasDate;
 
   curCat = 'custom';
   document.getElementById('l-title').textContent = '自定义筛选';
@@ -1353,35 +1485,43 @@ async function doCustomFilter() {
   showScreen('s-list');
 
   try {
-    let data;
-    if(conditions.length > 0){
-      // 有意向/客群等文字条件：传给飞书服务端过滤
-      data = await proxyCall('custom', { filters: conditions, conjunction: 'and' });
-    } else {
-      // 只有日期条件或无条件：拉全量
-      data = await proxyCall('all');
-    }
+    // 拉全量数据，前端做过滤
+    // 同字段多个值 = OR，不同字段 = AND
+    const data = await proxyCall('all');
     if(data.code!==0&&data.code!==undefined){
       document.getElementById('l-sub').textContent='查询出错';
       document.getElementById('list-content').innerHTML=`<div class="empty-state"><div class="ei">⚠️</div>错误：${esc(data.msg||'')}</div>`;
       return;
     }
+
     let items = data.data?.items || [];
-    // 日期条件前端过滤
-    if(dateFilters.length > 0){
+
+    if(!fetchAll){
       items = items.filter(item => {
         const f = item.fields;
+
+        // 多选字段：同字段内 OR（任意匹配）
+        for(const [field, vals] of Object.entries(filterMulti)){
+          if(vals.size === 0) continue;
+          const raw = f[field];
+          const fv = Array.isArray(raw) ? raw.map(r=>typeof r==='object'?r.value||r.text||String(r):String(r)) : [String(raw||'')];
+          const matched = [...vals].some(v => fv.some(r=>r.includes(v)));
+          if(!matched) return false; // 跨字段 AND
+        }
+
+        // 日期字段
         for(const {field, op, ts} of dateFilters){
           const raw = f[field];
-          if(raw == null) return false;
-          const t = typeof raw === 'number' ? raw : parseInt(raw);
-          if(op === '>=' && t <  ts) return false;
-          if(op === '<=' && t >  ts) return false;
-          if(op === '<'  && t >= ts) return false;
+          if(raw==null) return false;
+          const t = typeof raw==='number'?raw:parseInt(raw);
+          if(op==='>='&&t<ts) return false;
+          if(op==='<='&&t>ts) return false;
         }
+
         return true;
       });
     }
+
     listStore = items;
     document.getElementById('l-sub').textContent = `共 ${listStore.length} 条`;
     renderList();
@@ -1506,7 +1646,6 @@ async function loadDailyQuote() {
 loadDailyQuote();
 loadMotto();
 updateCountdown();
-function goMain(){ showScreen('s-main'); }
 
 function enterFollowUp(){
   showScreen('s-home');
@@ -1847,7 +1986,10 @@ async function doMaintainFilter(){
 </script>
 
 <!-- ═══ 织网首页 ═══ -->
-<div id="s-maintain-home" class="screen">
+<!-- ═══ 织网分栏 ═══ -->
+<div class="split-wrap" id="split-zhiwang">
+<div class="split-left" id="split-zhiwang-left">
+<div id="s-maintain-home" class="screen panel-active">
   <div class="hd hd-sub">
     <div class="hd-row-sub">
       <div class="hd-info">
@@ -1924,6 +2066,9 @@ async function doMaintainFilter(){
 </div>
 
 <!-- ═══ 织网详情 ═══ -->
+</div><!-- /split-left zhiwang -->
+<div class="split-right" id="split-zhiwang-right">
+<div class="split-right-empty" id="zhiwang-empty"><div class="sre-icon">🧶</div><div class="sre-text">从左侧选择一位学员查看详情</div></div>
 <div id="s-maintain-detail" class="screen">
   <div class="hd hd-sub">
     <div class="hd-row-sub">
@@ -2246,5 +2391,9 @@ async function doStudentCreate(){
   btn.disabled=false; btn.textContent='创建学员';
 }
 </script>
+</div><!-- /split-right zhiwang -->
+</div><!-- /split-wrap zhiwang -->
+
+</div><!-- /app-root -->
 </body>
 </html>
