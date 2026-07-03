@@ -178,6 +178,8 @@ html,body{height:100%;background:var(--bg);font-family:-apple-system,'PingFang S
 .rn{font-size:16px;font-weight:600;margin-bottom:3px;color:var(--text)}
 .rp{font-size:13px;color:var(--sub)}
 .ri-meta{font-size:11px;color:var(--hint);margin-top:3px}
+.ri-meta-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:3px}
+.ri-meta-row .ri-meta{margin-top:0}
 .rb{
   width:32px;height:32px;min-width:32px;min-height:32px;
   border-radius:50%;flex-shrink:0;box-sizing:border-box;
@@ -215,7 +217,7 @@ html,body{height:100%;background:var(--bg);font-family:-apple-system,'PingFang S
 .ib[data-v="A"].sel{background:var(--iA)}.ib[data-v="B"].sel{background:var(--iB)}
 .ib[data-v="C"].sel{background:var(--iC)}.ib[data-v="D"].sel{background:var(--iD)}
 .ib[data-v="E"].sel{background:var(--iE)}.ib[data-v="F"].sel{background:var(--iF)}
-.ib[data-v="G"].sel{background:var(--iG)}.ib[data-v="已报名"].sel{background:#FEF9C3;color:#78350F;border-color:#FDE68A}
+.ib[data-v="G"].sel{background:var(--iG)}.ib[data-v="已报名"].sel{background:#0284C7;color:#fff;border-color:#0284C7}
 
 /* 是/否 & 自有按钮 */
 .yn-row{display:flex;gap:8px;margin-top:8px}
@@ -297,6 +299,16 @@ input[type=date].fi{color:var(--text)}
   display:flex;align-items:center;gap:8px
 }
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0) scale(1)}
+.signup-mask{position:fixed;inset:0;background:rgba(15,23,42,.32);display:none;align-items:center;justify-content:center;z-index:1200;padding:24px}
+.signup-mask.show{display:flex}
+.signup-dialog{width:min(320px,100%);background:#fff;border-radius:18px;box-shadow:0 18px 48px rgba(15,23,42,.18);padding:18px}
+.signup-title{font-size:17px;font-weight:700;color:var(--text);margin-bottom:6px}
+.signup-sub{font-size:13px;color:var(--sub);margin-bottom:14px}
+.signup-date{width:100%;height:44px;border:1.5px solid var(--border);border-radius:12px;padding:0 12px;font-size:15px;font-family:inherit;color:var(--text);outline:none}
+.signup-actions{display:flex;gap:10px;margin-top:16px}
+.signup-cancel,.signup-ok{flex:1;height:42px;border-radius:12px;border:none;font-size:15px;font-weight:700;font-family:inherit;cursor:pointer}
+.signup-cancel{background:#F1F5F9;color:#64748B}
+.signup-ok{background:var(--ink-grad);color:#fff}
 .toast-ck{width:20px;height:20px;flex-shrink:0}
 .toast-ck-circle{stroke:#4ADE80;stroke-width:2;fill:none;stroke-dasharray:57;stroke-dashoffset:57;transition:stroke-dashoffset .4s ease .05s}
 .toast-ck-check{stroke:#4ADE80;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;fill:none;stroke-dasharray:16;stroke-dashoffset:16;transition:stroke-dashoffset .3s ease .35s}
@@ -508,7 +520,7 @@ input[type=date].fi{color:var(--text)}
         <div class="cat-desc" id="cnt-enrolled">加载中…</div>
       </button>
       <button class="cat-btn" onclick="loadList('month')">
-        <div class="cat-icon-wrap" style="background:linear-gradient(135deg,#7DD3FC 0%,#0F766E 100%)">📋</div>
+        <div class="cat-icon-wrap" style="background:linear-gradient(135deg,#7DD3FC 0%,#0284C7 100%)">📋</div>
         <div class="cat-label">本月分配</div>
         <div class="cat-desc" id="cnt-month">加载中…</div>
       </button>
@@ -834,6 +846,17 @@ input[type=date].fi{color:var(--text)}
 </div><!-- /split-wrap xunzhi -->
 
 <div id="toast" class="toast"><svg class="toast-ck" viewBox="0 0 20 20"><circle class="toast-ck-circle" cx="10" cy="10" r="8" transform="rotate(-90 10 10)"/><path class="toast-ck-check" d="M6 10l3 3 5-5"/></svg><span id="toast-msg"></span></div>
+<div id="signup-mask" class="signup-mask">
+  <div class="signup-dialog">
+    <div class="signup-title">选择报名时间</div>
+    <div class="signup-sub">保存后会同步到多维表格的报名时间字段</div>
+    <input type="date" id="signup-date" class="signup-date">
+    <div class="signup-actions">
+      <button class="signup-cancel" onclick="cancelSignupDate()">取消</button>
+      <button class="signup-ok" onclick="confirmSignupDate()">确定</button>
+    </div>
+  </div>
+</div>
 
 <script>
 const PROXY = 'https://feishu-le-proxy-wyyuhgxhep.cn-hangzhou.fcapp.run';
@@ -1050,6 +1073,21 @@ function fmtDate(ms) {
   const d = new Date(Number(ms));
   return isNaN(d)?'':d.toLocaleDateString('zh-CN',{year:'numeric',month:'long',day:'numeric',timeZone:'Asia/Shanghai'});
 }
+function fmtShortDate(v) {
+  if (!v) return '';
+  const raw = String(v).trim();
+  let d;
+  if (/^\d{10,}$/.test(raw)) {
+    d = new Date(Number(raw));
+  } else {
+    d = new Date(raw.replace(/年|月/g,'-').replace(/日/g,'').replace(/\//g,'-'));
+  }
+  if (isNaN(d)) return '';
+  const parts = new Intl.DateTimeFormat('zh-CN',{
+    year:'2-digit',month:'numeric',day:'numeric',timeZone:'Asia/Shanghai'
+  }).formatToParts(d).reduce((acc,p)=>(acc[p.type]=p.value,acc),{});
+  return parts.year + '/' + parts.month + '/' + parts.day;
+}
 function iColor(v){
   return ({A:'#EF4444',B:'#7C3AED',C:'#38BDF8',D:'#16A34A',E:'#94A3B8',F:'#475569',G:'#1E293B','已报名':'#FEF9C3'})[v]||'#94A3B8';
 }
@@ -1113,8 +1151,9 @@ function renderList() {
     const phone=rv(f['号码/微信'])||'—';
     const intent=rv(f['意向'])||'';
     const dateMs=curCat==='month'?f['分配时间']:(f['下次跟进日期']||f['分配时间']);
-    const dateTxt=dateMs?fmtDate(dateMs):'';
-    const badgeStyle = intent==='已报名' ? 'background:#D97706;color:#fff' : `background:${iColor(intent)}`;
+    const dateTxt=dateMs?fmtShortDate(dateMs):'';
+    const updateTxt=f['最后更新时间']?fmtShortDate(f['最后更新时间']):'';
+    const badgeStyle = intent==='已报名' ? 'background:#0284C7;color:#fff' : `background:${iColor(intent)}`;
     const badgeText = intent==='已报名' ? '报' : intent;
     const group = rv(f['客群'])||'';
     const groupPalette = {'小学生':{bg:'#ECFCCB',c:'#365314'},'初中生':{bg:'#DCFCE7',c:'#14532D'},'高中生':{bg:'#FEF9C3',c:'#78350F'},'大学生':{bg:'#DBEAFE',c:'#1E3A8A'},'成人':{bg:'#EDE9FE',c:'#4C1D95'}};
@@ -1138,14 +1177,14 @@ function renderList() {
           <span class="rn" style="margin-bottom:0">${esc(name)}</span>${groupTag}${ownerTag}${studyTag}
         </div>
         <div class="rp">${esc(phone)}</div>
-        ${dateTxt?`<div class="ri-meta">${esc(dateTxt)}</div>`:''}
+        ${(dateTxt||updateTxt)?`<div class="ri-meta-row">${dateTxt?`<span class="ri-meta">${esc(dateTxt)}</span>`:''}${updateTxt?`<span class="ri-meta">${esc(updateTxt)}</span>`:''}</div>`:''}
       </div>
       <div class="ri-right">${callBtn}${badge}</div>
     </div>`;
   }).join('');
 }
 
-let cur=null,curIntent='',curYN='',curOwner='',curGroup='';
+let cur=null,curIntent='',curYN='',curOwner='',curGroup='',curSignupDate='';
 
 function openRecord(idx){
   cur=listStore[idx];
@@ -1163,7 +1202,9 @@ function openRecord(idx){
   }
   document.getElementById('f-name').value=name;
   document.getElementById('f-phone').value=phone;
-  curIntent=rv(f['意向'])||''; renderIntent();
+  curIntent=rv(f['意向'])||'';
+  curSignupDate=msToDateInput(f['报名时间']);
+  renderIntent();
   document.getElementById('f-call-ro').textContent=rv(f['最新通话记录'])||'—';
   const callTimeEl = document.getElementById('f-call-time');
   if(callTimeEl) callTimeEl.textContent = fmtDate(f['最后更新时间']) || '';
@@ -1180,9 +1221,31 @@ function openRecord(idx){
   showScreen('s-detail');
 }
 
-function setIntent(v){curIntent=(curIntent===v)?'':v;renderIntent();}
+function setIntent(v){
+  if(v==='已报名' && curIntent!=='已报名'){
+    const input=document.getElementById('signup-date');
+    const mask=document.getElementById('signup-mask');
+    if(input){ input.value=curSignupDate || new Date(new Date().getTime()+8*3600000).toISOString().slice(0,10); }
+    if(mask){ mask.classList.add('show'); return; }
+  }
+  curIntent=(curIntent===v)?'':v;
+  if(curIntent!=='已报名') curSignupDate='';
+  renderIntent();
+}
+function confirmSignupDate(){
+  const input=document.getElementById('signup-date');
+  if(!input || !input.value){ toast('请选择报名时间'); return; }
+  curSignupDate=input.value;
+  curIntent='已报名';
+  document.getElementById('signup-mask')?.classList.remove('show');
+  renderIntent();
+}
+function cancelSignupDate(){
+  document.getElementById('signup-mask')?.classList.remove('show');
+}
+
 function renderIntent(){
-  const colors={'A':'#EF4444','B':'#7C3AED','C':'#38BDF8','D':'#16A34A','E':'#94A3B8','F':'#475569','G':'#1E293B','已报名':'#D97706'};
+  const colors={'A':'#EF4444','B':'#7C3AED','C':'#38BDF8','D':'#16A34A','E':'#94A3B8','F':'#475569','G':'#1E293B','已报名':'#0284C7'};
   document.querySelectorAll('#s-detail .ow-btn[data-v]').forEach(b=>{
     // 只处理意向按钮（A-G 和已报名）
     if(!colors[b.dataset.v]) return;
@@ -1309,6 +1372,7 @@ async function doSave(){
     const name=document.getElementById('f-name').value.trim();if(name)fields['姓名']=name;
     const phone=document.getElementById('f-phone').value.trim();if(phone)fields['号码/微信']=phone;
     if(curIntent)fields['意向']=curIntent;
+    if(curIntent==='已报名' && curSignupDate) fields['报名时间']=new Date(curSignupDate+'T15:59:00.000Z').getTime();
     const info=document.getElementById('f-info').value.trim();if(info)fields['具体信息']=info;
     const dv=document.getElementById('f-date').value;
     const origDate=cur.fields['下次跟进日期'];
@@ -1816,17 +1880,24 @@ function renderStudentList(){
     const name    = rv(f['学员姓名']) || '（无姓名）';
     const phone   = rv(f['乙方电话']) || '—';
     const ctype   = rv(f['合同类型']) || '';
-    const remind  = fmtDate(f['提醒时间']);
+    const remind  = fmtShortDate(f['提醒时间']);
+    const signDate = fmtShortDate(f['签约日期']);
+    const lastUpdate = fmtShortDate(f['最后更新日期'] || f['最后更新时间']);
     const amt     = f['金额'] != null ? '¥ ' + Number(f['金额']).toLocaleString('zh-CN') : '';
-    const ctypeColors = {'一对一':'#2563EB','班课':'#D97706','留学':'#7C3AED'};
-    const badge = ctype ? `<span class="rb" style="background:${ctypeColors[ctype]||'#94A3B8'}">${esc(ctype)}</span>` : '';
+    const ctypeColors = {'一对一':'#2563EB','班课':'#F59E0B','留学':'#7C3AED'};
+    const ctypeStyleMap = {
+      '一对一':'background:#7C3AED;color:#FFFFFF',
+      '班课':'background:#7C3AED;color:#FFFFFF',
+      '留学':'background:#7C3AED;color:#FFFFFF'
+    };
+    const badge = ctype ? `<span class="rb" style="${ctypeStyleMap[ctype]||'background:#E2E8F0;color:#475569'}">${esc(ctype)}</span>` : '';
     const rawPhone = rv(f['乙方电话'])||'';
     const phoneNum = rawPhone.replace(/\s/g,'');
     const callBtn = phoneNum&&/^\d{7,}$/.test(phoneNum)
       ? `<a class="call-btn" href="tel:${phoneNum}" onclick="event.stopPropagation()"><svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.67A2 2 0 012 1h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 8.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg></a>` : '';
     const metaLine = isContractCat
-      ? (amt ? `<div class="ri-meta" style="color:#0F6E56;font-weight:500">${amt}</div>` : '')
-      : (remind ? `<div class="ri-meta">提醒 ${esc(remind)}</div>` : '');
+      ? ((amt||signDate||lastUpdate) ? `<div class="ri-meta-row">${amt?`<span class="ri-meta" style="color:#0F6E56;font-weight:500">${amt}</span>`:''}${signDate?`<span class="ri-meta">${esc(signDate)}</span>`:''}${lastUpdate?`<span class="ri-meta">${esc(lastUpdate)}</span>`:''}</div>` : '')
+      : ((remind||lastUpdate) ? `<div class="ri-meta-row">${remind?`<span class="ri-meta">${esc(remind)}</span>`:''}${lastUpdate?`<span class="ri-meta">${esc(lastUpdate)}</span>`:''}</div>` : '');
     return `<div class="ri" onclick="openStudentRecord(${idx})">
       <div class="ri-left">
         <div class="rn">${esc(name)}</div>
@@ -2060,12 +2131,12 @@ async function doMaintainFilter(){
         <div class="cat-desc" id="scnt-month-contract">加载中…</div>
       </button>
       <button class="cat-btn" onclick="loadStudentList('student_month_remind')">
-        <div class="cat-icon-wrap" style="background:linear-gradient(135deg,#38BDF8 0%,#0369A1 100%)">📆</div>
+        <div class="cat-icon-wrap" style="background:linear-gradient(135deg,#38BDF8 0%,#0284C7 100%)">📆</div>
         <div class="cat-label">本月待联系</div>
         <div class="cat-desc" id="scnt-month-remind">加载中…</div>
       </button>
       <button class="cat-btn" onclick="showScreen('s-maintain-new')">
-        <div class="cat-icon-wrap" style="background:linear-gradient(135deg,#2DD4BF 0%,#0F766E 100%)">✏️</div>
+        <div class="cat-icon-wrap" style="background:linear-gradient(135deg,#2DD4BF 0%,#0284C7 100%)">✏️</div>
         <div class="cat-label">新增学员</div>
         <div class="cat-desc">手动录入台账信息</div>
       </button>
