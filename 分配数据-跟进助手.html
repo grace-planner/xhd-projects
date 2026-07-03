@@ -1373,6 +1373,7 @@ async function doSave(){
     const phone=document.getElementById('f-phone').value.trim();if(phone)fields['号码/微信']=phone;
     if(curIntent)fields['意向']=curIntent;
     if(curIntent==='已报名' && curSignupDate) fields['报名时间']=new Date(curSignupDate+'T15:59:00.000Z').getTime();
+    else if(curIntent!=='已报名' && cur.fields['报名时间']) fields['报名时间']=null;
     const info=document.getElementById('f-info').value.trim();if(info)fields['具体信息']=info;
     const dv=document.getElementById('f-date').value;
     const origDate=cur.fields['下次跟进日期'];
