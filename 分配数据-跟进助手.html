@@ -1095,7 +1095,13 @@ function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').repl
 function setRO(id,val){const e=document.getElementById(id);if(!e)return;e.textContent=val||'—';e.className='firo'+(val?'':' empty')}
 
 const CAT_NAMES={today:'今日待联系',week:'本周待联系',enrolled:'已报名客户',month:'本月分配',today_assigned:'今日分配',strong_intent:'近日强意向',custom:'自定义筛选'};
+const INTENT_ORDER=['A','B','C','D','E','F','G','已报名'];
+const INTENT_RANK=Object.fromEntries(INTENT_ORDER.map((v,i)=>[v,i]));
 let listStore=[],curCat='';
+
+function intentRank(item){
+  return INTENT_RANK[rv(item?.fields?.['意向'])] ?? INTENT_ORDER.length;
+}
 
 async function doSearch() {
   const q=document.getElementById('q').value.trim();
@@ -1142,9 +1148,7 @@ function renderList() {
   const sub=document.getElementById('l-sub');
   if(sub) sub.textContent='共 '+listStore.length+' 条';
   if(!listStore.length){el.innerHTML='<div class="empty-state"><div class="ei">😌</div>暂无数据</div>';return;}
-  // 倒序排列：分配类用分配时间，跟进类用下次跟进日期
-  const sortField = (curCat==='month'||curCat==='today_assigned') ? '分配时间' : '下次跟进日期';
-  listStore = [...listStore].sort((a,b)=>(b.fields[sortField]||0)-(a.fields[sortField]||0));
+  listStore = [...listStore].sort((a,b)=>intentRank(a)-intentRank(b));
   el.innerHTML=listStore.map((item,idx)=>{
     const f=item.fields;
     const name=rv(f['姓名'])||'（无姓名）';
@@ -1302,7 +1306,8 @@ function checkAndRemove(savedFields, cat, store, record, goBackFn) {
   let shouldRemove = false;
   const f = savedFields;
 
-  if(cat==='today'         && '下次跟进日期' in f) shouldRemove = !f['下次跟进日期'] || !isToday(f['下次跟进日期']);
+  if(cat==='custom') shouldRemove = !matchesCustomFilters(record.fields);
+  else if(cat==='today'         && '下次跟进日期' in f) shouldRemove = !f['下次跟进日期'] || !isToday(f['下次跟进日期']);
   else if(cat==='week'     && '下次跟进日期' in f) shouldRemove = !f['下次跟进日期'] || !isWeek(f['下次跟进日期']);
   else if(cat==='month'    && '分配时间'     in f) shouldRemove = !f['分配时间']     || !isMonth(f['分配时间']);
   else if(cat==='today_assigned' && '分配时间' in f) shouldRemove = !f['分配时间']   || !isToday(f['分配时间']);
@@ -1493,6 +1498,7 @@ document.getElementById('q').addEventListener('keydown',e=>{if(e.key==='Enter')d
 // ═══ 自定义筛选逻辑 ═══
 // multiSel: 字段名 -> Set，单选字段 -> 字段名 -> 单个值
 const filterMulti = {}; // 多选字段（意向、客群）
+let activeCustomFilter = { multi:{}, dateFilters:[], fetchAll:true };
 
 const intentColorMap = {
   // 意向（和详情页 ib 颜色一致）
@@ -1557,6 +1563,40 @@ function resetFilter() {
   toast('已重置');
 }
 
+function snapshotCustomFilter(dateFilters, fetchAll) {
+  const multi = {};
+  Object.entries(filterMulti).forEach(([field, vals]) => {
+    multi[field] = new Set(vals);
+  });
+  activeCustomFilter = {
+    multi,
+    dateFilters: dateFilters.map(f=>({...f})),
+    fetchAll
+  };
+}
+
+function matchesCustomFilters(fields, filter=activeCustomFilter) {
+  if(!filter || filter.fetchAll) return true;
+
+  for(const [field, vals] of Object.entries(filter.multi || {})){
+    if(!vals || vals.size === 0) continue;
+    const raw = fields[field];
+    const fv = Array.isArray(raw) ? raw.map(r=>typeof r==='object'?r.value||r.text||String(r):String(r)) : [String(raw||'')];
+    const matched = [...vals].some(v => fv.some(r=>r.includes(v)));
+    if(!matched) return false;
+  }
+
+  for(const {field, op, ts} of filter.dateFilters || []){
+    const raw = fields[field];
+    if(raw==null) return false;
+    const t = typeof raw==='number'?raw:parseInt(raw);
+    if(op==='>='&&t<ts) return false;
+    if(op==='<='&&t>ts) return false;
+  }
+
+  return true;
+}
+
 async function doCustomFilter() {
   // 收集日期条件（用于前端过滤）
   const dateRangeMap = [
@@ -1575,6 +1615,7 @@ async function doCustomFilter() {
   const hasMulti  = Object.values(filterMulti).some(s=>s.size>0);
   const hasDate   = dateFilters.length > 0;
   const fetchAll  = !hasMulti && !hasDate;
+  snapshotCustomFilter(dateFilters, fetchAll);
 
   curCat = 'custom';
   document.getElementById('l-title').textContent = '自定义筛选';
@@ -1594,31 +1635,7 @@ async function doCustomFilter() {
 
     let items = data.data?.items || [];
 
-    if(!fetchAll){
-      items = items.filter(item => {
-        const f = item.fields;
-
-        // 多选字段：同字段内 OR（任意匹配）
-        for(const [field, vals] of Object.entries(filterMulti)){
-          if(vals.size === 0) continue;
-          const raw = f[field];
-          const fv = Array.isArray(raw) ? raw.map(r=>typeof r==='object'?r.value||r.text||String(r):String(r)) : [String(raw||'')];
-          const matched = [...vals].some(v => fv.some(r=>r.includes(v)));
-          if(!matched) return false; // 跨字段 AND
-        }
-
-        // 日期字段
-        for(const {field, op, ts} of dateFilters){
-          const raw = f[field];
-          if(raw==null) return false;
-          const t = typeof raw==='number'?raw:parseInt(raw);
-          if(op==='>='&&t<ts) return false;
-          if(op==='<='&&t>ts) return false;
-        }
-
-        return true;
-      });
-    }
+    if(!fetchAll) items = items.filter(item => matchesCustomFilters(item.fields));
 
     listStore = items;
     document.getElementById('l-sub').textContent = `共 ${listStore.length} 条`;
