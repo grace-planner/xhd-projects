@@ -1096,6 +1096,24 @@ function setRO(id,val){const e=document.getElementById(id);if(!e)return;e.textCo
 
 const CAT_NAMES={today:'今日待联系',week:'本周待联系',enrolled:'已报名客户',month:'本月分配',today_assigned:'今日分配',strong_intent:'近日强意向',custom:'自定义筛选'};
 let listStore=[],curCat='';
+const INTENT_SORT_ORDER = ['A','B','C','D','E','F','G','已报名'];
+const INTENT_SORT_RANK = INTENT_SORT_ORDER.reduce((acc, v, idx)=>(acc[v]=idx,acc), {});
+
+function sortLeadItems(items, cat){
+  if(cat==='custom'){
+    return [...items].sort((a,b)=>{
+      const af = a.fields || {}, bf = b.fields || {};
+      const ar = INTENT_SORT_RANK[rv(af['意向'])] ?? 999;
+      const br = INTENT_SORT_RANK[rv(bf['意向'])] ?? 999;
+      if(ar!==br) return ar-br;
+      const at = af['下次跟进日期'] || af['分配时间'] || 0;
+      const bt = bf['下次跟进日期'] || bf['分配时间'] || 0;
+      return bt-at;
+    });
+  }
+  const sortField = (cat==='month'||cat==='today_assigned') ? '分配时间' : '下次跟进日期';
+  return [...items].sort((a,b)=>(b.fields[sortField]||0)-(a.fields[sortField]||0));
+}
 
 async function doSearch() {
   const q=document.getElementById('q').value.trim();
@@ -1142,9 +1160,7 @@ function renderList() {
   const sub=document.getElementById('l-sub');
   if(sub) sub.textContent='共 '+listStore.length+' 条';
   if(!listStore.length){el.innerHTML='<div class="empty-state"><div class="ei">😌</div>暂无数据</div>';return;}
-  // 倒序排列：分配类用分配时间，跟进类用下次跟进日期
-  const sortField = (curCat==='month'||curCat==='today_assigned') ? '分配时间' : '下次跟进日期';
-  listStore = [...listStore].sort((a,b)=>(b.fields[sortField]||0)-(a.fields[sortField]||0));
+  listStore = sortLeadItems(listStore, curCat);
   el.innerHTML=listStore.map((item,idx)=>{
     const f=item.fields;
     const name=rv(f['姓名'])||'（无姓名）';
@@ -1311,6 +1327,7 @@ function checkAndRemove(savedFields, cat, store, record, goBackFn) {
     if('意向' in f) shouldRemove = f['意向']!=='A'&&f['意向']!=='B';
     else if('下次跟进日期' in f) shouldRemove = !f['下次跟进日期'] || !isWeek(f['下次跟进日期']);
   }
+  else if(cat==='custom') shouldRemove = !leadMatchesCustomFilters(record);
   // 织网
   else if(cat==='student_today_remind'   && '提醒时间' in f) shouldRemove = !f['提醒时间'] || !isToday(f['提醒时间']);
   else if(cat==='student_week_remind'    && '提醒时间' in f) shouldRemove = !f['提醒时间'] || !isWeek(f['提醒时间']);
@@ -1493,6 +1510,7 @@ document.getElementById('q').addEventListener('keydown',e=>{if(e.key==='Enter')d
 // ═══ 自定义筛选逻辑 ═══
 // multiSel: 字段名 -> Set，单选字段 -> 字段名 -> 单个值
 const filterMulti = {}; // 多选字段（意向、客群）
+const LEAD_FILTER_FIELDS = new Set(['意向','客群','是否自有/曾哥/他人','留学报备']);
 
 const intentColorMap = {
   // 意向（和详情页 ib 颜色一致）
@@ -1557,8 +1575,7 @@ function resetFilter() {
   toast('已重置');
 }
 
-async function doCustomFilter() {
-  // 收集日期条件（用于前端过滤）
+function getLeadCustomDateFilters(){
   const dateRangeMap = [
     { fromId:'fi-date-from', toId:'fi-date-to', field:'下次跟进日期' },
     { fromId:'fi-assign-from', toId:'fi-assign-to', field:'分配时间' },
@@ -1570,9 +1587,42 @@ async function doCustomFilter() {
     if(from) dateFilters.push({ field, op:'>=', ts: new Date(from+'T00:00:00+08:00').getTime() });
     if(to)   dateFilters.push({ field, op:'<=', ts: new Date(to+'T00:00:00+08:00').getTime() + 86400000 - 1 });
   });
+  return dateFilters;
+}
+
+function fieldMatchesMulti(raw, vals){
+  const fv = Array.isArray(raw) ? raw.map(r=>typeof r==='object'?r.value||r.text||String(r):String(r)) : [String(raw||'')];
+  return [...vals].some(v => fv.some(r=>r.includes(v)));
+}
+
+function getLeadFilterEntries(){
+  return Object.entries(filterMulti).filter(([field])=>LEAD_FILTER_FIELDS.has(field));
+}
+
+function leadMatchesCustomFilters(item){
+  const f = item.fields || {};
+
+  for(const [field, vals] of getLeadFilterEntries()){
+    if(vals.size === 0) continue;
+    if(!fieldMatchesMulti(f[field], vals)) return false;
+  }
+
+  for(const {field, op, ts} of getLeadCustomDateFilters()){
+    const raw = f[field];
+    if(raw==null) return false;
+    const t = typeof raw==='number'?raw:parseInt(raw);
+    if(op==='>='&&t<ts) return false;
+    if(op==='<='&&t>ts) return false;
+  }
+
+  return true;
+}
+
+async function doCustomFilter() {
+  const dateFilters = getLeadCustomDateFilters();
 
   // 判断是否有任何条件
-  const hasMulti  = Object.values(filterMulti).some(s=>s.size>0);
+  const hasMulti  = getLeadFilterEntries().some(([, s])=>s.size>0);
   const hasDate   = dateFilters.length > 0;
   const fetchAll  = !hasMulti && !hasDate;
 
@@ -1595,29 +1645,7 @@ async function doCustomFilter() {
     let items = data.data?.items || [];
 
     if(!fetchAll){
-      items = items.filter(item => {
-        const f = item.fields;
-
-        // 多选字段：同字段内 OR（任意匹配）
-        for(const [field, vals] of Object.entries(filterMulti)){
-          if(vals.size === 0) continue;
-          const raw = f[field];
-          const fv = Array.isArray(raw) ? raw.map(r=>typeof r==='object'?r.value||r.text||String(r):String(r)) : [String(raw||'')];
-          const matched = [...vals].some(v => fv.some(r=>r.includes(v)));
-          if(!matched) return false; // 跨字段 AND
-        }
-
-        // 日期字段
-        for(const {field, op, ts} of dateFilters){
-          const raw = f[field];
-          if(raw==null) return false;
-          const t = typeof raw==='number'?raw:parseInt(raw);
-          if(op==='>='&&t<ts) return false;
-          if(op==='<='&&t>ts) return false;
-        }
-
-        return true;
-      });
+      items = items.filter(leadMatchesCustomFilters);
     }
 
     listStore = items;
