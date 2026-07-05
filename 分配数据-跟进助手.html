@@ -196,6 +196,15 @@ html,body{height:100%;background:var(--bg);font-family:-apple-system,'PingFang S
 }
 .call-btn:active{background:#00a863}
 .ri-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.follow-status{
+  display:inline-flex;align-items:center;
+  font-size:11px;font-weight:700;
+  padding:2px 8px;border-radius:999px;line-height:1.35;
+  border:1px solid transparent;white-space:nowrap
+}
+.follow-status.overdue{color:#DC2626;background:#FEF2F2;border-color:#FECACA}
+.follow-status.today{color:#B45309;background:#FEF3C7;border-color:#FDE68A}
+.follow-status.stale{color:#475569;background:#F1F5F9;border-color:#CBD5E1}
 
 /* ════ 详情卡片 ════ */
 .card{background:var(--card);border-radius:var(--radius);margin-bottom:12px;overflow:hidden;box-shadow:var(--shadow)}
@@ -240,7 +249,6 @@ html,body{height:100%;background:var(--bg);font-family:-apple-system,'PingFang S
 }
 .ow-btn:active{transform:scale(.88);box-shadow:none;}
 .ow-btn.sel{border-width:2px;box-shadow:0 2px 8px rgba(0,0,0,.15);transform:scale(1.04);}
-
 /* 表单行 */
 .fr{padding:13px 16px;border-top:1px solid var(--border)}.fr:first-of-type{border-top:none}
 .fl{font-size:11px;font-weight:600;color:var(--sub);margin-bottom:6px;letter-spacing:.3px}
@@ -1170,6 +1178,8 @@ function renderList() {
     const studySign = rv(f['留学是否签约'])||'';
     const studyTag = studySign==='是' ? `<span style="background:#FDF4FF;color:#7E22CE;font-size:10px;font-weight:700;padding:2px 8px;border-radius:8px;white-space:nowrap">留✓</span>` : '';
     const badge=intent?`<span class="rb" style="${badgeStyle}">${esc(badgeText)}</span>`:'';
+    const followStatus=calcFollowStatus(item);
+    const followStatusTag=followStatus?`<span class="follow-status ${followStatus.type}">${esc(followStatus.label)}</span>`:'';
     const rawPhone=rv(f['号码/微信'])||'';
     const phoneNum=rawPhone.replace(/\s/g,'');
     const callBtn=phoneNum&&/^\d{7,}$/.test(phoneNum)
@@ -1181,7 +1191,7 @@ function renderList() {
           <span class="rn" style="margin-bottom:0">${esc(name)}</span>${groupTag}${ownerTag}${studyTag}
         </div>
         <div class="rp">${esc(phone)}</div>
-        ${(dateTxt||updateTxt)?`<div class="ri-meta-row">${dateTxt?`<span class="ri-meta">${esc(dateTxt)}</span>`:''}${updateTxt?`<span class="ri-meta">${esc(updateTxt)}</span>`:''}</div>`:''}
+        ${(dateTxt||updateTxt||followStatusTag)?`<div class="ri-meta-row">${dateTxt?`<span class="ri-meta">${esc(dateTxt)}</span>`:''}${updateTxt?`<span class="ri-meta">${esc(updateTxt)}</span>`:''}${followStatusTag}</div>`:''}
       </div>
       <div class="ri-right">${callBtn}${badge}</div>
     </div>`;
@@ -1189,6 +1199,31 @@ function renderList() {
 }
 
 let cur=null,curIntent='',curYN='',curOwner='',curGroup='',curSignupDate='';
+
+function dayStart(ms){
+  const d=ms?new Date(ms):new Date();
+  return new Date(d.getFullYear(),d.getMonth(),d.getDate()).getTime();
+}
+
+function daysSince(ms){
+  if(!ms) return null;
+  return Math.floor((dayStart() - dayStart(ms)) / 86400000);
+}
+
+function calcFollowStatus(item){
+  const f=item?.fields||{};
+  const intent=rv(f['意向'])||'';
+  if(intent==='已报名') return null;
+  const due=f['下次跟进日期'];
+  const today=dayStart();
+  const dueDay=due?dayStart(due):0;
+  if(dueDay&&dueDay<today) return {type:'overdue',label:'已逾期'};
+  if(dueDay===today) return {type:'today',label:'今日到期'};
+  const idleDays=daysSince(f['最后更新时间']);
+  if((intent==='A'||intent==='B')&&idleDays!==null&&idleDays>3) return {type:'stale',label:'久未动'};
+  if(intent==='C'&&idleDays!==null&&idleDays>7) return {type:'stale',label:'久未动'};
+  return null;
+}
 
 function openRecord(idx){
   cur=listStore[idx];
