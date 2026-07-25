@@ -637,7 +637,8 @@ input[type=date].fi{color:var(--text)}
             <button class="ow-btn" data-v="E" onclick="setIntent('E')" style="padding:6px 4px;text-align:center;width:100%">E</button>
             <button class="ow-btn" data-v="F" onclick="setIntent('F')" style="padding:6px 4px;text-align:center;width:100%">F</button>
             <button class="ow-btn" data-v="G" onclick="setIntent('G')" style="padding:6px 4px;text-align:center;width:100%">G</button>
-            <button class="ow-btn" data-v="已报名" onclick="setIntent('已报名')" style="padding:6px 4px;font-size:12px;text-align:center;width:100%;grid-column:span 2">报名</button>
+            <button class="ow-btn" data-v="已报名" onclick="setIntent('已报名')" style="padding:6px 4px;font-size:12px;text-align:center;width:100%">报</button>
+            <button class="ow-btn" data-v="续费" onclick="setIntent('续费')" style="padding:6px 4px;font-size:12px;text-align:center;width:100%">续</button>
           </div>
         </div>
         <!-- 客群 -->
@@ -1284,9 +1285,9 @@ function cancelSignupDate(){
 }
 
 function renderIntent(){
-  const colors={'A':'#EF4444','B':'#7C3AED','C':'#38BDF8','D':'#16A34A','E':'#94A3B8','F':'#475569','G':'#1E293B','已报名':'#0284C7'};
+  const colors={'A':'#EF4444','B':'#7C3AED','C':'#38BDF8','D':'#16A34A','E':'#94A3B8','F':'#475569','G':'#1E293B','已报名':'#0284C7','续费':'#2563EB'};
   document.querySelectorAll('#s-detail .ow-btn[data-v]').forEach(b=>{
-    // 只处理意向按钮（A-G 和已报名）
+    // 只处理意向按钮（A-G、已报名和续费）
     if(!colors[b.dataset.v]) return;
     const sel = b.dataset.v === curIntent;
     b.classList.toggle('sel', sel);
