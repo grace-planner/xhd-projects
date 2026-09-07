@@ -41,6 +41,14 @@ nav{padding:20px 24px;display:flex;align-items:center;justify-content:space-betw
 .card:hover .card-arrow{background:var(--ink);border-color:var(--ink);color:white;}
 .footer-note{text-align:center;padding:40px 24px;font-size:13px;color:var(--ink-60);line-height:1.8;}
 .footer-note a{color:var(--sage);text-decoration:none;cursor:pointer;}
+.card{cursor:pointer;}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(28,28,26,0.55);z-index:200;align-items:center;justify-content:center;padding:24px;}
+.modal-overlay.active{display:flex;}
+.modal-box{background:var(--white);border-radius:16px;padding:28px;max-width:400px;width:100%;display:flex;flex-direction:column;gap:10px;}
+.modal-title{font-size:16px;font-weight:500;color:var(--ink);margin-bottom:8px;text-align:center;}
+.modal-option{display:block;padding:14px 18px;border-radius:10px;border:1px solid var(--ink-10);background:var(--bg);color:var(--ink);text-decoration:none;font-size:14px;text-align:center;transition:all 0.2s;}
+.modal-option:hover{border-color:var(--sage);background:var(--sage-pale);color:var(--sage);}
+.modal-close{margin-top:8px;padding:10px;border:none;background:none;color:var(--ink-60);font-size:13px;cursor:pointer;font-family:'Outfit',sans-serif;}
 </style>
 </head>
 <body>
@@ -98,12 +106,26 @@ nav{padding:20px 24px;display:flex;align-items:center;justify-content:space-betw
       <div class="card-left"><span class="card-tag">留学预备</span><div class="card-name">留学预备入学测试</div><div class="card-meta">⏱ 40 分钟</div></div><div class="card-arrow">→</div>
     </a>
     <div class="section-label" style="padding-top:16px;">语言考试</div>
-    <a class="card" href="https://learninghub.xhd.cn/org/et.html?key=NDc1Niw2LC9od2t4L3N0dS9lbWsuaHRtbD9pZD04NCZ0eXBlPTEmY2F0ZWdvcnk9OSxjZHhoZCwxNzc3ODgxMDk3NTY4" target="_blank">
-      <div class="card-left"><span class="card-tag">雅思</span><div class="card-name">雅思全套测试</div><div class="card-meta">⏱ 167 分钟</div></div><div class="card-arrow">→</div>
+    <div class="card" onclick="openModal('ielts')">
+      <div class="card-left"><span class="card-tag">雅思</span><div class="card-name">雅思全套测试</div><div class="card-meta">⏱ 167 分钟 · 3 种测试可选</div></div><div class="card-arrow">→</div>
+    </div>
+    <div class="section-label" style="padding-top:16px;">雅思单项测试</div>
+    <a class="card" href="https://4r.xhd.cn/org/et.html?key=MTE0NSwzMjM3LDEzMiwxNzg4NzQ3MzM1NzQ1" target="_blank">
+      <div class="card-left"><span class="card-tag">听力</span><div class="card-name">雅思听力单项测试</div></div><div class="card-arrow">→</div>
     </a>
-    <a class="card" href="https://learninghub.xhd.cn/org/et.html?key=NDc1Niw2LC9od2t4L3N0dS9lbWsuaHRtbD9pZD00MDQzJnR5cGU9MSZjYXRlZ29yeT0yMSxjZHhoZCwxNzc3ODgxMDk3NTY4" target="_blank">
-      <div class="card-left"><span class="card-tag">新托福 2026</span><div class="card-name">新托福入学测试</div><div class="card-meta">⏱ 66 分钟</div></div><div class="card-arrow">→</div>
+    <a class="card" href="https://4r.xhd.cn/org/et.html?key=MTE0NiwzMjM3LDEzNCwxNzg4NzQ3MzUxMDI2" target="_blank">
+      <div class="card-left"><span class="card-tag">阅读</span><div class="card-name">雅思阅读单项测试</div></div><div class="card-arrow">→</div>
     </a>
+    <a class="card" href="https://4r.xhd.cn/org/et.html?key=MTE0NywzMjM3LDEzNiwxNzg4NzUwOTA4NDk1" target="_blank">
+      <div class="card-left"><span class="card-tag">写作</span><div class="card-name">雅思写作单项测试</div></div><div class="card-arrow">→</div>
+    </a>
+    <a class="card" href="https://4r.xhd.cn/org/et.html?key=MTE0OCwzMjM3LDE1MCwxNzg4NzUwOTI5OTQz" target="_blank">
+      <div class="card-left"><span class="card-tag">口语</span><div class="card-name">雅思口语单项测试</div></div><div class="card-arrow">→</div>
+    </a>
+    <div class="section-label" style="padding-top:16px;">托福测试</div>
+    <div class="card" onclick="openModal('toefl')">
+      <div class="card-left"><span class="card-tag">新托福 2026</span><div class="card-name">新托福入学测试</div><div class="card-meta">⏱ 66 分钟 · 2 种测试可选</div></div><div class="card-arrow">→</div>
+    </div>
     <a class="card" href="https://learninghub.xhd.cn/org/et.html?key=NDc1Niw2LC9od2t4L3N0dS9lbWsuaHRtbD9pZD0yMjMmdHlwZT0xJnB1c2g9MSZwdXNodHlwZT00JnB1c2hxdHlwZT0wJmNhdGVnb3J5PTEzLGNkeGhkLDE3Nzc4ODEwOTc1Njg=" target="_blank">
       <div class="card-left"><span class="card-tag">PTE</span><div class="card-name">PTE 入学测试</div><div class="card-meta">⏱ 148 分钟</div></div><div class="card-arrow">→</div>
     </a>
@@ -137,12 +159,26 @@ nav{padding:20px 24px;display:flex;align-items:center;justify-content:space-betw
 
   <!-- 语言考试 -->
   <div class="cards" id="tab-language">
-    <a class="card" href="https://learninghub.xhd.cn/org/et.html?key=NDc1Niw2LC9od2t4L3N0dS9lbWsuaHRtbD9pZD04NCZ0eXBlPTEmY2F0ZWdvcnk9OSxjZHhoZCwxNzc3ODgxMDk3NTY4" target="_blank">
-      <div class="card-left"><span class="card-tag">雅思</span><div class="card-name">雅思全套测试</div><div class="card-meta">⏱ 167 分钟</div></div><div class="card-arrow">→</div>
+    <div class="card" onclick="openModal('ielts')">
+      <div class="card-left"><span class="card-tag">雅思</span><div class="card-name">雅思全套测试</div><div class="card-meta">⏱ 167 分钟 · 3 种测试可选</div></div><div class="card-arrow">→</div>
+    </div>
+    <div class="section-label" style="padding-top:16px;">雅思单项测试</div>
+    <a class="card" href="https://4r.xhd.cn/org/et.html?key=MTE0NSwzMjM3LDEzMiwxNzg4NzQ3MzM1NzQ1" target="_blank">
+      <div class="card-left"><span class="card-tag">听力</span><div class="card-name">雅思听力单项测试</div></div><div class="card-arrow">→</div>
     </a>
-    <a class="card" href="https://learninghub.xhd.cn/org/et.html?key=NDc1Niw2LC9od2t4L3N0dS9lbWsuaHRtbD9pZD00MDQzJnR5cGU9MSZjYXRlZ29yeT0yMSxjZHhoZCwxNzc3ODgxMDk3NTY4" target="_blank">
-      <div class="card-left"><span class="card-tag">新托福 2026</span><div class="card-name">新托福入学测试</div><div class="card-meta">⏱ 66 分钟</div></div><div class="card-arrow">→</div>
+    <a class="card" href="https://4r.xhd.cn/org/et.html?key=MTE0NiwzMjM3LDEzNCwxNzg4NzQ3MzUxMDI2" target="_blank">
+      <div class="card-left"><span class="card-tag">阅读</span><div class="card-name">雅思阅读单项测试</div></div><div class="card-arrow">→</div>
     </a>
+    <a class="card" href="https://4r.xhd.cn/org/et.html?key=MTE0NywzMjM3LDEzNiwxNzg4NzUwOTA4NDk1" target="_blank">
+      <div class="card-left"><span class="card-tag">写作</span><div class="card-name">雅思写作单项测试</div></div><div class="card-arrow">→</div>
+    </a>
+    <a class="card" href="https://4r.xhd.cn/org/et.html?key=MTE0OCwzMjM3LDE1MCwxNzg4NzUwOTI5OTQz" target="_blank">
+      <div class="card-left"><span class="card-tag">口语</span><div class="card-name">雅思口语单项测试</div></div><div class="card-arrow">→</div>
+    </a>
+    <div class="section-label" style="padding-top:16px;">托福测试</div>
+    <div class="card" onclick="openModal('toefl')">
+      <div class="card-left"><span class="card-tag">新托福 2026</span><div class="card-name">新托福入学测试</div><div class="card-meta">⏱ 66 分钟 · 2 种测试可选</div></div><div class="card-arrow">→</div>
+    </div>
     <a class="card" href="https://learninghub.xhd.cn/org/et.html?key=NDc1Niw2LC9od2t4L3N0dS9lbWsuaHRtbD9pZD0yMjMmdHlwZT0xJnB1c2g9MSZwdXNodHlwZT00JnB1c2hxdHlwZT0wJmNhdGVnb3J5PTEzLGNkeGhkLDE3Nzc4ODEwOTc1Njg=" target="_blank">
       <div class="card-left"><span class="card-tag">PTE</span><div class="card-name">PTE 入学测试</div><div class="card-meta">⏱ 148 分钟</div></div><div class="card-arrow">→</div>
     </a>
@@ -169,12 +205,37 @@ nav{padding:20px 24px;display:flex;align-items:center;justify-content:space-betw
   <p id="copy-tip" style="margin-top:8px;color:#3D6B48;font-size:13px;min-height:20px;"></p>
 </div>
 
+<div class="modal-overlay" id="modal-ielts" onclick="if(event.target===this)closeModal('ielts')">
+  <div class="modal-box">
+    <div class="modal-title">选择雅思测试类型</div>
+    <a class="modal-option" href="https://learninghub.xhd.cn/org/et.html?key=NDc1Niw2LC9od2t4L3N0dS9lbWsuaHRtbD9pZD04NCZ0eXBlPTEmY2F0ZWdvcnk9OSxjZHhoZCwxNzc3ODgxMDk3NTY4" target="_blank">雅思全套测试（标准）</a>
+    <a class="modal-option" href="https://4r.xhd.cn/org/et.html?key=MTEzOSwzMjM3LDE1MiwxNzg4NzQ3MDg2NjYy" target="_blank">4R 雅思战队入学测试 1</a>
+    <a class="modal-option" href="https://4r.xhd.cn/org/et.html?key=MTE0MywzMjM3LDE0OCwxNzg4NzQ3MjQ2MzQ3" target="_blank">4R 雅思战队入学测试 2</a>
+    <button class="modal-close" onclick="closeModal('ielts')">取消</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-toefl" onclick="if(event.target===this)closeModal('toefl')">
+  <div class="modal-box">
+    <div class="modal-title">选择托福测试类型</div>
+    <a class="modal-option" href="https://learninghub.xhd.cn/org/et.html?key=NDc1Niw2LC9od2t4L3N0dS9lbWsuaHRtbD9pZD00MDQzJnR5cGU9MSZjYXRlZ29yeT0yMSxjZHhoZCwxNzc3ODgxMDk3NTY4" target="_blank">新托福入学测试（标准）</a>
+    <a class="modal-option" href="https://4r.xhd.cn/org/et.html?key=MTE0NCwzMjM3LDE1NCwxNzg4NzQ3MjkyMjk3" target="_blank">4R 托福战队入学测试</a>
+    <button class="modal-close" onclick="closeModal('toefl')">取消</button>
+  </div>
+</div>
+
 <script>
 function switchTab(id,btn){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.querySelectorAll('.cards').forEach(c=>c.classList.remove('active'));
   btn.classList.add('active');
   document.getElementById('tab-'+id).classList.add('active');
+}
+function openModal(id){
+  document.getElementById('modal-'+id).classList.add('active');
+}
+function closeModal(id){
+  document.getElementById('modal-'+id).classList.remove('active');
 }
 function copyWechat(){
   navigator.clipboard.writeText('18512820890').then(()=>{
