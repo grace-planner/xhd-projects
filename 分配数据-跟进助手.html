@@ -857,7 +857,7 @@ input[type=date].fi{color:var(--text)}
 <div id="toast" class="toast"><svg class="toast-ck" viewBox="0 0 20 20"><circle class="toast-ck-circle" cx="10" cy="10" r="8" transform="rotate(-90 10 10)"/><path class="toast-ck-check" d="M6 10l3 3 5-5"/></svg><span id="toast-msg"></span></div>
 <div id="signup-mask" class="signup-mask">
   <div class="signup-dialog">
-    <div class="signup-title">选择报名时间</div>
+    <div class="signup-title" id="signup-title">选择报名时间</div>
     <div class="signup-sub">保存后会同步到多维表格的报名时间字段</div>
     <input type="date" id="signup-date" class="signup-date">
     <div class="signup-actions">
@@ -1261,22 +1261,29 @@ function openRecord(idx){
   showScreen('s-detail');
 }
 
+// 需要选择时间的意向（报名 / 续费），日期都写入「报名时间」字段
+const DATE_INTENTS=['已报名','续费'];
+let pendingDateIntent='';
 function setIntent(v){
-  if(v==='已报名' && curIntent!=='已报名'){
+  if(DATE_INTENTS.includes(v) && curIntent!==v){
     const input=document.getElementById('signup-date');
     const mask=document.getElementById('signup-mask');
+    const title=document.getElementById('signup-title');
+    pendingDateIntent=v;
+    if(title) title.textContent=v==='续费'?'选择续费时间':'选择报名时间';
     if(input){ input.value=curSignupDate || new Date(new Date().getTime()+8*3600000).toISOString().slice(0,10); }
     if(mask){ mask.classList.add('show'); return; }
   }
   curIntent=(curIntent===v)?'':v;
-  if(curIntent!=='已报名') curSignupDate='';
+  if(!DATE_INTENTS.includes(curIntent)) curSignupDate='';
   renderIntent();
 }
 function confirmSignupDate(){
   const input=document.getElementById('signup-date');
-  if(!input || !input.value){ toast('请选择报名时间'); return; }
+  const label=pendingDateIntent==='续费'?'续费':'报名';
+  if(!input || !input.value){ toast('请选择'+label+'时间'); return; }
   curSignupDate=input.value;
-  curIntent='已报名';
+  curIntent=pendingDateIntent||'已报名';
   document.getElementById('signup-mask')?.classList.remove('show');
   renderIntent();
 }
@@ -1413,8 +1420,8 @@ async function doSave(){
     const name=document.getElementById('f-name').value.trim();if(name)fields['姓名']=name;
     const phone=document.getElementById('f-phone').value.trim();if(phone)fields['号码/微信']=phone;
     if(curIntent)fields['意向']=curIntent;
-    if(curIntent==='已报名' && curSignupDate) fields['报名时间']=new Date(curSignupDate+'T15:59:00.000Z').getTime();
-    else if(curIntent!=='已报名' && cur.fields['报名时间']) fields['报名时间']=null;
+    if(DATE_INTENTS.includes(curIntent) && curSignupDate) fields['报名时间']=new Date(curSignupDate+'T15:59:00.000Z').getTime();
+    else if(!DATE_INTENTS.includes(curIntent) && cur.fields['报名时间']) fields['报名时间']=null;
     const info=document.getElementById('f-info').value.trim();if(info)fields['具体信息']=info;
     const dv=document.getElementById('f-date').value;
     const origDate=cur.fields['下次跟进日期'];
