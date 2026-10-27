@@ -114,6 +114,9 @@ h1{font:700 clamp(42px,10vw,80px)/1.04 var(--serif-zh);letter-spacing:.01em;marg
 textarea{resize:vertical;display:block}
 .live .int{color:var(--muted)}
 .live .ph{color:var(--faint)}
+.meter{height:6px;background:var(--line);margin-top:10px;position:relative;overflow:hidden}
+.meter i{position:absolute;inset:0 auto 0 0;width:0;background:var(--accent);transition:width .08s linear}
+.srnote{color:var(--warn);font-size:14px;line-height:1.6;margin:8px 0 0;min-height:1.6em}
 .notes-ro{white-space:pre-wrap;color:var(--muted);font-size:14px;border-left:2px solid var(--line);padding-left:12px;margin-top:10px}
 .label{display:block;margin:18px 0 8px;color:var(--muted)}
 .actions{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:22px}
@@ -525,7 +528,7 @@ function renderStage(){
     ans='<label class="label mono" for="notes">便签 · 真实考试可以写笔记</label><textarea id="notes" rows="5" placeholder="写几个关键词就够了，不用写句子">'+esc(S.notes)+'</textarea>';
     acts='<button class="btn" data-act="skip">跳过准备，直接作答</button>';
   }else if(ph==='answer'){
-    if(S.mode==='voice') ans='<div class="live" id="live"><span class="fin"></span><span class="int"></span><span class="ph">'+(SR?'开口说话，文字会出现在这里…':'正在录音。这个浏览器不会实时转写，说完后可在报告里补充文字。')+'</span></div>';
+    if(S.mode==='voice') ans='<div class="live" id="live"><span class="fin"></span><span class="int"></span><span class="ph">'+(SR?'开口说话，文字会出现在这里…':'正在录音。这个浏览器不会实时转写，说完后可在报告里补充文字。')+'</span></div><div class="meter" id="meter" aria-label="麦克风音量"><i></i></div><p class="srnote" id="srnote"></p>';
     else ans='<textarea id="typed" rows="'+(p===2?10:5)+'" placeholder="像开口说话一样把答案写下来…"></textarea>';
     if(p===2&&S.notes.trim()) ans+='<div class="notes-ro"><span class="mono">便签</span>\n'+esc(S.notes)+'</div>';
     acts='<button class="btn primary" data-act="done">完成作答</button>';
@@ -562,9 +565,39 @@ function beginAnswer(fromPrep){
 }
 
 /* ---------- capture ---------- */
+const SR_ERR={
+  network:'转写服务连不上。Chrome 的转写依赖 Google 服务，国内网络通常连不上。录音仍在进行，说完后可在报告里手动补字；也可以换 Edge 或手机 Safari 再试。',
+  'not-allowed':'浏览器没有授予转写权限。请点地址栏左侧的锁形图标，允许麦克风后刷新页面。',
+  'service-not-allowed':'浏览器不允许使用转写服务。录音仍在进行，说完后可在报告里手动补字。',
+  'audio-capture':'找不到可用的麦克风。请检查系统的输入设备设置。',
+  'language-not-supported':'这个浏览器不支持英语转写。录音仍在进行，说完后可在报告里手动补字。'
+};
+function setNote(t){const n=$('#srnote');if(n) n.textContent=t}
+function startMeter(){
+  try{
+    const C=window.AudioContext||window.webkitAudioContext;
+    cap.ctx=new C();
+    if(cap.ctx.state==='suspended') cap.ctx.resume();
+    const an=cap.ctx.createAnalyser();an.fftSize=512;
+    cap.ctx.createMediaStreamSource(S.mic).connect(an);
+    const buf=new Uint8Array(an.fftSize);
+    cap.mt=setInterval(()=>{
+      an.getByteTimeDomainData(buf);
+      let m=0;for(let i=0;i<buf.length;i++) m=Math.max(m,Math.abs(buf[i]-128));
+      const lv=Math.min(1,m/64);cap.peak=Math.max(cap.peak,lv);
+      const f=$('#meter i');if(f) f.style.width=(lv*100)+'%';
+    },80);
+  }catch(e){}
+}
 function startCapture(){
-  cap={chunks:[],rec:null,sr:null,final:'',interim:'',stopped:false,dead:false};
+  cap={chunks:[],rec:null,sr:null,final:'',interim:'',stopped:false,dead:false,peak:0,mt:null,ctx:null,th:null};
   if(S.mode!=='voice') return;
+  startMeter();
+  cap.th=setTimeout(()=>{
+    if(cap.stopped) return;
+    if(cap.peak<.04) setNote('几乎没有收到声音。请检查系统输入设备是否选对，或麦克风是否被其他软件占用。');
+    else if(SR&&!cap.dead&&!(cap.final+cap.interim).trim()) setNote('麦克风收到了声音，但还没有转写结果，转写服务可能连不上。录音仍在继续，说完后可在报告里手动补字。');
+  },6000);
   try{
     const mt=['audio/webm;codecs=opus','audio/webm','audio/mp4'].find(t=>MediaRecorder.isTypeSupported&&MediaRecorder.isTypeSupported(t));
     cap.rec=new MediaRecorder(S.mic,mt?{mimeType:mt}:undefined);
@@ -582,7 +615,12 @@ function startCapture(){
         }
         cap.interim=interim;renderLive();
       };
-      sr.onerror=ev=>{if(ev.error==='not-allowed'||ev.error==='service-not-allowed') cap.dead=true};
+      sr.onerror=ev=>{
+        const e=ev.error;
+        if(e==='no-speech'||e==='aborted') return;
+        cap.dead=true;
+        setNote(SR_ERR[e]||('转写出错（'+e+'）。录音仍在进行，说完后可在报告里手动补字。'));
+      };
       sr.onend=()=>{if(!cap.stopped&&!cap.dead){try{sr.start()}catch(e){}}};
       sr.start();cap.sr=sr;
     }catch(e){cap.sr=null}
@@ -591,6 +629,8 @@ function startCapture(){
 function stopCapture(){
   return new Promise(res=>{
     cap.stopped=true;
+    clearInterval(cap.mt);clearTimeout(cap.th);
+    try{cap.ctx&&cap.ctx.close()}catch(e){}
     let pending=0,fin=false;
     const once=f=>{let u=false;return()=>{if(u)return;u=true;f()}};
     const done=()=>{pending--;if(pending<=0&&!fin){fin=true;res()}};
@@ -621,7 +661,7 @@ async function finishAnswer(auto){
 }
 function quit(){
   clearTimer();
-  if(cap&&!cap.stopped){cap.stopped=true;try{cap.rec&&cap.rec.state!=='inactive'&&cap.rec.stop()}catch(e){}try{cap.sr&&cap.sr.abort()}catch(e){}}
+  if(cap&&!cap.stopped){cap.stopped=true;clearInterval(cap.mt);clearTimeout(cap.th);try{cap.ctx&&cap.ctx.close()}catch(e){}try{cap.rec&&cap.rec.state!=='inactive'&&cap.rec.stop()}catch(e){}try{cap.sr&&cap.sr.abort()}catch(e){}}
   releaseMic();S.phase='idle';show('s-lobby');
 }
 function endSession(){
