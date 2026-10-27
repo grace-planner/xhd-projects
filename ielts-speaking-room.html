@@ -116,6 +116,10 @@ textarea{resize:vertical;display:block}
 .live .ph{color:var(--faint)}
 .meter{height:6px;background:var(--line);margin-top:10px;position:relative;overflow:hidden}
 .meter i{position:absolute;inset:0 auto 0 0;width:0;background:var(--accent);transition:width .08s linear}
+.mictest{margin-top:30px;padding-top:18px;border-top:1px solid var(--line)}
+.mt-row{display:flex;gap:10px;flex-wrap:wrap}
+.mt-row select{flex:1 1 220px;min-width:0;background:var(--desk);color:var(--fg);border:1px solid var(--line);border-radius:4px;padding:12px;font:inherit;font-size:15px}
+.mt-row .btn{padding:12px 20px}
 .srnote{color:var(--warn);font-size:14px;line-height:1.6;margin:8px 0 0;min-height:1.6em}
 .notes-ro{white-space:pre-wrap;color:var(--muted);font-size:14px;border-left:2px solid var(--line);padding-left:12px;margin-top:10px}
 .label{display:block;margin:18px 0 8px;color:var(--muted)}
@@ -225,6 +229,12 @@ blockquote{margin:0;border-left:2px solid var(--accent);padding:2px 0 2px 16px;f
       <div class="row">
         <label class="sw"><input type="checkbox" id="typedOnly"><span>文字作答（不使用麦克风）</span></label>
         <button class="btn primary" id="drawBtn">抽题 →</button>
+      </div>
+      <div class="mictest" id="mictest">
+        <p class="mono muted" style="margin:0 0 10px">麦克风检测</p>
+        <div class="mt-row"><select id="micsel" aria-label="选择麦克风"><option value="">默认麦克风</option></select><button class="btn" id="micBtn" type="button">开始检测</button></div>
+        <div class="meter" id="tmeter" aria-label="麦克风音量"><i></i></div>
+        <p class="fine" id="micstat">点“开始检测”，说几句话，音量条应该跳动。录音前先在这里选对设备。</p>
       </div>
       <p class="fine" id="envnote"></p>
     </section>
@@ -446,11 +456,79 @@ function envNote(){
   $('#envnote').textContent=s;
 }
 
+function attachMeter(stream,barSel){
+  let ctx=null,mt=null,peak=0;
+  try{
+    const C=window.AudioContext||window.webkitAudioContext;
+    ctx=new C();
+    if(ctx.state==='suspended') ctx.resume();
+    const an=ctx.createAnalyser();an.fftSize=512;
+    ctx.createMediaStreamSource(stream).connect(an);
+    const buf=new Uint8Array(an.fftSize);
+    mt=setInterval(()=>{
+      an.getByteTimeDomainData(buf);
+      let m=0;for(let i=0;i<buf.length;i++) m=Math.max(m,Math.abs(buf[i]-128));
+      const lv=Math.min(1,m/64);peak=Math.max(peak,lv);
+      const f=$(barSel);if(f) f.style.width=(lv*100)+'%';
+    },80);
+  }catch(e){}
+  return {peak:()=>peak,stop:()=>{clearInterval(mt);try{ctx&&ctx.close()}catch(e){}const f=$(barSel);if(f) f.style.width='0'}};
+}
+function micConstraints(){return {audio:S.deviceId?{deviceId:{exact:S.deviceId}}:true}}
+async function openMic(){
+  try{return await navigator.mediaDevices.getUserMedia(micConstraints())}
+  catch(e){
+    if(e&&e.name==='OverconstrainedError'&&S.deviceId){S.deviceId='';return await navigator.mediaDevices.getUserMedia({audio:true})}
+    throw e;
+  }
+}
 async function initMic(){
   releaseMic();S.micMsg='';
   if(S.forceTyped||!HAS_MIC) return;
-  try{S.mic=await navigator.mediaDevices.getUserMedia({audio:true})}
+  try{S.mic=await openMic()}
   catch(e){S.mic=null;S.micMsg='denied'}
+}
+/* mic test panel */
+const T={stream:null,meter:null,timer:null};
+function stopTest(){
+  clearTimeout(T.timer);if(T.meter) T.meter.stop();T.meter=null;
+  if(T.stream) T.stream.getTracks().forEach(t=>t.stop());T.stream=null;
+}
+const MIC_ERR={
+  NotAllowedError:'麦克风权限被拒绝。点地址栏左侧的锁形图标，把麦克风改成“允许”，然后刷新页面。如果已经允许，请检查系统设置里 Chrome 是否有麦克风权限。',
+  NotFoundError:'找不到麦克风设备。请确认麦克风或耳机已插好。',
+  NotReadableError:'麦克风被其他软件占用，或被系统禁用。请关掉会议软件或录音软件后重试。',
+  OverconstrainedError:'这个设备已经不可用，请在下拉框里重新选择。'
+};
+async function listMics(){
+  try{
+    const d=(await navigator.mediaDevices.enumerateDevices()).filter(x=>x.kind==='audioinput'&&x.deviceId);
+    const sel=$('#micsel');
+    sel.innerHTML=d.map((x,i)=>'<option value="'+esc(x.deviceId)+'">'+esc(x.label||('麦克风 '+(i+1)))+'</option>').join('')||'<option value="">默认麦克风</option>';
+  }catch(e){}
+}
+async function testMic(){
+  stopTest();
+  const st=$('#micstat'),sel=$('#micsel');
+  S.deviceId=sel.value&&sel.value!=='default'?sel.value:sel.value;
+  try{
+    T.stream=await openMic();
+    const tr=T.stream.getAudioTracks()[0];
+    const cur=tr&&tr.getSettings?tr.getSettings().deviceId:'';
+    await listMics();
+    if(cur&&[...sel.options].some(o=>o.value===cur)) sel.value=cur;
+    S.deviceId=sel.value;
+    st.textContent='正在使用：'+((tr&&tr.label)||'默认麦克风')+'。请说几句话，音量条应该跳动。';
+    T.meter=attachMeter(T.stream,'#tmeter i');
+    T.timer=setTimeout(()=>{
+      if(!T.meter) return;
+      st.textContent=T.meter.peak()<.04
+        ?'没有收到声音。请在上面的下拉框换一个设备（不要选“立体声混音”或虚拟设备），再检查系统声音设置里的输入音量是否被静音。'
+        :'麦克风正常，可以抽题了。';
+    },4000);
+  }catch(e){
+    st.textContent=MIC_ERR[e&&e.name]||('无法打开麦克风（'+((e&&e.name)||'未知错误')+'）。');
+  }
 }
 function releaseMic(){if(S.mic){S.mic.getTracks().forEach(t=>t.stop())}S.mic=null}
 function revokeUrls(){S.urls.forEach(u=>{try{URL.revokeObjectURL(u)}catch(e){}});S.urls=[]}
@@ -573,29 +651,13 @@ const SR_ERR={
   'language-not-supported':'这个浏览器不支持英语转写。录音仍在进行，说完后可在报告里手动补字。'
 };
 function setNote(t){const n=$('#srnote');if(n) n.textContent=t}
-function startMeter(){
-  try{
-    const C=window.AudioContext||window.webkitAudioContext;
-    cap.ctx=new C();
-    if(cap.ctx.state==='suspended') cap.ctx.resume();
-    const an=cap.ctx.createAnalyser();an.fftSize=512;
-    cap.ctx.createMediaStreamSource(S.mic).connect(an);
-    const buf=new Uint8Array(an.fftSize);
-    cap.mt=setInterval(()=>{
-      an.getByteTimeDomainData(buf);
-      let m=0;for(let i=0;i<buf.length;i++) m=Math.max(m,Math.abs(buf[i]-128));
-      const lv=Math.min(1,m/64);cap.peak=Math.max(cap.peak,lv);
-      const f=$('#meter i');if(f) f.style.width=(lv*100)+'%';
-    },80);
-  }catch(e){}
-}
 function startCapture(){
-  cap={chunks:[],rec:null,sr:null,final:'',interim:'',stopped:false,dead:false,peak:0,mt:null,ctx:null,th:null};
+  cap={chunks:[],rec:null,sr:null,final:'',interim:'',stopped:false,dead:false,meter:null,th:null};
   if(S.mode!=='voice') return;
-  startMeter();
+  cap.meter=attachMeter(S.mic,'#meter i');
   cap.th=setTimeout(()=>{
     if(cap.stopped) return;
-    if(cap.peak<.04) setNote('几乎没有收到声音。请检查系统输入设备是否选对，或麦克风是否被其他软件占用。');
+    if(cap.meter&&cap.meter.peak()<.04) setNote('几乎没有收到声音。请退出本次，在首页的“麦克风检测”里换一个设备，并检查系统的输入音量。');
     else if(SR&&!cap.dead&&!(cap.final+cap.interim).trim()) setNote('麦克风收到了声音，但还没有转写结果，转写服务可能连不上。录音仍在继续，说完后可在报告里手动补字。');
   },6000);
   try{
@@ -629,8 +691,7 @@ function startCapture(){
 function stopCapture(){
   return new Promise(res=>{
     cap.stopped=true;
-    clearInterval(cap.mt);clearTimeout(cap.th);
-    try{cap.ctx&&cap.ctx.close()}catch(e){}
+    clearTimeout(cap.th);if(cap.meter) cap.meter.stop();
     let pending=0,fin=false;
     const once=f=>{let u=false;return()=>{if(u)return;u=true;f()}};
     const done=()=>{pending--;if(pending<=0&&!fin){fin=true;res()}};
@@ -661,7 +722,7 @@ async function finishAnswer(auto){
 }
 function quit(){
   clearTimer();
-  if(cap&&!cap.stopped){cap.stopped=true;clearInterval(cap.mt);clearTimeout(cap.th);try{cap.ctx&&cap.ctx.close()}catch(e){}try{cap.rec&&cap.rec.state!=='inactive'&&cap.rec.stop()}catch(e){}try{cap.sr&&cap.sr.abort()}catch(e){}}
+  if(cap&&!cap.stopped){cap.stopped=true;clearTimeout(cap.th);if(cap.meter) cap.meter.stop();try{cap.rec&&cap.rec.state!=='inactive'&&cap.rec.stop()}catch(e){}try{cap.sr&&cap.sr.abort()}catch(e){}}
   releaseMic();S.phase='idle';show('s-lobby');
 }
 function endSession(){
@@ -787,8 +848,16 @@ async function runAI(){
 
 /* ---------- events ---------- */
 $$('.part').forEach(b=>b.addEventListener('click',()=>{S.part=+b.dataset.part;$$('.part').forEach(x=>x.setAttribute('aria-checked',String(x===b)))}));
-$('#typedOnly').addEventListener('change',e=>{S.forceTyped=e.target.checked;envNote()});
-$('#drawBtn').addEventListener('click',startSession);
+function syncMicTest(){
+  const box=$('#mictest');box.hidden=!HAS_MIC||S.forceTyped;
+  if(box.hidden) stopTest();
+}
+$('#typedOnly').addEventListener('change',e=>{S.forceTyped=e.target.checked;envNote();syncMicTest()});
+$('#micBtn').addEventListener('click',testMic);
+$('#micsel').addEventListener('change',testMic);
+$('#drawBtn').addEventListener('click',()=>{stopTest();startSession()});
+window.addEventListener('pagehide',stopTest);
+syncMicTest();
 $('#s-stage').addEventListener('click',e=>{
   const b=e.target.closest('[data-act]');if(!b) return;
   const a=b.dataset.act;
