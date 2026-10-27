@@ -235,6 +235,8 @@ blockquote{margin:0;border-left:2px solid var(--accent);padding:2px 0 2px 16px;f
         <div class="mt-row"><select id="micsel" aria-label="选择麦克风"><option value="">默认麦克风</option></select><button class="btn" id="micBtn" type="button">开始检测</button></div>
         <div class="meter" id="tmeter" aria-label="麦克风音量"><i></i></div>
         <p class="fine" id="micstat">点“开始检测”，说几句话，音量条应该跳动。录音前先在这里选对设备。</p>
+        <div class="mt-row" style="margin-top:18px"><select id="engsel" aria-label="转写方式"><option value="auto">转写方式：自动（先用浏览器自带，连不上再用本地引擎）</option><option value="local">转写方式：本地引擎（国内推荐，说完后转写）</option></select><button class="btn" id="engBtn" type="button">预下载引擎</button></div>
+        <p class="fine" id="engstat">本地引擎在浏览器里运行，不上传录音。首次需要下载约 80 MB，之后会缓存在浏览器里。</p>
       </div>
       <p class="fine" id="envnote"></p>
     </section>
@@ -430,7 +432,7 @@ const CFG={
   3:{cap:60,prep:0,lo:45,hi:100,label:'Discussion'}
 };
 
-const S={part:1,qs:[],idx:0,card:null,topic:'',answers:[],mic:null,mode:'typed',phase:'idle',forceTyped:false,notes:'',tick:null,t0:0,sample:null,chk:[],urls:[],last:{},A:null,micMsg:''};
+const S={part:1,qs:[],idx:0,card:null,topic:'',answers:[],mic:null,mode:'typed',phase:'idle',forceTyped:false,notes:'',tick:null,t0:0,sample:null,chk:[],urls:[],last:{},A:null,micMsg:'',deviceId:'',engineMode:'auto',srBroken:false,engineFail:false};
 let cap=null;
 
 const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
@@ -444,14 +446,15 @@ function setChip(){
   const c=$('#micchip'),t=$('#micchip-t');
   c.classList.remove('ok','warn');
   if(S.phase==='idle'&&!S.mic&&!S.micMsg){t.textContent='麦克风 未检测';return}
-  if(S.mode==='voice'){c.classList.add(SR?'ok':'warn');t.textContent=SR?'录音 + 实时转写':'仅录音，需手动补字'}
+  if(S.mode==='voice'){c.classList.add('ok');t.textContent=useSR()?'录音 + 实时转写':'录音 + 本地转写'}
   else{c.classList.add('warn');t.textContent='文字作答'}
 }
 function envNote(){
   let s;
   if(S.forceTyped) s='已选择文字作答：不会请求麦克风，语速不会被统计。';
-  else if(HAS_MIC&&SR) s='可以录音并实时转写。点击“抽题”时浏览器会请求麦克风权限，推荐 Chrome、Edge 或 Safari。';
-  else if(HAS_MIC) s='可以录音，但这个浏览器不支持自动转写，说完后需要手动补充文字。推荐 Chrome、Edge 或 Safari。';
+  else if(HAS_MIC&&S.engineMode==='local') s='已选择本地转写引擎：说完后在浏览器里转写，不上传录音。首次需要下载约 80 MB，之后会缓存。';
+  else if(HAS_MIC&&SR) s='可以录音并实时转写。浏览器自带转写连不上时，会自动改用本地引擎。点击“抽题”时浏览器会请求麦克风权限。';
+  else if(HAS_MIC) s='可以录音。这个浏览器不支持自带转写，说完后会用本地引擎转写（首次需要下载约 80 MB）。';
   else s='这里没有可用的麦克风接口，会自动改为文字作答。把页面文件放到自己的网址（例如 GitHub Pages）里打开，就能使用录音。';
   $('#envnote').textContent=s;
 }
@@ -550,6 +553,8 @@ async function startSession(){
   S.answers=[];S.idx=0;S.notes='';S.chk=[];S.phase='idle';
   await initMic();
   S.mode=S.mic?'voice':'typed';
+  S.engineFail=false;
+  if(S.mode==='voice'&&!useSR()) loadEngine().catch(()=>{});
   setChip();
   if(!S.forceTyped&&!S.mic) toast(HAS_MIC?'这里不允许使用麦克风，已改为文字作答。':'没有可用的麦克风，已改为文字作答。');
   pick();
@@ -606,7 +611,7 @@ function renderStage(){
     ans='<label class="label mono" for="notes">便签 · 真实考试可以写笔记</label><textarea id="notes" rows="5" placeholder="写几个关键词就够了，不用写句子">'+esc(S.notes)+'</textarea>';
     acts='<button class="btn" data-act="skip">跳过准备，直接作答</button>';
   }else if(ph==='answer'){
-    if(S.mode==='voice') ans='<div class="live" id="live"><span class="fin"></span><span class="int"></span><span class="ph">'+(SR?'开口说话，文字会出现在这里…':'正在录音。这个浏览器不会实时转写，说完后可在报告里补充文字。')+'</span></div><div class="meter" id="meter" aria-label="麦克风音量"><i></i></div><p class="srnote" id="srnote"></p>';
+    if(S.mode==='voice') ans='<div class="live" id="live"><span class="fin"></span><span class="int"></span><span class="ph">'+livePh()+'</span></div><div class="meter" id="meter" aria-label="麦克风音量"><i></i></div><p class="srnote" id="srnote"></p>';
     else ans='<textarea id="typed" rows="'+(p===2?10:5)+'" placeholder="像开口说话一样把答案写下来…"></textarea>';
     if(p===2&&S.notes.trim()) ans+='<div class="notes-ro"><span class="mono">便签</span>\n'+esc(S.notes)+'</div>';
     acts='<button class="btn primary" data-act="done">完成作答</button>';
@@ -624,7 +629,7 @@ function renderStage(){
 function renderLive(){
   const l=$('#live');if(!l||!cap) return;
   const has=(cap.final+cap.interim).trim();
-  l.innerHTML='<span>'+esc(cap.final)+'</span><span class="int">'+esc(cap.interim)+'</span>'+(has?'':'<span class="ph">开口说话，文字会出现在这里…</span>');
+  l.innerHTML='<span>'+esc(cap.final)+'</span><span class="int">'+esc(cap.interim)+'</span>'+(has?'':'<span class="ph">'+livePh()+'</span>');
 }
 
 function startPrep(){
@@ -651,6 +656,8 @@ const SR_ERR={
   'language-not-supported':'这个浏览器不支持英语转写。录音仍在进行，说完后可在报告里手动补字。'
 };
 function setNote(t){const n=$('#srnote');if(n) n.textContent=t}
+function useSR(){return !!SR&&S.engineMode!=='local'&&!S.srBroken}
+function livePh(){return useSR()?'开口说话，文字会出现在这里…':'正在录音。说完后会用本地引擎转写成文字。'}
 function startCapture(){
   cap={chunks:[],rec:null,sr:null,final:'',interim:'',stopped:false,dead:false,meter:null,th:null};
   if(S.mode!=='voice') return;
@@ -658,7 +665,10 @@ function startCapture(){
   cap.th=setTimeout(()=>{
     if(cap.stopped) return;
     if(cap.meter&&cap.meter.peak()<.04) setNote('几乎没有收到声音。请退出本次，在首页的“麦克风检测”里换一个设备，并检查系统的输入音量。');
-    else if(SR&&!cap.dead&&!(cap.final+cap.interim).trim()) setNote('麦克风收到了声音，但还没有转写结果，转写服务可能连不上。录音仍在继续，说完后可在报告里手动补字。');
+    else if(cap.sr&&!cap.dead&&!(cap.final+cap.interim).trim()){
+      loadEngine().catch(()=>{});
+      setNote('麦克风收到了声音，但浏览器自带转写还没有结果。如果一直没有，说完后会自动改用本地引擎转写。');
+    }
   },6000);
   try{
     const mt=['audio/webm;codecs=opus','audio/webm','audio/mp4'].find(t=>MediaRecorder.isTypeSupported&&MediaRecorder.isTypeSupported(t));
@@ -666,7 +676,7 @@ function startCapture(){
     cap.rec.ondataavailable=e=>{if(e.data&&e.data.size) cap.chunks.push(e.data)};
     cap.rec.start();
   }catch(e){cap.rec=null}
-  if(SR){
+  if(useSR()){
     try{
       const sr=new SR();sr.lang='en-US';sr.continuous=true;sr.interimResults=true;sr.maxAlternatives=1;
       sr.onresult=ev=>{
@@ -681,6 +691,13 @@ function startCapture(){
         const e=ev.error;
         if(e==='no-speech'||e==='aborted') return;
         cap.dead=true;
+        if(e==='network'||e==='service-not-allowed'){
+          S.srBroken=true;loadEngine().catch(()=>{});
+          setNote('浏览器自带转写连不上，已改用本地引擎：说完后会自动转写成文字（首次需要下载引擎，请保持页面打开）。');
+          const ph=$('#live .ph');if(ph) ph.textContent=livePh();
+          setChip();
+          return;
+        }
         setNote(SR_ERR[e]||('转写出错（'+e+'）。录音仍在进行，说完后可在报告里手动补字。'));
       };
       sr.onend=()=>{if(!cap.stopped&&!cap.dead){try{sr.start()}catch(e){}}};
@@ -707,15 +724,15 @@ async function finishAnswer(auto){
   const c=CFG[S.part];
   const sec=Math.min(c.cap,Math.round((performance.now()-S.t0)/1000));
   const b=$('[data-act="done"]');if(b){b.disabled=true;b.textContent='收音中…'}
-  let text='',audio=null;
+  let text='',audio=null,blob=null;
   if(S.mode==='voice'){
     await stopCapture();
     text=(cap.final+' '+cap.interim).replace(/\s+/g,' ').trim();
-    if(cap.chunks.length){audio=URL.createObjectURL(new Blob(cap.chunks,{type:(cap.rec&&cap.rec.mimeType)||'audio/webm'}));S.urls.push(audio)}
+    if(cap.chunks.length){blob=new Blob(cap.chunks,{type:(cap.rec&&cap.rec.mimeType)||'audio/webm'});audio=URL.createObjectURL(blob);S.urls.push(audio)}
   }else{
     const t=$('#typed');text=t?t.value.trim():'';
   }
-  S.answers.push({q:S.qs[S.idx],text,sec,mode:S.mode,audio});
+  S.answers.push({q:S.qs[S.idx],text,sec,mode:S.mode,audio,blob,needsLocal:S.mode==='voice'&&!text&&!!blob});
   if(auto) toast('时间到');
   if(S.idx<S.qs.length-1){S.idx++;S.phase='ready';renderStage()}
   else endSession();
@@ -725,8 +742,89 @@ function quit(){
   if(cap&&!cap.stopped){cap.stopped=true;clearTimeout(cap.th);if(cap.meter) cap.meter.stop();try{cap.rec&&cap.rec.state!=='inactive'&&cap.rec.stop()}catch(e){}try{cap.sr&&cap.sr.abort()}catch(e){}}
   releaseMic();S.phase='idle';show('s-lobby');
 }
-function endSession(){
+/* ---------- local transcription engine: Whisper running in the browser ---------- */
+const ENGINE_CFG={
+  model:'Xenova/whisper-base.en',
+  libs:[
+    {lib:'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3',dist:'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3/dist/'},
+    {lib:'https://gcore.jsdelivr.net/npm/@huggingface/transformers@3',dist:'https://gcore.jsdelivr.net/npm/@huggingface/transformers@3/dist/'},
+    {lib:'https://fastly.jsdelivr.net/npm/@huggingface/transformers@3',dist:'https://fastly.jsdelivr.net/npm/@huggingface/transformers@3/dist/'},
+    {lib:'https://unpkg.com/@huggingface/transformers@3/dist/transformers.min.js',dist:'https://unpkg.com/@huggingface/transformers@3/dist/'}
+  ],
+  hosts:['https://hf-mirror.com/','https://huggingface.co/']
+};
+const ENGINE={pipe:null,promise:null,msg:'',files:{},err:''};
+function engineMsg(t){
+  ENGINE.msg=t;
+  const a=$('#engstat');if(a) a.textContent=t;
+  const b=$('#engmsg');if(b) b.textContent=t;
+}
+function engineProg(e){
+  if(!e||e.status!=='progress'||!e.file) return;
+  ENGINE.files[e.file]={l:e.loaded||0,t:e.total||0};
+  let l=0,t=0;for(const k in ENGINE.files){l+=ENGINE.files[k].l;t+=ENGINE.files[k].t}
+  if(t>0) engineMsg('正在下载转写引擎 '+Math.round(l/t*100)+'%（共约 '+Math.round(t/1048576)+' MB，只需要一次，之后会缓存在浏览器里）');
+}
+function loadEngine(){
+  if(ENGINE.pipe) return Promise.resolve(ENGINE.pipe);
+  if(ENGINE.promise) return ENGINE.promise;
+  ENGINE.promise=(async()=>{
+    let lastErr=null;
+    for(const c of ENGINE_CFG.libs){
+      let T;
+      try{engineMsg('正在加载转写引擎…');T=await import(c.lib)}catch(e){lastErr=e;continue}
+      try{T.env.allowLocalModels=false;T.env.backends.onnx.wasm.numThreads=1;T.env.backends.onnx.wasm.wasmPaths=c.dist}catch(e){}
+      for(const host of ENGINE_CFG.hosts){
+        try{
+          T.env.remoteHost=host;ENGINE.files={};
+          const p=await T.pipeline('automatic-speech-recognition',ENGINE_CFG.model,{dtype:'q8',device:'wasm',progress_callback:engineProg});
+          ENGINE.pipe=p;engineMsg('转写引擎已就绪');return p;
+        }catch(e){lastErr=e}
+      }
+    }
+    ENGINE.err=(lastErr&&(lastErr.message||String(lastErr)))||'未知错误';
+    engineMsg('本地引擎没能加载：'+ENGINE.err);
+    throw lastErr||new Error('engine');
+  })();
+  ENGINE.promise.catch(()=>{ENGINE.promise=null});
+  return ENGINE.promise;
+}
+async function decodeTo16k(blob){
+  const ab=await blob.arrayBuffer();
+  const C=window.AudioContext||window.webkitAudioContext;
+  const ctx=new C({sampleRate:16000});
+  try{const buf=await ctx.decodeAudioData(ab);return buf.getChannelData(0).slice()}
+  finally{try{ctx.close()}catch(e){}}
+}
+async function transcribe(blob){
+  const pipe=await loadEngine();
+  const data=await decodeTo16k(blob);
+  let peak=0;for(let i=0;i<data.length;i+=64) peak=Math.max(peak,Math.abs(data[i]));
+  if(data.length<16000||peak<.01) return '';
+  const out=await pipe(data,{chunk_length_s:30,stride_length_s:5});
+  return String((out&&out.text)||'').replace(/\[[^\]]*\]|\([^)]*\)/g,' ').replace(/\s+/g,' ').trim();
+}
+async function endSession(){
   releaseMic();S.phase='report';
+  const todo=S.answers.filter(a=>a.needsLocal);
+  if(todo.length){
+    $('#s-report').innerHTML='<p class="mono eyebrow2">Transcribing</p><h2 class="rh">正在转写你的录音</h2><p class="muted" id="engmsg" aria-live="polite"></p><p class="fine">录音只在你的浏览器里处理，不会上传。转写时页面可能短暂卡顿，请稍等；用时取决于电脑性能和录音长度。</p>';
+    show('s-report');
+    engineMsg(ENGINE.msg||'正在准备转写引擎…');
+    for(let i=0;i<todo.length;i++){
+      const a=todo[i];
+      try{
+        await loadEngine();
+        engineMsg('正在转写第 '+(i+1)+' / '+todo.length+' 段…');
+        await sleep(80);
+        a.text=await transcribe(a.blob);a.engine='local';
+      }catch(e){
+        ENGINE.err=ENGINE.err||(e&&e.message)||String(e);
+        todo.slice(i).forEach(x=>{x.err=true});
+        break;
+      }
+    }
+  }
   renderReport();show('s-report');
 }
 
@@ -775,13 +873,13 @@ function tipsHTML(A){
 function reviewHTML(A){
   const rep=new Set();
   if(!A.empty){A.repeated.forEach(x=>rep.add(x.w));A.weak.forEach(x=>rep.add(x.w))}
-  let h='<div class="sec"><h3>逐题回顾</h3><p class="legend"><mark class="f">口头语</mark>　<mark class="r">重复或偏弱用词</mark>　转写有误可以点“修正转写”，再重新分析。</p>';
+  let h='<div class="sec"><h3>逐题回顾</h3><p class="legend"><mark class="f">口头语</mark>　<mark class="r">重复或偏弱用词</mark>　转写有误可以点“修正转写”，再重新分析。</p>'+(S.answers.some(a=>a.engine==='local')?'<p class="fine">这份文字由本地引擎转写，会自动省略“嗯、啊”，所以口头语统计可能偏少。</p>':'');
   S.answers.forEach((a,i)=>{
     const empty=!a.text;
     const open=empty;
     h+='<article class="rv"><div class="rv-h"><span class="mono">Q'+(i+1)+' · 用时 '+a.sec+' 秒 · '+tokenize(a.text).length+' 词</span><button class="lnk" data-edit="'+i+'">修正转写</button></div>'
      +'<p class="rv-q">'+esc(a.q)+'</p>'
-     +'<p class="rv-t'+(empty?' empty':'')+'">'+(empty?(a.mode==='voice'?'没有转写出文字（浏览器不支持转写，或没有听到声音）。录音还在，可以在下面补充你说的内容。':'这一题没有写内容。'):highlight(a.text,rep))+'</p>'
+     +'<p class="rv-t'+(empty?' empty':'')+'">'+(empty?(a.err?'本地转写引擎没能加载（'+esc(ENGINE.err||'未知错误')+'）。可能是网络问题。录音还在，可以在下面手动补字。':a.mode==='voice'?'没有转写出文字（可能没有听到声音）。录音还在，可以在下面补充你说的内容。':'这一题没有写内容。'):highlight(a.text,rep))+'</p>'
      +(a.audio?'<audio controls preload="none" src="'+a.audio+'"></audio>':'')
      +'<div class="edit" id="edit'+i+'"'+(open?'':' hidden')+'><textarea id="ed'+i+'" rows="4">'+esc(a.text)+'</textarea><button class="btn" data-apply="'+i+'">重新分析</button></div></article>';
   });
@@ -853,6 +951,22 @@ function syncMicTest(){
   if(box.hidden) stopTest();
 }
 $('#typedOnly').addEventListener('change',e=>{S.forceTyped=e.target.checked;envNote();syncMicTest()});
+try{
+  const sv=localStorage.getItem('ielts_engine');
+  if(sv==='auto'||sv==='local') S.engineMode=sv;
+  else if(/^Asia\/(Shanghai|Chongqing|Harbin|Urumqi)/.test(Intl.DateTimeFormat().resolvedOptions().timeZone||'')) S.engineMode='local';
+}catch(e){}
+$('#engsel').value=S.engineMode;
+$('#engsel').addEventListener('change',e=>{
+  S.engineMode=e.target.value;
+  try{localStorage.setItem('ielts_engine',S.engineMode)}catch(x){}
+  envNote();
+});
+$('#engBtn').addEventListener('click',async()=>{
+  const b=$('#engBtn');b.disabled=true;engineMsg('正在加载转写引擎…');
+  try{await loadEngine()}catch(e){}
+  b.disabled=false;
+});
 $('#micBtn').addEventListener('click',testMic);
 $('#micsel').addEventListener('change',testMic);
 $('#drawBtn').addEventListener('click',()=>{stopTest();startSession()});
