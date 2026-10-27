@@ -1,0 +1,793 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:dark}body{margin:0}[hidden]{display:none!important}</style></head><body><title>雅思口语考场</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,700&family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@600;700&display=swap">
+<style>
+/* Layout: one exam-desk column. Dark ink desk, a pale paper cue card as the only physical object, Bodoni numerals for the clock and the band score. */
+:root{
+  --bg:#0C111A; --desk:#131A26; --desk2:#1A2332; --line:#283347;
+  --fg:#E7EAF0; --muted:#97A3B7; --faint:#5F6C82;
+  --accent:#7FD1BE; --accent-ink:#06231D; --accent-dim:rgba(127,209,190,.13);
+  --rec:#FF6A5C; --warn:#E9B64F; --ok:#7FD1BE;
+  --paper:#ECE7D8; --paper-ink:#1D2230; --paper-line:#CBC4AE; --paper-mute:#6B6652;
+  --display:"Bodoni Moda","Noto Serif SC","Songti SC",serif;
+  --serif-zh:"Noto Serif SC","Songti SC",serif;
+  --sans:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --bg:#EEF1F5; --desk:#FFFFFF; --desk2:#F4F6F9; --line:#D5DBE5;
+    --fg:#101726; --muted:#55617A; --faint:#8A95AA;
+    --accent:#0B7A69; --accent-ink:#F2FFFB; --accent-dim:rgba(11,122,105,.09);
+    --rec:#D6372A; --warn:#9A6A00; --ok:#0B7A69;
+    --paper:#FFFDF5; --paper-ink:#1D2230; --paper-line:#E1D9BF; --paper-mute:#7A745E;
+    color-scheme:light;
+  }
+}
+:root[data-theme="light"]{
+  --bg:#EEF1F5; --desk:#FFFFFF; --desk2:#F4F6F9; --line:#D5DBE5;
+  --fg:#101726; --muted:#55617A; --faint:#8A95AA;
+  --accent:#0B7A69; --accent-ink:#F2FFFB; --accent-dim:rgba(11,122,105,.09);
+  --rec:#D6372A; --warn:#9A6A00; --ok:#0B7A69;
+  --paper:#FFFDF5; --paper-ink:#1D2230; --paper-line:#E1D9BF; --paper-mute:#7A745E;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:400 16px/1.65 var(--sans);-webkit-font-smoothing:antialiased;
+  padding-block:20px 64px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:880px;margin:0 auto;min-width:0}
+.mono{font:500 12px/1.4 var(--mono);letter-spacing:.09em;text-transform:uppercase}
+.muted{color:var(--muted)}
+.fine{color:var(--muted);font-size:13px;line-height:1.6;margin:10px 0 0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+
+/* top bar */
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding-bottom:16px;border-bottom:1px solid var(--line)}
+.brand{color:var(--muted)}
+.chip{display:inline-flex;align-items:center;gap:8px;font:500 12px/1 var(--mono);color:var(--muted);padding:7px 10px;border:1px solid var(--line);border-radius:4px}
+.chip .dot{width:7px;height:7px;border-radius:50%;background:var(--faint)}
+.chip.ok .dot{background:var(--ok)}
+.chip.warn .dot{background:var(--warn)}
+
+/* lobby */
+.eyebrow{color:var(--accent);margin:48px 0 14px}
+h1{font:700 clamp(42px,10vw,80px)/1.04 var(--serif-zh);letter-spacing:.01em;margin:0 0 18px;text-wrap:balance}
+.lede{max-width:34em;color:var(--muted);font-size:17px;margin:0 0 34px}
+.parts{display:grid;gap:10px;margin-bottom:24px}
+.part{display:grid;grid-template-columns:52px minmax(0,1fr);gap:16px;align-items:center;text-align:left;width:100%;padding:16px 18px;background:var(--desk);border:1px solid var(--line);border-radius:6px;color:var(--fg);font:inherit;cursor:pointer;transition:border-color .15s,background .15s}
+.part:hover{border-color:var(--faint)}
+.part[aria-checked="true"]{border-color:var(--accent);background:var(--accent-dim)}
+.pn{font:500 46px/1 var(--display);color:var(--accent);text-align:center}
+.pt b{display:block;font:700 18px/1.35 var(--sans)}
+.pt small{display:block;color:var(--muted);font-size:14px;line-height:1.5;margin-top:3px}
+.row{display:flex;gap:16px 24px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.sw{display:inline-flex;align-items:center;gap:10px;color:var(--muted);font-size:14px;cursor:pointer}
+.sw input{width:18px;height:18px;accent-color:var(--accent)}
+.btn{font:700 16px/1 var(--sans);padding:15px 26px;border-radius:4px;border:1px solid var(--line);background:var(--desk2);color:var(--fg);cursor:pointer}
+.btn:hover{border-color:var(--faint)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn:disabled{opacity:.5;cursor:default}
+.lnk{background:none;border:0;padding:0;color:var(--accent);font:500 13px var(--sans);cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+
+/* draw */
+.draw{display:grid;justify-items:center;gap:30px;padding-top:80px;min-height:380px}
+.deck{position:relative;width:150px;height:210px}
+.deck i{position:absolute;inset:0;border:1px solid var(--faint);border-radius:6px;background:repeating-linear-gradient(135deg,var(--accent-dim) 0 2px,transparent 2px 9px),var(--desk2);animation:riffle 1.2s ease-in-out infinite}
+.deck i:nth-child(2){animation-delay:.12s}
+.deck i:nth-child(3){animation-delay:.24s}
+.deck i:nth-child(4){animation-delay:.36s}
+@keyframes riffle{0%,100%{transform:translate(0,0) rotate(0)}30%{transform:translate(-46px,-6px) rotate(-7deg)}60%{transform:translate(46px,4px) rotate(8deg)}}
+
+/* stage */
+.stagehead{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:34px 0 22px;color:var(--muted)}
+.dots{display:flex;gap:6px}
+.dots i{width:28px;height:4px;background:var(--line)}
+.dots i.on{background:var(--accent)}
+.dots i.done{background:var(--faint)}
+.tag{color:var(--accent);margin:0 0 12px}
+.q{font:500 clamp(26px,5.2vw,42px)/1.25 var(--display);margin:0;text-wrap:balance}
+.cue{position:relative;background:var(--paper);color:var(--paper-ink);border:1px solid var(--paper-line);border-radius:3px;padding:26px 28px 24px;box-shadow:0 18px 40px -24px rgba(0,0,0,.65)}
+.cue::after{content:"";position:absolute;inset:7px;border:1px solid var(--paper-line);border-radius:2px;pointer-events:none}
+.cue-h{display:flex;justify-content:space-between;gap:12px;color:var(--paper-mute);margin-bottom:14px}
+.cue-t{font:700 clamp(22px,4.2vw,30px)/1.25 var(--display);margin:0 0 14px;text-wrap:balance}
+.cue p{margin:0}
+.cue ul{margin:6px 0 10px;padding-left:1.2em}
+.cue li{margin:4px 0}
+.cue-e{font-weight:500}
+.clock{margin:30px 0 14px}
+.clock-top{display:flex;justify-content:space-between;align-items:center;gap:12px;color:var(--muted)}
+.digits{font:500 clamp(68px,17vw,116px)/1.05 var(--display);color:var(--fg)}
+.digits .d{display:inline-block;width:.64em;text-align:center}
+.digits .c{display:inline-block;width:.3em;text-align:center}
+.clock.low .digits{color:var(--rec)}
+.ruler{position:relative;height:12px;background:repeating-linear-gradient(90deg,var(--line) 0 1px,transparent 1px 10%);border-bottom:1px solid var(--line)}
+.ruler i{position:absolute;left:0;bottom:-1px;height:3px;width:0;background:var(--accent)}
+.rec{display:inline-flex;align-items:center;gap:8px;color:var(--rec)}
+.rec i{width:9px;height:9px;border-radius:50%;background:var(--rec);animation:pulse 1.2s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.25}}
+.live,textarea{width:100%;min-height:150px;background:var(--desk);border:1px solid var(--line);border-radius:6px;padding:14px 16px;color:var(--fg);font:400 17px/1.75 var(--sans)}
+textarea{resize:vertical;display:block}
+.live .int{color:var(--muted)}
+.live .ph{color:var(--faint)}
+.notes-ro{white-space:pre-wrap;color:var(--muted);font-size:14px;border-left:2px solid var(--line);padding-left:12px;margin-top:10px}
+.label{display:block;margin:18px 0 8px;color:var(--muted)}
+.actions{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:22px}
+
+/* report */
+.eyebrow2{color:var(--accent);margin:40px 0 10px}
+.rh{font:700 clamp(32px,7vw,52px)/1.1 var(--serif-zh);margin:0 0 26px}
+.verdict{display:grid;grid-template-columns:minmax(0,230px) minmax(0,1fr);gap:20px 40px;padding:28px 0;border-block:1px solid var(--line)}
+.band{font:500 clamp(88px,22vw,140px)/.9 var(--display);color:var(--accent)}
+.cap{color:var(--muted);margin:10px 0 0}
+.crit{display:grid;gap:7px;margin-bottom:18px}
+.crit:last-child{margin-bottom:0}
+.crit-h{display:flex;justify-content:space-between;align-items:baseline;gap:12px;color:var(--muted)}
+.crit-h b{font:500 28px/1 var(--display);color:var(--fg)}
+.track{height:6px;background:var(--line);position:relative}
+.track i{position:absolute;inset:0 auto 0 0;background:var(--accent)}
+.crit.na .crit-h b{color:var(--faint)}
+.why{margin:0;color:var(--muted);font-size:13px;line-height:1.55}
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:0 28px;margin:26px 0 0}
+.m{padding:14px 0 16px;border-top:1px solid var(--line);min-width:0}
+.m .mono{color:var(--muted)}
+.m b{display:block;font:500 36px/1.15 var(--display);margin:4px 0 2px}
+.m b small{font:400 13px var(--sans);color:var(--muted);margin-left:4px}
+.m p{margin:0;color:var(--muted);font-size:13px;line-height:1.5}
+.m .st{color:var(--accent)}
+.m .st.bad{color:var(--warn)}
+.sec h3{font:700 22px/1.3 var(--serif-zh);margin:44px 0 16px}
+.tips{list-style:none;counter-reset:t;padding:0;margin:0;display:grid;gap:18px}
+.tips li{display:grid;grid-template-columns:34px minmax(0,1fr);gap:14px}
+.tips li::before{counter-increment:t;content:counter(t);font:500 32px/1 var(--display);color:var(--accent)}
+.tips b{display:block;margin-bottom:2px}
+.tips p{margin:0;color:var(--muted)}
+.good{list-style:none;padding:0;margin:0;display:grid;gap:8px}
+.good li{padding-left:18px;position:relative;color:var(--muted)}
+.good li::before{content:"";position:absolute;left:0;top:.8em;width:8px;height:2px;background:var(--accent)}
+.notice{border:1px solid var(--warn);color:var(--fg);padding:14px 16px;border-radius:6px;margin:0 0 8px}
+.rv{padding:18px 0;border-top:1px solid var(--line)}
+.rv-h{display:flex;justify-content:space-between;align-items:center;gap:12px;color:var(--muted)}
+.rv-q{margin:8px 0 0;font:500 19px/1.4 var(--display)}
+.rv-t{font-size:17px;line-height:1.85;margin:10px 0;overflow-wrap:anywhere}
+.rv-t.empty{color:var(--faint)}
+mark.f{background:color-mix(in srgb,var(--warn) 28%,transparent);color:inherit;border-radius:3px;padding:0 3px}
+mark.r{background:none;color:inherit;border-bottom:1px dotted var(--accent)}
+.legend{color:var(--muted);font-size:13px;margin:0 0 4px}
+audio{width:100%;margin-top:6px}
+.edit{margin-top:10px;display:grid;gap:10px;justify-items:start}
+.chk{border:1px solid var(--line);border-radius:6px;padding:14px 18px;margin:0}
+.chk legend{padding:0 8px;color:var(--muted)}
+.chk label{display:flex;gap:10px;align-items:flex-start;padding:5px 0;cursor:pointer}
+.chk input{margin-top:6px;accent-color:var(--accent)}
+.ai{border:1px solid var(--line);background:var(--desk);border-radius:6px;padding:20px 22px}
+.ai h3{margin:0 0 6px}
+.ai-out{margin-top:16px;display:grid;gap:16px}
+.chips{display:flex;gap:10px;flex-wrap:wrap}
+.chips span{border:1px solid var(--line);border-radius:4px;padding:8px 12px;font:500 13px var(--mono)}
+.chips b{font:500 20px var(--display);margin-left:8px}
+.fix{border-top:1px solid var(--line);padding-top:12px}
+.fix p{margin:4px 0}
+.fix .b{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--faint)}
+.fix .a{color:var(--accent);font-weight:500}
+blockquote{margin:0;border-left:2px solid var(--accent);padding:2px 0 2px 16px;font:400 17px/1.8 var(--display)}
+.cta{margin-top:40px;padding:22px 0 0;border-top:1px solid var(--line)}
+.cta p{margin:0 0 12px;max-width:36em}
+.foot{margin-top:56px;padding-top:16px;border-top:1px solid var(--line);color:var(--faint);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--fg);color:var(--bg);padding:11px 16px;border-radius:4px;font-size:14px;max-width:calc(100vw - 32px);opacity:0;pointer-events:none;transition:opacity .2s;z-index:20}
+#toast.on{opacity:1}
+@media (max-width:640px){
+  .verdict{grid-template-columns:minmax(0,1fr)}
+  .cue{padding:22px 20px 20px}
+}
+@media (prefers-reduced-motion:reduce){
+  .deck i{animation:none}
+  .deck i:nth-child(2){transform:rotate(-5deg)}
+  .deck i:nth-child(3){transform:rotate(4deg)}
+  .deck i:nth-child(4){transform:rotate(9deg)}
+  .rec i{animation:none}
+  #toast{transition:none}
+}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="mono brand">IELTS Speaking Room</div>
+    <div class="chip" id="micchip" aria-live="polite"><i class="dot"></i><span id="micchip-t">麦克风 未检测</span></div>
+  </header>
+
+  <main>
+    <section id="s-lobby">
+      <p class="mono eyebrow">Part 1 · Part 2 · Part 3</p>
+      <h1>雅思口语考场</h1>
+      <p class="lede">抽一道题，按真实考试的时间作答。说完立刻得到一份用数据说话的点评：语速、口头语、词汇多样度、衔接手段和句式。</p>
+      <div class="parts" role="radiogroup" aria-label="选择考试部分">
+        <button class="part" role="radio" aria-checked="true" data-part="1">
+          <span class="pn">1</span>
+          <span class="pt"><b>Interview · 日常问答</b><small>同一话题 3 个问题，每题限时 45 秒，目标 25–55 词。</small></span>
+        </button>
+        <button class="part" role="radio" aria-checked="false" data-part="2">
+          <span class="pn">2</span>
+          <span class="pt"><b>Long turn · 一分钟准备，两分钟独白</b><small>抽一张提示卡，准备 60 秒，连续讲 2 分钟，目标 140–240 词。</small></span>
+        </button>
+        <button class="part" role="radio" aria-checked="false" data-part="3">
+          <span class="pn">3</span>
+          <span class="pt"><b>Discussion · 抽象讨论</b><small>围绕同一话题的 3 个延伸问题，每题限时 60 秒，目标 45–100 词。</small></span>
+        </button>
+      </div>
+      <div class="row">
+        <label class="sw"><input type="checkbox" id="typedOnly"><span>文字作答（不使用麦克风）</span></label>
+        <button class="btn primary" id="drawBtn">抽题 →</button>
+      </div>
+      <p class="fine" id="envnote"></p>
+    </section>
+
+    <section id="s-draw" class="draw" hidden>
+      <div class="deck" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+      <p class="mono muted">考官正在抽题…</p>
+    </section>
+
+    <section id="s-stage" hidden></section>
+    <section id="s-report" hidden></section>
+  </main>
+
+  <footer class="foot">
+    <span class="mono" id="foot-brand"></span>
+    <span class="mono">模拟评分仅供练习参考，不是官方成绩</span>
+  </footer>
+</div>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+// ==ANALYSIS-START
+const FILLERS=[
+  ['um / uh / er',/\b(?:u+m+|u+h+m*|e+r+m*|a+h+m*)\b/gi],
+  ['you know',/\byou know\b/gi],
+  ['I mean',/\bi mean\b/gi],
+  ['kind of / sort of',/\b(?:kind|sort) of\b/gi],
+  ['basically',/\bbasically\b/gi],
+  ['actually',/\bactually\b/gi],
+  ['literally',/\bliterally\b/gi]
+];
+const CONN=['however','although','even though','whereas','while','because','since','therefore','so that','as a result','for example','for instance','such as','in addition','besides','moreover','furthermore',"what's more",'on the other hand','in contrast','on the whole','overall','to be honest','personally','in fact','apart from','instead','otherwise','unless','as well as',"that's why",'this is why','firstly','secondly','finally','in the end','at first','eventually','not only','as long as','in terms of','on top of that','to some extent','in particular','generally speaking','having said that'];
+const SUB=/\b(?:although|even though|whereas|while|unless|if|whenever|which|who|whom|whose|until|once|so that|as soon as|as long as)\b/g;
+const FAMILIES=[
+  ['完成时',/\b(?:have|has|had)\s+(?:been|\w+ed|\w+en|done|made|gone|seen|had|become|got|taken|given|known)\b/],
+  ['would / could / might',/\b(?:would|could|might)\s+\w+/],
+  ['if 条件句',/\bif\b/],
+  ['被动语态',/\b(?:is|are|was|were|be|been|being)\s+(?:\w+ed|made|done|given|taken|known|seen|built|held|called|used|found)\b/],
+  ['定语从句',/\b(?:which|who|whose|whom)\b/],
+  ['比较结构',/\bthan\b/],
+  ['used to',/\bused to\b/]
+];
+const WEAK={good:'beneficial / worthwhile / decent',bad:'harmful / unpleasant / poor',very:'extremely / remarkably，或直接换更强的形容词',really:'genuinely / truly',thing:'aspect / factor，或直接说出具体名词',things:'aspects / factors，或直接说出具体名词',people:'individuals / the public / folks',lot:'plenty of / a great deal of',lots:'plenty of / numerous',nice:'pleasant / charming / enjoyable',big:'substantial / considerable',important:'crucial / vital / significant',interesting:'fascinating / engaging / thought-provoking'};
+const STOP=new Set("a an the and or but so if of to in on at for with from by as is are was were be been being am i you he she it we they me my your his her its our their this that these those there here do does did done have has had having not no yes just can could will would should may might must what which who whom whose when where why how than then too also about into over after before up down out off more most some any each every all both few many much one two get got going go goes went make made say said think thought know feel want don't it's i'm that's can't didn't doesn't i've i'd i'll like".split(" "));
+const BASIC_LONG=new Set("something everything sometimes different important especially probably actually definitely remember interesting together favourite favorite usually another anything whatever children basically obviously absolutely yesterday tomorrow beautiful including although understand everyone everybody nowadays sometimes whenever however therefore otherwise".split(" "));
+
+function tokenize(s){return (String(s).toLowerCase().replace(/[’‘]/g,"'").match(/[a-z]+(?:'[a-z]+)?/g))||[]}
+function count(re,s){const m=s.match(new RegExp(re.source,'gi'));return m?m.length:0}
+function mattr(t,w){
+  w=w||50;
+  if(t.length<=w) return new Set(t).size/Math.max(1,t.length);
+  let sum=0,n=0;
+  for(let i=0;i+w<=t.length;i++){sum+=new Set(t.slice(i,i+w)).size/w;n++}
+  return sum/n;
+}
+function snap(x){return Math.max(3.5,Math.min(7.5,Math.round(x*2)/2))}
+
+function analyze(answers,cfg){
+  const norm=s=>String(s||'').replace(/[’‘]/g,"'");
+  const all=answers.map(a=>norm(a.text)).join(' ').replace(/\s+/g,' ').trim();
+  const toks=tokenize(all), words=toks.length;
+  if(words<8) return {empty:true,words};
+  const lower=all.toLowerCase();
+
+  const voice=answers.filter(a=>a.mode==='voice'&&a.sec>0);
+  let wpm=null;
+  if(voice.length){
+    const w=voice.reduce((n,a)=>n+tokenize(a.text).length,0), s=voice.reduce((n,a)=>n+a.sec,0);
+    if(w>=8&&s>=8) wpm=w/(s/60);
+  }
+  const avg=words/answers.length;
+
+  const fl=[]; let ft=0;
+  for(const [label,re] of FILLERS){const n=count(re,all); if(n){fl.push({label,n});ft+=n}}
+  fl.sort((a,b)=>b.n-a.n);
+  const frate=ft/words;
+
+  const m=mattr(toks);
+
+  const used=[]; let ct=0;
+  for(const p of CONN){const n=count(new RegExp('\\b'+p+'\\b'),lower); if(n){used.push({p,n});ct+=n}}
+  used.sort((a,b)=>b.n-a.n);
+  const per100=ct/words*100;
+
+  const crate=count(SUB,lower)/words*100;
+  const fams=FAMILIES.filter(f=>f[1].test(lower)).map(f=>f[0]);
+
+  const freq={}; for(const t of toks) freq[t]=(freq[t]||0)+1;
+  const thr=cfg.hi>150?4:3;
+  const repeated=Object.entries(freq).filter(([w,n])=>n>=thr&&w.length>2&&!STOP.has(w)&&!WEAK[w]).map(([w,n])=>({w,n})).sort((a,b)=>b.n-a.n).slice(0,4);
+  const weak=Object.keys(WEAK).filter(w=>freq[w]>=((w==='very'||w==='really')?4:3)).map(w=>({w,n:freq[w],alt:WEAK[w]})).sort((a,b)=>b.n-a.n).slice(0,3);
+  const adv=[...new Set(toks.filter(w=>w.length>=8&&!w.includes("'")&&!BASIC_LONG.has(w)))].slice(0,8);
+
+  let fc=5, lr=5, gra=5;
+  const r=avg/((cfg.lo+cfg.hi)/2);
+  fc+= r>=.9?1 : r>=.65?.5 : r<.4?-.5 : 0;
+  fc+= frate<.02?.5 : frate<.05?0 : frate<.09?-.5 : -1;
+  fc+= per100>=3?1 : per100>=1.5?.5 : per100<.5?-.5 : 0;
+  if(wpm!=null) fc+= (wpm>=110&&wpm<=170)?.5 : wpm<80?-1 : wpm<110?-.25 : wpm>190?-.5 : 0;
+
+  lr+= m>=.78?1.5 : m>=.72?1 : m>=.66?.5 : m<.58?-.5 : 0;
+  lr+= adv.length>=5?1 : adv.length>=3?.5 : adv.length<=1?-.25 : 0;
+  lr-= Math.min(.75,.25*(repeated.length+weak.length));
+  if(words<30) lr=Math.min(lr,5.5);
+
+  gra+= crate>=5?1.5 : crate>=3?1 : crate>=1.5?.5 : crate<.8?-.5 : 0;
+  gra+= Math.min(1,fams.length*.25);
+  if(words<30) gra=Math.min(gra,5.5);
+
+  const b={fc:snap(fc),lr:snap(lr),gra:snap(gra)};
+  b.overall=snap((b.fc+b.lr+b.gra)/3);
+
+  const pct=Math.round(frate*100);
+  const why={
+    fc:(wpm!=null?'语速 '+Math.round(wpm)+' 词/分 · ':'')+'口头语 '+pct+'% · 衔接 '+per100.toFixed(1)+' / 100 词',
+    lr:'词汇多样度 '+Math.round(m*100)+' · 较长词 '+adv.length+' 个'+((repeated.length+weak.length)?' · 重复或偏弱用词 '+(repeated.length+weak.length)+' 处':''),
+    gra:'复合句线索 '+crate.toFixed(1)+' / 100 词 · 句式 '+fams.length+'/7 类'
+  };
+
+  const tips=[];
+  if(avg<cfg.lo) tips.push({sev:3+(cfg.lo-avg)/cfg.lo*10,t:'展开得不够',b:'平均每题 '+Math.round(avg)+' 词，这个部分建议 '+cfg.lo+'–'+cfg.hi+' 词。'+(cfg.hi>150?'拿提示卡的 4 个点当骨架，每个点讲 2–3 句，时间自然就够了。':'用“直接回答 → 一个原因 → 一个具体例子”三步，每步一句。')});
+  else if(avg>cfg.hi*1.5) tips.push({sev:2,t:'收得不够紧',b:'平均每题 '+Math.round(avg)+' 词，超过建议上限 '+cfg.hi+'。先给答案，再用一两个理由收住，考官更看重清晰。'});
+  if(frate>.03&&ft>=2) tips.push({sev:4+frate*60,t:'口头语偏多',b:'口头语占 '+pct+'%（'+fl.slice(0,3).map(x=>x.label+' ×'+x.n).join('，')+'）。用安静的半秒停顿代替，或换成 “Let me think…”“Well, I’d say…” 这类有内容的缓冲语。'});
+  if(wpm!=null&&wpm<95) tips.push({sev:5+(95-wpm)/10,t:'语速偏慢',b:'约 '+Math.round(wpm)+' 词/分（含停顿）。不用急着加速，先把每句话提前想完一半再开口；平时用跟读 (shadowing) 把节奏带到 110–150。'});
+  if(wpm!=null&&wpm>185) tips.push({sev:3,t:'语速偏快',b:'约 '+Math.round(wpm)+' 词/分。每个观点结束时刻意停 0.5 秒，让考官听清，也给自己留出组织下一句的时间。'});
+  if(per100<1.5) tips.push({sev:4+(1.5-per100)*2,t:'观点之间缺少连接',b:'衔接手段只用了 '+used.length+' 种。每个回答至少放两处：对比 (although / whereas)、举例 (for instance)、因果 (that’s why / as a result)。'});
+  if(crate<1.5||fams.length<2) tips.push({sev:4+(fams.length<2?2:0),t:'句式太单一',b:'复合句线索偏少（'+fams.length+'/7 类）。每题强制自己写进一句：“Although …, …”“The reason why … is that …”“If I had …, I would …”。'});
+  for(const w of weak.slice(0,2)) tips.push({sev:3.5+w.n/4,t:'“'+w.w+'” 用了 '+w.n+' 次',b:'可以换成：'+w.alt+'。'});
+  for(const w of repeated.slice(0,1)) tips.push({sev:3+w.n/4,t:'“'+w.w+'” 重复了 '+w.n+' 次',b:'同一个词反复出现会压低词汇分，试着用代词或同义表达替换一部分。'});
+  if(m<.62&&words>=40) tips.push({sev:4,t:'词汇多样度偏低',b:'多样度 '+Math.round(m*100)+'。每个话题准备 3–5 个固定搭配（collocations），比临场找单词更稳。'});
+  tips.sort((a,b)=>b.sev-a.sev);
+  if(!tips.length) tips.push({sev:1,t:'已经比较稳',b:'下一步可以挑战更高阶的表达：加入不那么常见的搭配和一两处倒装或强调句，同时保持自然。'});
+
+  const goods=[];
+  if(avg>=cfg.lo&&avg<=cfg.hi*1.5) goods.push('答案长度合适，平均 '+Math.round(avg)+' 词。');
+  if(per100>=3&&used.length>=2) goods.push('衔接自然，用了 '+used.slice(0,3).map(x=>x.p).join('、')+'。');
+  if(frate<.02&&words>=30) goods.push('几乎没有口头语，表达干净。');
+  if(wpm!=null&&wpm>=110&&wpm<=170) goods.push('语速约 '+Math.round(wpm)+' 词/分，落在舒适区间。');
+  if(m>=.72) goods.push('词汇多样度不错（'+Math.round(m*100)+'）。');
+  if(fams.length>=3) goods.push('句式有变化：'+fams.slice(0,3).join('、')+'。');
+
+  return {empty:false,words,avg,wpm,fillers:{total:ft,rate:frate,list:fl},mattr:m,conn:{distinct:used.length,total:ct,per100,list:used},cx:{rate:crate,fams},repeated,weak,adv,bands:b,why,tips:tips.slice(0,3),goods:goods.slice(0,3)};
+}
+// ==ANALYSIS-END
+</script>
+
+<script>
+(function(){
+'use strict';
+
+/* Edit these three lines for your own page. Leave contact empty to hide the copy button. */
+const BRAND={
+  name:'Grace · 国际升学规划师',
+  cta:'发音、临场反应和思路展开，最好让真人老师听一遍录音。把这份报告发给 Grace，一起看下一步怎么练。',
+  contact:''
+};
+
+const $=(s,r)=>(r||document).querySelector(s);
+const $$=(s,r)=>Array.from((r||document).querySelectorAll(s));
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const pad=n=>String(n).padStart(2,'0');
+const rnd=a=>a[Math.floor(Math.random()*a.length)];
+const reduced=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+const P1=[
+  {topic:'Hometown',qs:['Where is your hometown, and what is it known for?','What do you like most about living there?','Has your hometown changed much since you were a child?']},
+  {topic:'Work or study',qs:['Do you work, or are you a student?','What do you enjoy most about it?','Is there anything you would like to change about your daily routine at work or school?']},
+  {topic:'Food and cooking',qs:['What kind of food do you eat most often?','Do you enjoy cooking? Why or why not?','Is there a dish from your region that visitors should try?']},
+  {topic:'Mobile phones',qs:['How often do you use your phone each day?','What do you mostly use it for?','Do you think people spend too much time on their phones?']},
+  {topic:'Weather',qs:['What is the weather like in your city at this time of year?','Which season do you like best, and why?','Does the weather affect your mood or your plans?']},
+  {topic:'Free time',qs:['What do you usually do in your free time?','Do you prefer spending free time alone or with others?','Is there a hobby you would like to try in the future?']},
+  {topic:'Transport',qs:['How do you usually get around your city?','Is public transport convenient where you live?','What would improve transport in your area?']},
+  {topic:'Reading',qs:['Do you like reading? What do you read most?','Do you prefer paper books or reading on a screen?','Did you read more when you were younger?']},
+  {topic:'Friends',qs:['Do you have many friends, or a few close ones?','How do you usually keep in touch with them?','What qualities do you value most in a friend?']},
+  {topic:'Home',qs:['Do you live in a house or an apartment?','What is your favourite room, and why?','Would you like to move somewhere different one day?']},
+  {topic:'Daily routine',qs:['What time do you usually get up on weekdays?','Is there a part of the day you enjoy most?','Do you prefer to plan your day or to be spontaneous?']},
+  {topic:'Music',qs:['What kind of music do you listen to?','Have your music tastes changed over the years?','Do you play, or would you like to play, an instrument?']}
+];
+const P2=[
+  {topic:'Teachers',t:'Describe a teacher who has influenced you.',say:['who this person was','what subject they taught','what they did that inspired you'],expl:'and explain why their influence has lasted.',p3:['What qualities make a good teacher?','How has the role of teachers changed with online learning?','Should schools put more emphasis on exams or on practical skills?']},
+  {topic:'Travel',t:'Describe a place you visited that you would like to go back to.',say:['where it is','when you went and who you went with','what you did there'],expl:'and explain why you would like to return.',p3:['Why do people like travelling to places far from home?','What are the positives and negatives of tourism for local communities?','Do you think people will travel more or less in the future?']},
+  {topic:'Skills',t:'Describe a skill you learned that has been useful in your life.',say:['what the skill is','how and when you learned it','who helped you'],expl:'and explain how it has been useful.',p3:['Which skills should children learn at school?','Is it better to learn a skill from a teacher or by yourself?','How might the skills employers look for change in the next twenty years?']},
+  {topic:'Food',t:'Describe a meal you remember well.',say:['where you had it','who you were with','what you ate'],expl:'and explain why it was memorable.',p3:['How have eating habits in your country changed?','Do you think cooking at home is becoming less common?','Should governments do more to encourage healthy eating?']},
+  {topic:'Helping others',t:'Describe a time when you helped someone.',say:['who you helped','what the problem was','what you did'],expl:'and explain how you felt afterwards.',p3:['Why do some people volunteer while others do not?','Should helping others be taught at school?','Is it the government’s job or individuals’ job to help people in need?']},
+  {topic:'Technology',t:'Describe a piece of technology you use often.',say:['what it is','how long you have had it','what you use it for'],expl:'and explain why it matters to you.',p3:['Do people depend too much on technology?','How has technology changed the way people work?','Will machines replace human workers in many jobs?']},
+  {topic:'Buildings',t:'Describe a building you find interesting.',say:['where it is','what it looks like','what it is used for'],expl:'and explain why you find it interesting.',p3:['Should old buildings be preserved or replaced?','How does architecture affect the way people feel in a city?','What makes a city a pleasant place to live?']},
+  {topic:'Goals',t:'Describe a goal you hope to achieve in the next few years.',say:['what the goal is','why you chose it','what steps you will take'],expl:'and explain how you would feel if you achieved it.',p3:['Do people set goals more easily when they are young or older?','Is it more important to have a clear plan or to stay flexible?','What role does luck play in success?']}
+];
+const CFG={
+  1:{cap:45,prep:0,lo:25,hi:55,label:'Interview'},
+  2:{cap:120,prep:60,lo:140,hi:240,label:'Long turn'},
+  3:{cap:60,prep:0,lo:45,hi:100,label:'Discussion'}
+};
+
+const S={part:1,qs:[],idx:0,card:null,topic:'',answers:[],mic:null,mode:'typed',phase:'idle',forceTyped:false,notes:'',tick:null,t0:0,sample:null,chk:[],urls:[],last:{},A:null,micMsg:''};
+let cap=null;
+
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+const HAS_MIC=!!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia&&window.MediaRecorder);
+
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('on');clearTimeout(toast.h);toast.h=setTimeout(()=>t.classList.remove('on'),2800)}
+function show(id){['s-lobby','s-draw','s-stage','s-report'].forEach(s=>{$('#'+s).hidden=s!==id});window.scrollTo(0,0)}
+function beep(){try{const C=window.AudioContext||window.webkitAudioContext;if(!C)return;const ctx=beep.c||(beep.c=new C());const o=ctx.createOscillator(),g=ctx.createGain();o.frequency.value=880;g.gain.value=.04;o.connect(g);g.connect(ctx.destination);o.start();o.stop(ctx.currentTime+.14)}catch(e){}}
+
+function setChip(){
+  const c=$('#micchip'),t=$('#micchip-t');
+  c.classList.remove('ok','warn');
+  if(S.phase==='idle'&&!S.mic&&!S.micMsg){t.textContent='麦克风 未检测';return}
+  if(S.mode==='voice'){c.classList.add(SR?'ok':'warn');t.textContent=SR?'录音 + 实时转写':'仅录音，需手动补字'}
+  else{c.classList.add('warn');t.textContent='文字作答'}
+}
+function envNote(){
+  let s;
+  if(S.forceTyped) s='已选择文字作答：不会请求麦克风，语速不会被统计。';
+  else if(HAS_MIC&&SR) s='可以录音并实时转写。点击“抽题”时浏览器会请求麦克风权限，推荐 Chrome、Edge 或 Safari。';
+  else if(HAS_MIC) s='可以录音，但这个浏览器不支持自动转写，说完后需要手动补充文字。推荐 Chrome、Edge 或 Safari。';
+  else s='这里没有可用的麦克风接口，会自动改为文字作答。把页面文件放到自己的网址（例如 GitHub Pages）里打开，就能使用录音。';
+  $('#envnote').textContent=s;
+}
+
+async function initMic(){
+  releaseMic();S.micMsg='';
+  if(S.forceTyped||!HAS_MIC) return;
+  try{S.mic=await navigator.mediaDevices.getUserMedia({audio:true})}
+  catch(e){S.mic=null;S.micMsg='denied'}
+}
+function releaseMic(){if(S.mic){S.mic.getTracks().forEach(t=>t.stop())}S.mic=null}
+function revokeUrls(){S.urls.forEach(u=>{try{URL.revokeObjectURL(u)}catch(e){}});S.urls=[]}
+
+function pick(){
+  const p=S.part;
+  const bank=p===1?P1:P2;
+  let item;
+  for(let i=0;i<6;i++){item=rnd(bank);if(item!==S.last[p])break}
+  S.last[p]=item;
+  if(p===1){S.qs=item.qs;S.topic=item.topic;S.card=null}
+  else if(p===2){S.qs=[item.t];S.card=item;S.topic=item.topic}
+  else{S.qs=item.p3;S.topic=item.topic;S.card=null}
+}
+
+async function startSession(){
+  const btn=$('#drawBtn');btn.disabled=true;
+  revokeUrls();clearTimer();
+  S.answers=[];S.idx=0;S.notes='';S.chk=[];S.phase='idle';
+  await initMic();
+  S.mode=S.mic?'voice':'typed';
+  setChip();
+  if(!S.forceTyped&&!S.mic) toast(HAS_MIC?'这里不允许使用麦克风，已改为文字作答。':'没有可用的麦克风，已改为文字作答。');
+  pick();
+  show('s-draw');
+  await sleep(reduced?300:1300);
+  btn.disabled=false;
+  if(S.part===2){startPrep()}else{S.phase='ready';renderStage();show('s-stage')}
+}
+
+/* ---------- timer ---------- */
+function clearTimer(){if(S.tick){clearInterval(S.tick);S.tick=null}}
+function runTimer(total,onEnd){
+  clearTimer();
+  const t0=performance.now();
+  setClock(total,total);
+  S.tick=setInterval(()=>{
+    const left=Math.max(0,total-(performance.now()-t0)/1000);
+    setClock(left,total);
+    if(left<=0){clearTimer();onEnd()}
+  },100);
+}
+function digits(s){return s.split('').map(c=>c===':'?'<span class="c">:</span>':'<span class="d">'+c+'</span>').join('')}
+function setClock(left,total){
+  const s=Math.ceil(left-1e-6);
+  if(setClock.last!==s){
+    setClock.last=s;
+    const el=$('#clk');if(el) el.innerHTML=digits(pad(Math.floor(s/60))+':'+pad(s%60));
+    const ck=$('#clock');if(ck) ck.classList.toggle('low',S.phase==='answer'&&s<=10);
+  }
+  const f=$('#fill');if(f) f.style.width=((1-left/total)*100)+'%';
+}
+
+/* ---------- stage ---------- */
+function cueHTML(c){
+  return '<article class="cue" aria-label="Part 2 提示卡"><div class="cue-h mono"><span>Candidate Task Card</span><span>Part 2</span></div>'
+   +'<h2 class="cue-t">'+esc(c.t)+'</h2><p>You should say:</p><ul>'+c.say.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul><p class="cue-e">'+esc(c.expl)+'</p></article>';
+}
+function renderStage(){
+  const p=S.part,c=CFG[p],ph=S.phase,total=S.qs.length;
+  const q=S.qs[S.idx];
+  const qh=p===2?cueHTML(S.card):'<div><p class="mono tag">'+(p===3?'Discussion':'Topic')+' · '+esc(S.topic)+'</p><p class="q">'+esc(q)+'</p></div>';
+  const dots=total>1?'<div class="dots" aria-label="第 '+(S.idx+1)+' 题，共 '+total+' 题">'+S.qs.map((_,i)=>'<i class="'+(i<S.idx?'done':i===S.idx?'on':'')+'"></i>').join('')+'</div>':'';
+  const secs=ph==='prep'?c.prep:c.cap;
+  let label;
+  if(ph==='prep') label='<span class="mono">Prep · 准备</span>';
+  else if(ph==='answer'&&S.mode==='voice') label='<span class="rec mono"><i></i>Rec · 录音中</span>';
+  else if(ph==='answer') label='<span class="mono">Writing · 作答</span>';
+  else label='<span class="mono">Ready · 就绪</span>';
+  let ans='',acts='';
+  if(ph==='ready'){
+    ans='<p class="fine">点击“开始作答”后计时，说完点“完成作答”，时间到会自动结束。</p>';
+    acts='<button class="btn primary" data-act="go">开始作答</button>';
+  }else if(ph==='prep'){
+    ans='<label class="label mono" for="notes">便签 · 真实考试可以写笔记</label><textarea id="notes" rows="5" placeholder="写几个关键词就够了，不用写句子">'+esc(S.notes)+'</textarea>';
+    acts='<button class="btn" data-act="skip">跳过准备，直接作答</button>';
+  }else if(ph==='answer'){
+    if(S.mode==='voice') ans='<div class="live" id="live"><span class="fin"></span><span class="int"></span><span class="ph">'+(SR?'开口说话，文字会出现在这里…':'正在录音。这个浏览器不会实时转写，说完后可在报告里补充文字。')+'</span></div>';
+    else ans='<textarea id="typed" rows="'+(p===2?10:5)+'" placeholder="像开口说话一样把答案写下来…"></textarea>';
+    if(p===2&&S.notes.trim()) ans+='<div class="notes-ro"><span class="mono">便签</span>\n'+esc(S.notes)+'</div>';
+    acts='<button class="btn primary" data-act="done">完成作答</button>';
+  }else{
+    ans='<p class="fine">正在收音…</p>';
+  }
+  $('#s-stage').innerHTML='<div class="stagehead"><span class="mono">Part '+p+' · '+c.label+'</span>'+dots+'</div>'
+    +qh
+    +'<div class="clock" id="clock"><div class="clock-top">'+label+'<span class="mono">'+(ph==='prep'?'准备 60 秒':'限时 '+Math.floor(c.cap/60)+':'+pad(c.cap%60))+'</span></div>'
+    +'<div class="digits" id="clk" role="timer">'+digits(pad(Math.floor(secs/60))+':'+pad(secs%60))+'</div><div class="ruler"><i id="fill"></i></div></div>'
+    +ans+'<div class="actions">'+acts+'<button class="lnk" data-act="quit">退出本次</button></div>';
+  setClock.last=-1;
+  if(ph==='answer'&&S.mode==='typed'){const t=$('#typed');if(t)t.focus()}
+}
+function renderLive(){
+  const l=$('#live');if(!l||!cap) return;
+  const has=(cap.final+cap.interim).trim();
+  l.innerHTML='<span>'+esc(cap.final)+'</span><span class="int">'+esc(cap.interim)+'</span>'+(has?'':'<span class="ph">开口说话，文字会出现在这里…</span>');
+}
+
+function startPrep(){
+  S.phase='prep';renderStage();show('s-stage');
+  runTimer(CFG[2].prep,()=>beginAnswer(true));
+}
+function beginAnswer(fromPrep){
+  if(S.phase==='answer') return;
+  clearTimer();
+  const n=$('#notes');if(n) S.notes=n.value;
+  if(fromPrep) beep();
+  S.phase='answer';renderStage();
+  startCapture();
+  S.t0=performance.now();
+  runTimer(CFG[S.part].cap,()=>finishAnswer(true));
+}
+
+/* ---------- capture ---------- */
+function startCapture(){
+  cap={chunks:[],rec:null,sr:null,final:'',interim:'',stopped:false,dead:false};
+  if(S.mode!=='voice') return;
+  try{
+    const mt=['audio/webm;codecs=opus','audio/webm','audio/mp4'].find(t=>MediaRecorder.isTypeSupported&&MediaRecorder.isTypeSupported(t));
+    cap.rec=new MediaRecorder(S.mic,mt?{mimeType:mt}:undefined);
+    cap.rec.ondataavailable=e=>{if(e.data&&e.data.size) cap.chunks.push(e.data)};
+    cap.rec.start();
+  }catch(e){cap.rec=null}
+  if(SR){
+    try{
+      const sr=new SR();sr.lang='en-US';sr.continuous=true;sr.interimResults=true;sr.maxAlternatives=1;
+      sr.onresult=ev=>{
+        let interim='';
+        for(let i=ev.resultIndex;i<ev.results.length;i++){
+          const r=ev.results[i];
+          if(r.isFinal) cap.final+=r[0].transcript.trim()+' '; else interim+=r[0].transcript;
+        }
+        cap.interim=interim;renderLive();
+      };
+      sr.onerror=ev=>{if(ev.error==='not-allowed'||ev.error==='service-not-allowed') cap.dead=true};
+      sr.onend=()=>{if(!cap.stopped&&!cap.dead){try{sr.start()}catch(e){}}};
+      sr.start();cap.sr=sr;
+    }catch(e){cap.sr=null}
+  }
+}
+function stopCapture(){
+  return new Promise(res=>{
+    cap.stopped=true;
+    let pending=0,fin=false;
+    const once=f=>{let u=false;return()=>{if(u)return;u=true;f()}};
+    const done=()=>{pending--;if(pending<=0&&!fin){fin=true;res()}};
+    if(cap.rec&&cap.rec.state!=='inactive'){pending++;const d=once(done);cap.rec.onstop=d;try{cap.rec.stop()}catch(e){d()}}
+    if(cap.sr){pending++;const d=once(done);const h=setTimeout(d,900);cap.sr.onend=()=>{clearTimeout(h);d()};try{cap.sr.stop()}catch(e){clearTimeout(h);d()}}
+    if(pending===0){fin=true;res()}
+  });
+}
+
+async function finishAnswer(auto){
+  if(S.phase!=='answer') return;
+  S.phase='finishing';clearTimer();
+  const c=CFG[S.part];
+  const sec=Math.min(c.cap,Math.round((performance.now()-S.t0)/1000));
+  const b=$('[data-act="done"]');if(b){b.disabled=true;b.textContent='收音中…'}
+  let text='',audio=null;
+  if(S.mode==='voice'){
+    await stopCapture();
+    text=(cap.final+' '+cap.interim).replace(/\s+/g,' ').trim();
+    if(cap.chunks.length){audio=URL.createObjectURL(new Blob(cap.chunks,{type:(cap.rec&&cap.rec.mimeType)||'audio/webm'}));S.urls.push(audio)}
+  }else{
+    const t=$('#typed');text=t?t.value.trim():'';
+  }
+  S.answers.push({q:S.qs[S.idx],text,sec,mode:S.mode,audio});
+  if(auto) toast('时间到');
+  if(S.idx<S.qs.length-1){S.idx++;S.phase='ready';renderStage()}
+  else endSession();
+}
+function quit(){
+  clearTimer();
+  if(cap&&!cap.stopped){cap.stopped=true;try{cap.rec&&cap.rec.state!=='inactive'&&cap.rec.stop()}catch(e){}try{cap.sr&&cap.sr.abort()}catch(e){}}
+  releaseMic();S.phase='idle';show('s-lobby');
+}
+function endSession(){
+  releaseMic();S.phase='report';
+  renderReport();show('s-report');
+}
+
+/* ---------- report ---------- */
+function highlight(text,rep){
+  const ranges=[];
+  for(const f of FILLERS){const r=new RegExp(f[1].source,'gi');let m;while((m=r.exec(text))) ranges.push([m.index,m.index+m[0].length,'f'])}
+  const wr=/[A-Za-z]+(?:['’][A-Za-z]+)?/g;let m;
+  while((m=wr.exec(text))){if(rep.has(m[0].toLowerCase().replace('’',"'"))) ranges.push([m.index,m.index+m[0].length,'r'])}
+  ranges.sort((a,b)=>a[0]-b[0]||(a[2]==='f'?-1:1));
+  let out='',pos=0;
+  for(const r of ranges){if(r[0]<pos) continue;out+=esc(text.slice(pos,r[0]))+'<mark class="'+r[2]+'">'+esc(text.slice(r[0],r[1]))+'</mark>';pos=r[1]}
+  return out+esc(text.slice(pos));
+}
+function wpmState(w){
+  if(w<80) return ['偏慢',1]; if(w<110) return ['略慢',1]; if(w<=170) return ['合适',0]; if(w<=190) return ['略快',1]; return ['偏快',1];
+}
+function verdictHTML(A){
+  const b=A.bands,hi=Math.min(9,b.overall+.5),lo=b.overall-.5;
+  const crit=(name,v,why,na)=>'<div class="crit'+(na?' na':'')+'"><div class="crit-h"><span class="mono">'+name+'</span><b>'+(na?'—':v.toFixed(1))+'</b></div><div class="track">'+(na?'':'<i style="width:'+(v/9*100).toFixed(1)+'%"></i>')+'</div><p class="why">'+why+'</p></div>';
+  return '<div class="verdict"><div><div class="band">'+b.overall.toFixed(1)+'</div><p class="mono cap">估计 Band · 区间 '+lo.toFixed(1)+'–'+hi.toFixed(1)+'</p><p class="fine">三项程序估算的均值，只反映文字和节奏，不是官方成绩。</p></div><div>'
+    +crit('Fluency &amp; Coherence',b.fc,esc(A.why.fc))
+    +crit('Lexical Resource',b.lr,esc(A.why.lr))
+    +crit('Grammatical Range',b.gra,esc(A.why.gra)+'（语法准确性程序无法可靠判断）')
+    +crit('Pronunciation',0,'发音无法从文字判断，需要真人老师听录音。',true)
+    +'</div></div>';
+}
+function metricsHTML(A,cfg){
+  const m=(k,v,sub,st)=>'<div class="m"><span class="mono">'+k+'</span><b>'+v+'</b><p>'+(st?'<span class="st'+(st[1]?' bad':'')+'">'+st[0]+'</span> · ':'')+sub+'</p></div>';
+  const w=A.wpm;
+  return '<div class="metrics">'
+   +(w!=null?m('语速','<span>'+Math.round(w)+'</span><small>词/分</small>','含停顿，舒适区间 110–170',wpmState(w)):m('语速','—','文字作答无法统计'))
+   +m('字数','<span>'+A.words+'</span><small>词</small>','平均每题 '+Math.round(A.avg)+'，目标 '+cfg.lo+'–'+cfg.hi,A.avg<cfg.lo?['偏短',1]:A.avg>cfg.hi*1.5?['偏长',1]:['合适',0])
+   +m('口头语','<span>'+A.fillers.total+'</span><small>次</small>',A.fillers.total?esc(A.fillers.list.slice(0,2).map(x=>x.label+' ×'+x.n).join('，')):'几乎没有')
+   +m('词汇多样度','<span>'+Math.round(A.mattr*100)+'</span>','越高说明重复越少，70 以上不错')
+   +m('衔接手段','<span>'+A.conn.distinct+'</span><small>种</small>','共 '+A.conn.total+' 次，'+A.conn.per100.toFixed(1)+' / 100 词')
+   +m('句式线索','<span>'+A.cx.fams.length+'</span><small>/ 7 类</small>',A.cx.fams.length?esc(A.cx.fams.slice(0,3).join('、')):'以简单句为主')
+   +'</div>';
+}
+function tipsHTML(A){
+  let h='<div class="sec"><h3>先改这三件事</h3><ol class="tips">'+A.tips.map(t=>'<li><div><b>'+esc(t.t)+'</b><p>'+esc(t.b)+'</p></div></li>').join('')+'</ol></div>';
+  if(A.goods.length) h+='<div class="sec"><h3>已经做得不错</h3><ul class="good">'+A.goods.map(g=>'<li>'+esc(g)+'</li>').join('')+'</ul></div>';
+  if(A.adv.length) h+='<div class="sec"><h3>你用到的较长词</h3><p class="muted" style="margin:0">'+esc(A.adv.join('  ·  '))+'</p></div>';
+  return h;
+}
+function reviewHTML(A){
+  const rep=new Set();
+  if(!A.empty){A.repeated.forEach(x=>rep.add(x.w));A.weak.forEach(x=>rep.add(x.w))}
+  let h='<div class="sec"><h3>逐题回顾</h3><p class="legend"><mark class="f">口头语</mark>　<mark class="r">重复或偏弱用词</mark>　转写有误可以点“修正转写”，再重新分析。</p>';
+  S.answers.forEach((a,i)=>{
+    const empty=!a.text;
+    const open=empty;
+    h+='<article class="rv"><div class="rv-h"><span class="mono">Q'+(i+1)+' · 用时 '+a.sec+' 秒 · '+tokenize(a.text).length+' 词</span><button class="lnk" data-edit="'+i+'">修正转写</button></div>'
+     +'<p class="rv-q">'+esc(a.q)+'</p>'
+     +'<p class="rv-t'+(empty?' empty':'')+'">'+(empty?(a.mode==='voice'?'没有转写出文字（浏览器不支持转写，或没有听到声音）。录音还在，可以在下面补充你说的内容。':'这一题没有写内容。'):highlight(a.text,rep))+'</p>'
+     +(a.audio?'<audio controls preload="none" src="'+a.audio+'"></audio>':'')
+     +'<div class="edit" id="edit'+i+'"'+(open?'':' hidden')+'><textarea id="ed'+i+'" rows="4">'+esc(a.text)+'</textarea><button class="btn" data-apply="'+i+'">重新分析</button></div></article>';
+  });
+  return h+'</div>';
+}
+function checklistHTML(){
+  const c=S.card;
+  const items=c.say.concat([c.expl.replace(/^and /,'')]);
+  const n=items.filter((_,i)=>S.chk[i]).length;
+  return '<div class="sec"><h3>对照提示卡自查</h3><fieldset class="chk"><legend class="mono">你讲到了哪几点？ 已覆盖 '+n+' / '+items.length+'</legend>'
+    +items.map((x,i)=>'<label><input type="checkbox" data-chk="'+i+'"'+(S.chk[i]?' checked':'')+'><span>'+esc(x)+'</span></label>').join('')+'</fieldset></div>';
+}
+function aiBox(){
+  return '<div class="sec"><h3>请 Claude 当一次考官</h3><div class="ai"><p class="muted" style="margin:0 0 14px">把你的回答交给 Claude，按流利连贯、词汇、语法三项打分，并给出改写示范。会使用你自己的 Claude 额度，首次需要你点头允许。</p><button class="btn" id="aiBtn">开始阅卷</button><div class="ai-out" id="aiOut" aria-live="polite"></div></div></div>';
+}
+function ctaHTML(){
+  return '<div class="cta"><p>'+esc(BRAND.cta)+'</p>'+(BRAND.contact?'<div class="actions" style="margin-top:0"><span class="mono" id="contactTxt">'+esc(BRAND.contact)+'</span><button class="btn" data-act="copy">复制联系方式</button></div>':'')+'</div>';
+}
+function renderReport(){
+  const p=S.part,cfg=CFG[p];
+  const A=analyze(S.answers,cfg);S.A=A;
+  const voice=S.answers.some(a=>a.mode==='voice');
+  let h='<p class="mono eyebrow2">Report · Part '+p+' · '+(voice?'语音转写':'文字作答')+'</p><h2 class="rh">考后点评</h2>';
+  if(A.empty) h+='<div class="notice">收到的文字不足 8 个词，暂时无法分析。请在下面的“逐题回顾”里补充你说的内容，再点“重新分析”。</div>';
+  else h+=verdictHTML(A)+metricsHTML(A,cfg)+tipsHTML(A);
+  h+=reviewHTML(A);
+  if(p===2) h+=checklistHTML();
+  if(!A.empty&&S.sample) h+=aiBox();
+  h+=ctaHTML();
+  h+='<div class="actions" style="margin-top:36px"><button class="btn primary" data-act="again">再抽一题</button><button class="btn" data-act="lobby">换个 Part</button></div>';
+  $('#s-report').innerHTML=h;
+}
+
+/* ---------- Claude as examiner ---------- */
+function aiErr(code){
+  return ({not_granted:'你没有允许使用 Claude，这项功能暂时不可用。',sampling_disabled:'这个账号暂时不能使用 Claude。',rate_limited:'调用太频繁，或额度已用完。请稍后再点一次。',invalid_json:'Claude 的回复格式出了问题，请再点一次。',cancelled:'已停止。',session_expired:'登录已过期，请刷新页面后重试。'})[code]||'连接出了问题，请稍后手动再试一次。';
+}
+function aiHTML(r){
+  const n=v=>(typeof v==='number'&&isFinite(v))?v.toFixed(1):'—';
+  let h='<div class="chips"><span>FC<b>'+n(r.fc)+'</b></span><span>LR<b>'+n(r.lr)+'</b></span><span>GRA<b>'+n(r.gra)+'</b></span><span>Overall<b>'+esc(r.overall==null?'—':r.overall)+'</b></span></div>';
+  if(r.summary) h+='<p style="margin:0">'+esc(r.summary)+'</p>';
+  if(Array.isArray(r.strengths)&&r.strengths.length) h+='<ul class="good">'+r.strengths.map(s=>'<li>'+esc(s)+'</li>').join('')+'</ul>';
+  if(Array.isArray(r.fixes)) h+=r.fixes.slice(0,4).map(f=>'<div class="fix"><p class="muted">'+esc(f.why||'')+'</p><p class="b">'+esc(f.before||'')+'</p><p class="a">'+esc(f.after||'')+'</p></div>').join('');
+  if(r.model) h+='<div><p class="mono muted" style="margin:0 0 8px">Band 7 参考说法</p><blockquote>'+esc(r.model)+'</blockquote></div>';
+  h+='<p class="fine">发音无法从文字判断；转写里的标点和识别错误没有被扣分。</p>';
+  return h;
+}
+async function runAI(){
+  const out=$('#aiOut'),btn=$('#aiBtn'),A=S.A;
+  if(!S.sample||!A||A.empty) return;
+  btn.disabled=true;
+  out.innerHTML='<p class="muted" style="margin:0">考官正在阅卷，通常需要 10–40 秒…</p><div><button class="btn" id="aiStop">停止</button></div>';
+  const ctl=new AbortController();$('#aiStop').onclick=()=>ctl.abort();
+  const p=S.part,c=CFG[p],voice=S.answers.some(a=>a.mode==='voice');
+  const items=S.answers.map((a,i)=>'Question '+(i+1)+': '+a.q+'\nAnswer ('+a.sec+' s): '+(a.text||'(no answer)')).join('\n\n');
+  const prompt='You are an experienced IELTS Speaking examiner and coach. A Chinese-speaking candidate just did IELTS Speaking Part '+p+' ('+c.label+'). Below are the questions and the candidate\'s answers as '+(voice?'a transcript from automatic speech recognition (no punctuation, may contain recognition errors; do not penalise those)':'typed text')+'.\n\n'+items+'\n\nScore ONLY Fluency & Coherence, Lexical Resource and Grammatical Range & Accuracy, each from 0 to 9 in 0.5 steps. Do not score Pronunciation, it cannot be judged from text. Be realistic and slightly strict.\n\nReply with only one JSON object in this shape: {"fc":6.0,"lr":5.5,"gra":6.0,"overall":"6.0","summary":"两句中文总评","strengths":["中文要点","中文要点"],"fixes":[{"why":"中文说明","before":"a real phrase quoted from the answer","after":"a better English version"}],"model":"A Band 7 style answer to the weakest question, English only, at most '+(p===2?170:80)+' words"}\nGive 3 to 4 items in "fixes". Write "why", "summary" and "strengths" in Chinese.';
+  try{
+    const r=await S.sample.json(prompt,{signal:ctl.signal,cache:false});
+    out.innerHTML=aiHTML(r||{});
+  }catch(e){
+    out.innerHTML='<p class="muted" style="margin:0">'+esc(aiErr(e&&e.code))+'</p>';
+  }finally{btn.disabled=false}
+}
+
+/* ---------- events ---------- */
+$$('.part').forEach(b=>b.addEventListener('click',()=>{S.part=+b.dataset.part;$$('.part').forEach(x=>x.setAttribute('aria-checked',String(x===b)))}));
+$('#typedOnly').addEventListener('change',e=>{S.forceTyped=e.target.checked;envNote()});
+$('#drawBtn').addEventListener('click',startSession);
+$('#s-stage').addEventListener('click',e=>{
+  const b=e.target.closest('[data-act]');if(!b) return;
+  const a=b.dataset.act;
+  if(a==='go') beginAnswer(false);
+  else if(a==='skip') beginAnswer(false);
+  else if(a==='done') finishAnswer(false);
+  else if(a==='quit') quit();
+});
+$('#s-report').addEventListener('click',e=>{
+  const t=e.target.closest('button');if(!t) return;
+  if(t.dataset.edit!=null){const b=$('#edit'+t.dataset.edit);b.hidden=!b.hidden;return}
+  if(t.dataset.apply!=null){
+    const i=+t.dataset.apply;S.answers[i].text=$('#ed'+i).value.trim();
+    const y=window.scrollY;renderReport();window.scrollTo(0,y);return;
+  }
+  if(t.id==='aiBtn'){runAI();return}
+  const a=t.dataset.act;
+  if(a==='again'){S.phase='idle';startSession()}
+  else if(a==='lobby'){S.phase='idle';show('s-lobby')}
+  else if(a==='copy'){
+    const txt=BRAND.contact;
+    if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(()=>toast('已复制'),()=>toast('请长按文字手动复制'));
+    else toast('请长按文字手动复制');
+  }
+});
+$('#s-report').addEventListener('change',e=>{
+  const i=e.target.dataset&&e.target.dataset.chk;if(i==null) return;
+  S.chk[+i]=e.target.checked;
+  const items=S.card.say.length+1;
+  const n=S.chk.filter(Boolean).length;
+  const lg=$('.chk legend');if(lg) lg.textContent='你讲到了哪几点？ 已覆盖 '+n+' / '+items;
+});
+
+$('#foot-brand').textContent=BRAND.name;
+envNote();
+(async()=>{
+  try{if(window.claude&&window.claude.use) S.sample=await window.claude.use('sample')}catch(e){S.sample=null}
+  if(S.sample&&!$('#s-report').hidden&&S.A&&!S.A.empty){const y=window.scrollY;renderReport();window.scrollTo(0,y)}
+})();
+})();
+</script>
+</body></html>
